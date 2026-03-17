@@ -1,0 +1,37 @@
+# ============================================================
+# AIリスクコンサル 自動化システム - cron設定
+# ============================================================
+# インストール方法:
+#   crontab /path/to/automation/crontab.txt
+#
+# 環境変数は .env を source するか、cronの中で設定
+# ============================================================
+
+SHELL=/bin/bash
+# .envファイルを読み込む共通前処理
+# 実際のパスに書き換えてください
+AUTOMATION_DIR=/home/user/ai-leaning/automation
+ENV_FILE=/home/user/ai-leaning/automation/.env
+
+# ===== ブログ記事自動生成・投稿 =====
+# 毎日 6:00 に1記事を自動生成・WordPress投稿
+0 6 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task blog >> logs/cron_blog.log 2>&1
+
+# ===== AIニュースチェック → SNS投稿 =====
+# 毎日 8:00, 12:00, 18:00 の3回（各2-3件処理）
+0 8 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task news_sns >> logs/cron_news.log 2>&1
+0 12 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task news_sns >> logs/cron_news.log 2>&1
+0 18 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task news_sns >> logs/cron_news.log 2>&1
+
+# ===== AIリスク関連SNS投稿 =====
+# 毎日 9:00 と 15:00 の2回投稿
+0 9 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task risk_sns >> logs/cron_risk.log 2>&1
+0 15 * * * cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task risk_sns >> logs/cron_risk.log 2>&1
+
+# ===== 営業メール =====
+# 平日10:00 に企業リストアップ+メール生成（キューに入れる）
+0 10 * * 1-5 cd $AUTOMATION_DIR && set -a && source $ENV_FILE && set +a && python3 run_all.py --task sales >> logs/cron_sales.log 2>&1
+
+# ===== ログローテーション =====
+# 毎月1日に古いログを圧縮
+0 0 1 * * find $AUTOMATION_DIR/logs -name "*.log" -mtime +30 -exec gzip {} \;
