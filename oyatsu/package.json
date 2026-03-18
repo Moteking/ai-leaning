@@ -20,6 +20,9 @@
     "stripe": "^20.4.1",
     "zustand": "^5.0.12"
   },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
