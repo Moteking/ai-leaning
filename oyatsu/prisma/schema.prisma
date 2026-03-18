@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// ユーザー
+// ========================================
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parents        Parent[]
+  cartItems      CartItem[]
+  orders         Order[]
+  calendarEvents CalendarEvent[]
+  splitRequests  SplitRequest[]
+}
+
+// ========================================
+// 親プロフィール
+// ========================================
+model Parent {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  relation     String  // "mother" | "father"
+  name         String
+  age          Int
+  livingAlone  Boolean @default(false)
+  healthStatus String  // "healthy" | "somewhat" | "needs_care"
+  hobbies      String  // JSON array stored as string
+  region       String
+  birthday     String? // MM-DD format
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ========================================
+// 商品カテゴリ
+// ========================================
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  emoji       String
+  description String
+  sortOrder   Int       @default(0)
+  products    Product[]
+}
+
+// ========================================
+// 商品
+// ========================================
+model Product {
+  id              String   @id @default(cuid())
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id])
+  name            String
+  description     String
+  longDescription String?
+  price           Int
+  image           String
+  tags            String   // JSON array
+  targetAge       String
+  targetGender    String
+  healthNote      String?
+  popularity      Int      @default(0)
+  isNew           Boolean  @default(false)
+  inStock         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+}
+
+// ========================================
+// レビュー
+// ========================================
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  author    String
+  age       Int?
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+// ========================================
+// カート
+// ========================================
+model CartItem {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  quantity     Int     @default(1)
+  message      String?
+  giftWrapping Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ========================================
+// 注文
+// ========================================
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  totalAmount     Int
+  status          String   @default("pending")
+  shippingName    String?
+  shippingAddress String?
+  shippingPhone   String?
+  message         String?
+  stripeSessionId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items         OrderItem[]
+  splitRequests SplitRequest[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Int
+}
+
+// ========================================
+// 兄弟割り勘
+// ========================================
+model SplitRequest {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id])
+  totalAmount Int
+  splitCount  Int
+  shareLink   String   @unique
+  createdAt   DateTime @default(now())
+
+  participants SplitParticipant[]
+}
+
+model SplitParticipant {
+  id             String       @id @default(cuid())
+  splitRequestId String
+  splitRequest   SplitRequest @relation(fields: [splitRequestId], references: [id])
+  name           String
+  email          String?
+  amount         Int
+  paid           Boolean      @default(false)
+  paidAt         DateTime?
+}
+
+// ========================================
+// 親孝行カレンダー
+// ========================================
+model CalendarEvent {
+  id             String  @id @default(cuid())
+  userId         String
+  user           User    @relation(fields: [userId], references: [id])
+  title          String
+  date           String  // MM-DD format
+  type           String
+  parentRelation String?
+  reminder       Boolean @default(true)
+  reminderDays   Int     @default(14)
+  notes          String?
+  createdAt      DateTime @default(now())
+}
