@@ -3,128 +3,107 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #0a0a0f;
-  --color-surface: #13131a;
-  --color-surface-2: #1a1a24;
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-text: #e8e8ed;
-  --color-text-secondary: #8b8b9e;
-  --color-accent: #6c5ce7;
-  --color-accent-glow: rgba(108, 92, 231, 0.3);
-  --color-success: #00d2a0;
-  --color-warning: #ffb347;
-  --color-danger: #ff6b6b;
-  --color-pink: #fd79a8;
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-2: #141414;
+  --surface-3: #1c1c1e;
+  --border: rgba(255,255,255,0.08);
+  --text: #f5f5f7;
+  --text-2: #98989f;
+  --text-3: #48484a;
+  --accent: #6c5ce7;
+  --accent-2: #a29bfe;
+  --green: #30d158;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+  --pink: #ff375f;
+  --blue: #0a84ff;
+  --teal: #64d2ff;
 }
 
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scrollbar-width: none;
-}
-*::-webkit-scrollbar { display: none; }
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Hiragino Sans',sans-serif;
+  overscroll-behavior:none;
 }
 
-/* Glass morphism */
-.glass {
-  background: rgba(19, 19, 26, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
-}
-.glass-light {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-}
+/* Glass */
+.glass{background:rgba(28,28,30,0.75);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--border)}
+.glass-heavy{background:rgba(10,10,10,0.85);backdrop-filter:blur(50px) saturate(200%);-webkit-backdrop-filter:blur(50px) saturate(200%)}
 
-/* Glow effects */
-.glow-accent {
-  box-shadow: 0 0 20px var(--color-accent-glow), 0 0 60px rgba(108, 92, 231, 0.1);
+/* Gradients */
+.grad-text{background:linear-gradient(135deg,#6c5ce7,#a29bfe,#ff375f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad-card{background:linear-gradient(135deg,rgba(108,92,231,0.12),rgba(255,55,95,0.08))}
+
+/* Glow */
+.glow{box-shadow:0 0 24px rgba(108,92,231,0.4),0 8px 32px rgba(0,0,0,0.5)}
+.glow-green{box-shadow:0 0 20px rgba(48,209,88,0.3)}
+.glow-pink{box-shadow:0 0 20px rgba(255,55,95,0.3)}
+
+/* Story ring */
+.story-ring{
+  background:conic-gradient(#ff375f,#ff9f0a,#ff375f);
+  padding:2px;
+  border-radius:9999px;
 }
-.glow-success {
-  box-shadow: 0 0 20px rgba(0, 210, 160, 0.3);
-}
-.glow-pink {
-  box-shadow: 0 0 20px rgba(253, 121, 168, 0.3);
-}
-.text-gradient {
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe, #fd79a8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.story-ring-seen{
+  background:var(--surface-3);
+  padding:2px;
+  border-radius:9999px;
 }
 
 /* Animations */
-@keyframes slide-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes slide-up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slide-down{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fade-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-in-fast{from{opacity:0}to{opacity:1}}
+@keyframes scale-in{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes scale-pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes heart-burst{
+  0%{transform:scale(0);opacity:1}
+  50%{transform:scale(1.4);opacity:1}
+  100%{transform:scale(1);opacity:0}
 }
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fade-in-fast {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes scale-in {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px var(--color-accent-glow); }
-  50% { box-shadow: 0 0 40px var(--color-accent-glow), 0 0 80px rgba(108, 92, 231, 0.15); }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-@keyframes progress-fill {
-  from { width: 0; }
-}
-@keyframes check-draw {
-  from { stroke-dashoffset: 24; }
-  to { stroke-dashoffset: 0; }
-}
-@keyframes ripple {
-  0% { transform: scale(0); opacity: 0.6; }
-  100% { transform: scale(4); opacity: 0; }
-}
+@keyframes spin-slow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes pulse-soft{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes progress-grow{from{width:0%}}
+@keyframes typing{0%,80%{opacity:0.3}40%{opacity:1}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes ripple{0%{transform:scale(0);opacity:0.5}100%{transform:scale(3);opacity:0}}
 
-.animate-slide-up { animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-fade-in { animation: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-fade-in-fast { animation: fade-in-fast 0.3s ease; }
-.animate-scale-in { animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-spin-slow { animation: spin-slow 3s linear infinite; }
+.ani-slide-up{animation:slide-up .4s cubic-bezier(.16,1,.3,1)}
+.ani-slide-down{animation:slide-down .4s cubic-bezier(.16,1,.3,1)}
+.ani-fade{animation:fade-in .5s cubic-bezier(.16,1,.3,1) both}
+.ani-fade-fast{animation:fade-in-fast .25s ease both}
+.ani-scale{animation:scale-in .4s cubic-bezier(.34,1.56,.64,1) both}
+.ani-pop{animation:scale-pop .35s cubic-bezier(.34,1.56,.64,1)}
+.ani-heart{animation:heart-burst .6s cubic-bezier(.34,1.56,.64,1) forwards}
+.ani-spin{animation:spin-slow 2s linear infinite}
+.ani-pulse{animation:pulse-soft 1.5s ease infinite}
+.ani-float{animation:float 3s ease-in-out infinite}
+.ani-typing span:nth-child(1){animation:typing 1.2s infinite 0s}
+.ani-typing span:nth-child(2){animation:typing 1.2s infinite .2s}
+.ani-typing span:nth-child(3){animation:typing 1.2s infinite .4s}
 
-/* Stagger children */
-.stagger > *:nth-child(1) { animation-delay: 0ms; }
-.stagger > *:nth-child(2) { animation-delay: 60ms; }
-.stagger > *:nth-child(3) { animation-delay: 120ms; }
-.stagger > *:nth-child(4) { animation-delay: 180ms; }
-.stagger > *:nth-child(5) { animation-delay: 240ms; }
-.stagger > *:nth-child(6) { animation-delay: 300ms; }
-.stagger > *:nth-child(7) { animation-delay: 360ms; }
-.stagger > *:nth-child(8) { animation-delay: 420ms; }
+/* Stagger */
+.stagger>*:nth-child(1){animation-delay:0ms}
+.stagger>*:nth-child(2){animation-delay:50ms}
+.stagger>*:nth-child(3){animation-delay:100ms}
+.stagger>*:nth-child(4){animation-delay:150ms}
+.stagger>*:nth-child(5){animation-delay:200ms}
+.stagger>*:nth-child(6){animation-delay:250ms}
+.stagger>*:nth-child(7){animation-delay:300ms}
+.stagger>*:nth-child(8){animation-delay:350ms}
+
+/* Hide scrollbar but keep functionality */
+.no-scroll::-webkit-scrollbar{display:none}
+
+/* Safe area inset for iOS */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+}
