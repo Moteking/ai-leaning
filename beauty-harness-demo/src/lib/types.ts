@@ -49,3 +49,26 @@ export interface AutomationLog {
   timestamp: string
   status: 'success' | 'pending'
 }
+
+export interface GalleryPost {
+  id: string
+  imageGradient: string
+  styleName: string
+  stylist: string
+  likes: number
+  comments: number
+  tags: string[]
+  description: string
+  treatment: string
+  price: number
+  duration: string
+}
+
+export interface Stylist {
+  id: string
+  name: string
+  title: string
+  rating: number
+  reviewCount: number
+  speciality: string
+}
