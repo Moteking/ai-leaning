@@ -4,22 +4,16 @@
 """
 
 import http.server
-import json
 import os
 import sys
+from string import Template
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from datetime import datetime, date
-from dashboard import StoreOperationsDashboard, run_demo
-from models.base import (
-    CouponType, MemberTier, ShelfZone,
-    Store, SKU, Member, SalesTransaction
-)
-
 PORT = 8080
 
-HTML_TEMPLATE = """<!DOCTYPE html>
+HTML_TEMPLATE = Template("""<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -96,11 +90,11 @@ tr:hover td { background: #334155; }
   <div class="subtitle">福岡天神店 (ST-001) | 売場面積 500㎡ | 什器30台 | レポート期間: 2026年4月</div>
   <div class="health-bar">
     <div>
-      <div class="health-score {health_class}">{health_score}</div>
+      <div class="health-score $health_class">$health_score</div>
       <div class="health-label">ヘルススコア / 100</div>
     </div>
     <div>
-      <div class="health-assessment {assess_class}">{assessment}</div>
+      <div class="health-assessment $assess_class">$assessment</div>
     </div>
   </div>
 </div>
@@ -110,22 +104,22 @@ tr:hover td { background: #334155; }
 <div class="kpi-grid">
   <div class="kpi-card">
     <div class="label">総売上</div>
-    <div class="value" style="color:#60a5fa">¥{total_sales}</div>
+    <div class="value" style="color:#60a5fa">¥$total_sales</div>
     <div class="label">2026年4月</div>
   </div>
   <div class="kpi-card">
     <div class="label">ロス率</div>
-    <div class="value" style="color:{loss_color}">{loss_rate}%</div>
+    <div class="value" style="color:$loss_color">$loss_rate%</div>
     <div class="label">業界平均: 2.0%</div>
   </div>
   <div class="kpi-card">
     <div class="label">実施中施策</div>
-    <div class="value" style="color:#c084fc">{active_promos}</div>
+    <div class="value" style="color:#c084fc">$active_promos</div>
     <div class="label">セール+ポイント+クーポン</div>
   </div>
   <div class="kpi-card">
     <div class="label">棚割最適化</div>
-    <div class="value" style="color:{opt_color}">{opt_score}/100</div>
+    <div class="value" style="color:$opt_color">$opt_score/100</div>
     <div class="label">ゴールデンゾーン配置</div>
   </div>
 </div>
@@ -135,7 +129,7 @@ tr:hover td { background: #334155; }
 <!-- 課題・アラート -->
 <div class="card full-width">
   <h2>課題・リスクアラート</h2>
-  {alerts_html}
+  $alerts_html
 </div>
 
 <!-- プロモーション管理 -->
@@ -167,10 +161,10 @@ tr:hover td { background: #334155; }
 <!-- ロス率分析 -->
 <div class="card">
   <h2>ロス率分析</h2>
-  <div class="stat-row"><span class="stat-label">総売上</span><span class="stat-value">¥{total_sales}</span></div>
-  <div class="stat-row"><span class="stat-label">総ロス金額</span><span class="stat-value danger">¥{total_loss}</span></div>
-  <div class="stat-row"><span class="stat-label">ロス率</span><span class="stat-value danger">{loss_rate}%</span></div>
-  <div class="stat-row"><span class="stat-label">判定</span><span class="stat-value"><span class="badge badge-danger">{severity}</span></span></div>
+  <div class="stat-row"><span class="stat-label">総売上</span><span class="stat-value">¥$total_sales</span></div>
+  <div class="stat-row"><span class="stat-label">総ロス金額</span><span class="stat-value danger">¥$total_loss</span></div>
+  <div class="stat-row"><span class="stat-label">ロス率</span><span class="stat-value danger">$loss_rate%</span></div>
+  <div class="stat-row"><span class="stat-label">判定</span><span class="stat-value"><span class="badge badge-danger">$severity</span></span></div>
 
   <h3>ロス種別内訳</h3>
   <table>
@@ -200,12 +194,12 @@ tr:hover td { background: #334155; }
   <h2>PDCAサイクル管理</h2>
   <div class="stat-row"><span class="stat-label">対象施策</span><span class="stat-value">スプリングセール シューズカテゴリ</span></div>
   <div class="stat-row"><span class="stat-label">目標KPI</span><span class="stat-value">ロス率 1.5%以下</span></div>
-  <div class="stat-row"><span class="stat-label">実績</span><span class="stat-value danger">{loss_rate}%</span></div>
+  <div class="stat-row"><span class="stat-label">実績</span><span class="stat-value danger">$loss_rate%</span></div>
 
   <div class="pdca-flow">
     <div class="pdca-step pdca-plan"><b>Plan</b><br>値引率30%以下<br>日次モニタリング</div>
     <div class="pdca-step pdca-do"><b>Do</b><br>セール開始<br>4/1〜4/30</div>
-    <div class="pdca-step pdca-check"><b>Check</b><br>ロス率{loss_rate}%<br>目標未達</div>
+    <div class="pdca-step pdca-check"><b>Check</b><br>ロス率$loss_rate%<br>目標未達</div>
     <div class="pdca-step pdca-act"><b>Act</b><br>値引率25%以下へ<br>対象SKU限定</div>
   </div>
 
@@ -218,20 +212,20 @@ tr:hover td { background: #334155; }
 <!-- プラノグラム -->
 <div class="card">
   <h2>プラノグラム（棚割）最適化</h2>
-  <div class="stat-row"><span class="stat-label">最適化スコア</span><span class="stat-value {opt_val_class}">{opt_score}/100</span></div>
+  <div class="stat-row"><span class="stat-label">最適化スコア</span><span class="stat-value $opt_val_class">$opt_score/100</span></div>
   <div class="stat-row"><span class="stat-label">ゴールデンゾーン商品数</span><span class="stat-value">2商品</span></div>
   <div class="stat-row"><span class="stat-label">ゴールデンゾーン平均単価</span><span class="stat-value" style="color:#22c55e">¥38,500</span></div>
 
   <h3>什器 入口正面A列 (ゴンドラ 180x200cm)</h3>
   <div class="shelf-visual">
-    <div class="shelf-upper">上段<br><b>ウェア DRI-FIT</b><br>¥6,500 × 3face</div>
+    <div class="shelf-upper">上段<br><b>ウェア DRI-FIT</b><br>¥6,500 x 3face</div>
     <div class="shelf-upper" style="opacity:0.3"></div>
-    <div class="shelf-golden">★ ゴールデン<br><b>ゴルフクラブ ドライバー</b><br>¥55,000 × 2face</div>
-    <div class="shelf-golden">★ ゴールデン<br><b>バスケシューズ AIR</b><br>¥22,000 × 3face</div>
-    <div class="shelf-middle">中段<br><b>ランニングシューズ Pro</b><br>¥15,000 × 4face</div>
-    <div class="shelf-middle">中段<br><b>ヨガマット プレミアム</b><br>¥8,500 × 3face</div>
-    <div class="shelf-lower">下段<br><b>テニスラケット PRO STAFF</b><br>¥28,000 × 2face</div>
-    <div class="shelf-lower">下段<br><b>サッカーボール 5号球</b><br>¥4,500 × 4face</div>
+    <div class="shelf-golden">★ ゴールデン<br><b>ゴルフクラブ ドライバー</b><br>¥55,000 x 2face</div>
+    <div class="shelf-golden">★ ゴールデン<br><b>バスケシューズ AIR</b><br>¥22,000 x 3face</div>
+    <div class="shelf-middle">中段<br><b>ランニングシューズ Pro</b><br>¥15,000 x 4face</div>
+    <div class="shelf-middle">中段<br><b>ヨガマット プレミアム</b><br>¥8,500 x 3face</div>
+    <div class="shelf-lower">下段<br><b>テニスラケット PRO STAFF</b><br>¥28,000 x 2face</div>
+    <div class="shelf-lower">下段<br><b>サッカーボール 5号球</b><br>¥4,500 x 4face</div>
   </div>
 
   <h3 style="margin-top:16px">棚割改善の推奨</h3>
@@ -273,12 +267,12 @@ tr:hover td { background: #334155; }
 </div><!-- grid -->
 
 <div style="text-align:center; padding: 32px; color: #475569; font-size: 12px;">
-  ワールドスポーツ 店舗運営改善システム v1.0 | Generated: {generated_at}
+  ワールドスポーツ 店舗運営改善システム v1.0 | Generated: $generated_at
 </div>
 
 </div><!-- container -->
 </body>
-</html>"""
+</html>""")
 
 
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
@@ -309,7 +303,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             alerts_html += '<div class="alert alert-warn">高単価商品2点（テニスラケット¥28,000、ランニングシューズ¥15,000）がゴールデンゾーン外に配置</div>'
             alerts_html += '<div class="alert alert-info">PDCAサイクル1巡目完了 → 次サイクルで値引率25%以下への引き下げを推奨</div>'
 
-            html = HTML_TEMPLATE.format(
+            html = HTML_TEMPLATE.substitute(
                 health_score=health_score,
                 health_class=health_class,
                 assess_class=assess_class,
