@@ -116,6 +116,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 .period-before{border-color:#cbd5e1;background:#f8fafc}
 .period-during{border-color:#22c55e;background:#f0fdf4}
 .period-after{border-color:#f59e0b;background:#fffbeb}
+.pos-connect{display:flex;align-items:center;gap:12px;padding:16px 20px;background:#f0fdf4;border:2px solid #86efac;border-radius:10px;margin-bottom:20px}
+.pos-connect .pos-dot{width:12px;height:12px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pos-connect .pos-label{font-size:13px;font-weight:600;color:#16a34a}
+.pos-connect .pos-time{font-size:11px;color:#64748b;margin-left:auto}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-bar select,.filter-bar input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff;color:#1e293b}
+.filter-bar select:focus,.filter-bar input:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:12px 0}
+.heatmap-cell{padding:8px 4px;border-radius:4px;text-align:center;font-size:10px;font-weight:600;line-height:1.3}
+.cat-bar{display:flex;align-items:center;gap:8px;margin:6px 0}
+.cat-bar .cat-fill{height:24px;border-radius:4px;display:flex;align-items:center;padding:0 8px;color:#fff;font-size:11px;font-weight:600;min-width:30px}
+.cat-bar .cat-label{font-size:12px;color:#475569;min-width:80px}
 .waterfall{display:flex;align-items:flex-end;gap:4px;height:180px;margin:16px 0}
 .waterfall-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .waterfall-bar .bar{width:100%;max-width:70px;border-radius:4px;text-align:center;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;min-height:24px}
@@ -155,6 +168,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="sidebar-section-label">店舗運営</div>
 <ul class="sidebar-menu">
 <li><a href="#" data-page="page-dashboard" class="active"><span class="icon">📊</span>ダッシュボード</a></li>
+<li><a href="#" data-page="page-pos"><span class="icon">🧾</span>POS・日販データ</a></li>
 <li><a href="#" data-page="page-inventory"><span class="icon">📦</span>在庫管理</a></li>
 <li><a href="#" data-page="page-forecast"><span class="icon">📈</span>需要予測</a></li>
 </ul>
@@ -241,6 +255,259 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <tr><td><strong>新規会員キャンペーン</strong></td><td>4/1〜4/30</td><td class="effect-text">+&yen;186,000</td><td>&yen;60,000</td><td style="color:#16a34a;font-weight:700">3.1x</td><td><span class="badge badge-green">優秀</span></td></tr>
 </tbody>
 </table>
+</div>
+</div>
+
+<!-- Page: POS・日販データ -->
+<div class="page-content" id="page-pos" style="display:none">
+<div class="page-title">🧾 POS・日販データ</div>
+<div class="page-subtitle">POSデータ連動による商品別・カテゴリ別の日販実績と販促効果の可視化</div>
+
+<!-- POS接続ステータス -->
+<div class="pos-connect">
+<div class="pos-dot"></div>
+<div class="pos-label">POS連携中 — スマレジ API v2.0 接続済み</div>
+<div class="pos-time">最終同期: 2026-04-07 23:55:00 | 同期間隔: 15分</div>
+</div>
+
+<!-- 日販KPI -->
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">💰 本日売上（リアルタイム）</div><div class="kpi-value">&yen;287,400</div><div class="kpi-sub up">▲ 昨日同時間比 +15.2%</div></div>
+<div class="kpi-card"><div class="kpi-label">🧾 本日取引数</div><div class="kpi-value">64<span style="font-size:14px;color:#64748b">件</span></div><div class="kpi-sub info">客単価 &yen;4,491</div></div>
+<div class="kpi-card"><div class="kpi-label">📊 今週累計</div><div class="kpi-value">&yen;3,450,000</div><div class="kpi-sub up">▲ 先週比 +8.2%</div></div>
+<div class="kpi-card"><div class="kpi-label">🎯 施策連動売上</div><div class="kpi-value" style="color:#16a34a">&yen;892,000</div><div class="kpi-sub info">全売上の25.9%</div></div>
+</div>
+
+<!-- フィルタ -->
+<div class="filter-bar">
+<select id="pos-period">
+<option>今日</option><option selected>今週（4/1〜4/7）</option><option>先週</option><option>今月</option><option>カスタム期間</option>
+</select>
+<select id="pos-category">
+<option value="all">全カテゴリ</option><option>シューズ</option><option>ウェア</option><option>用品</option><option>ゴルフ</option><option>フィットネス</option>
+</select>
+<select id="pos-promo">
+<option value="all">全取引</option><option>施策対象のみ</option><option>通常販売のみ</option>
+</select>
+<button class="btn btn-green btn-sm" style="margin-left:auto">📥 CSVエクスポート</button>
+</div>
+
+<!-- 日別売上チャート（施策重ね表示） -->
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>日別売上推移 × 施策期間マッピング</div>
+<p style="font-size:11px;color:#64748b;margin-bottom:8px">🟩 通常売上 &nbsp; 🟦 施策連動売上 &nbsp; 🟧 施策期間</p>
+<div class="chart-area" style="height:240px">
+<div class="chart-bar-group">
+<span class="chart-value">&yen;380K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:52px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:48px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/1(火)<br><span style="color:#f59e0b;font-size:9px">●セール</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;350K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:45px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:47px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/2(水)<br><span style="color:#f59e0b;font-size:9px">●セール</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;420K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:62px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:48px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/3(木)<br><span style="color:#f59e0b;font-size:9px">●セール</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;510K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:85px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:49px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/4(金)<br><span style="color:#f59e0b;font-size:9px">●セール</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;680K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:128px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:51px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/5(土)<br><span style="color:#f59e0b;font-size:9px">●セール+Pt</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;720K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:138px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:51px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/6(日)<br><span style="color:#f59e0b;font-size:9px">●セール+Pt</span></div>
+</div>
+<div class="chart-bar-group">
+<span class="chart-value">&yen;390K</span>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:56px">
+<div style="width:100%;height:55px;background:#3b82f6;border-radius:6px 6px 0 0;opacity:.7"></div>
+<div style="width:100%;height:48px;background:#22c55e;border-radius:0 0 2px 2px"></div>
+</div>
+<div class="chart-label">4/7(月)<br><span style="color:#f59e0b;font-size:9px">●セール</span></div>
+</div>
+</div>
+<div class="chart-legend"><span class="leg-actual">通常売上</span><span class="leg-predicted">施策連動売上</span></div>
+</div>
+
+<!-- カテゴリ別日販 -->
+<div class="card">
+<div class="card-title"><span class="icon">📦</span>カテゴリ別 日販実績（今週 4/1〜4/7）</div>
+<table class="data-table">
+<thead><tr><th>カテゴリ</th><th>売上</th><th>構成比</th><th>前週比</th><th>施策売上</th><th>施策比率</th><th>実施中施策</th><th>日販グラフ</th></tr></thead>
+<tbody>
+<tr><td><strong>シューズ</strong></td><td style="font-weight:700">&yen;1,080,000</td><td>31.3%</td><td class="effect-text">+74.2%</td><td style="color:#3b82f6;font-weight:700">&yen;460,000</td><td>42.6%</td><td><span class="badge badge-red">セール26.7%OFF</span> <span class="badge badge-blue">Pt10倍</span></td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:30px">
+<div style="width:8px;height:14px;background:#22c55e;border-radius:2px" title="4/1"></div>
+<div style="width:8px;height:12px;background:#22c55e;border-radius:2px" title="4/2"></div>
+<div style="width:8px;height:16px;background:#22c55e;border-radius:2px" title="4/3"></div>
+<div style="width:8px;height:22px;background:#22c55e;border-radius:2px" title="4/4"></div>
+<div style="width:8px;height:28px;background:#16a34a;border-radius:2px" title="4/5"></div>
+<div style="width:8px;height:30px;background:#16a34a;border-radius:2px" title="4/6"></div>
+<div style="width:8px;height:15px;background:#22c55e;border-radius:2px" title="4/7"></div>
+</div></td></tr>
+<tr><td><strong>ウェア</strong></td><td style="font-weight:700">&yen;650,000</td><td>18.8%</td><td style="color:#64748b">-2.1%</td><td style="color:#3b82f6;font-weight:700">&yen;45,000</td><td>6.9%</td><td><span class="badge badge-blue">クーポン15%OFF</span></td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:30px">
+<div style="width:8px;height:18px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:16px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:17px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:20px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:24px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:22px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:15px;background:#22c55e;border-radius:2px"></div>
+</div></td></tr>
+<tr><td><strong>用品</strong></td><td style="font-weight:700">&yen;420,000</td><td>12.2%</td><td class="effect-text">+5.3%</td><td style="color:#3b82f6;font-weight:700">&yen;44,000</td><td>10.5%</td><td><span class="badge badge-green">テニスフェア10%OFF</span></td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:30px">
+<div style="width:8px;height:12px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:10px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:14px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:16px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:22px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:20px;background:#22c55e;border-radius:2px"></div>
+<div style="width:8px;height:11px;background:#22c55e;border-radius:2px"></div>
+</div></td></tr>
+<tr><td><strong>ゴルフ</strong></td><td style="font-weight:700">&yen;380,000</td><td>11.0%</td><td style="color:#ef4444">-8.2%</td><td style="color:#64748b">-</td><td>0%</td><td><span class="badge badge-gray">施策なし</span></td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:30px">
+<div style="width:8px;height:14px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:12px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:10px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:13px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:16px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:18px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:9px;background:#94a3b8;border-radius:2px"></div>
+</div></td></tr>
+<tr><td><strong>フィットネス</strong></td><td style="font-weight:700">&yen;310,000</td><td>9.0%</td><td class="effect-text">+3.8%</td><td style="color:#64748b">-</td><td>0%</td><td><span class="badge badge-gray">施策なし</span></td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:30px">
+<div style="width:8px;height:10px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:9px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:11px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:12px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:16px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:15px;background:#94a3b8;border-radius:2px"></div>
+<div style="width:8px;height:8px;background:#94a3b8;border-radius:2px"></div>
+</div></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 商品別（SKU別）日販 -->
+<div class="card">
+<div class="card-title"><span class="icon">🏷️</span>商品別（SKU別）日販実績 — 施策対象商品</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">施策が適用されている商品のPOSデータをリアルタイムで表示</p>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>SKU</th><th>商品名</th><th>適用施策</th><th>定価</th><th>販売価格</th><th>今週販売数</th><th>今週売上</th><th>前週売上</th><th>増減</th><th>日別販売数</th></tr></thead>
+<tbody>
+<tr><td>SKU-001</td><td><strong>ランニングシューズ Pro</strong></td><td><span class="badge badge-red">セール26.7%OFF</span></td><td><span style="text-decoration:line-through;color:#94a3b8">&yen;15,000</span></td><td style="color:#16a34a;font-weight:700">&yen;11,000</td><td style="font-weight:700">42個</td><td style="font-weight:700">&yen;462,000</td><td>&yen;180,000</td><td class="effect-text">+156.7%</td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:24px">
+<div style="width:7px;background:#16a34a;border-radius:2px;height:10px" title="4/1: 4個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:8px" title="4/2: 3個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:14px" title="4/3: 5個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:16px" title="4/4: 6個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:24px" title="4/5: 9個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:22px" title="4/6: 10個"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:14px" title="4/7: 5個"></div>
+</div></td></tr>
+<tr><td>SKU-006</td><td><strong>バスケシューズ AIR</strong></td><td><span class="badge badge-red">セール26.7%OFF</span></td><td><span style="text-decoration:line-through;color:#94a3b8">&yen;22,000</span></td><td style="color:#16a34a;font-weight:700">&yen;16,126</td><td style="font-weight:700">15個</td><td style="font-weight:700">&yen;241,890</td><td>&yen;88,000</td><td class="effect-text">+174.9%</td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:24px">
+<div style="width:7px;background:#16a34a;border-radius:2px;height:8px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:6px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:10px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:20px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:24px"></div>
+<div style="width:7px;background:#16a34a;border-radius:2px;height:8px"></div>
+</div></td></tr>
+<tr><td>SKU-007</td><td><strong>テニスラケット PRO STAFF</strong></td><td><span class="badge badge-green">テニスフェア10%OFF</span></td><td><span style="text-decoration:line-through;color:#94a3b8">&yen;28,000</span></td><td style="color:#16a34a;font-weight:700">&yen;25,200</td><td style="font-weight:700">4個</td><td style="font-weight:700">&yen;100,800</td><td>&yen;56,000</td><td class="effect-text">+80.0%</td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:24px">
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:0"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:0"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#3b82f6;border-radius:2px;height:0"></div>
+</div></td></tr>
+<tr><td>SKU-002</td><td><strong>ウェア DRI-FIT</strong></td><td><span class="badge badge-blue">クーポン15%OFF</span></td><td>&yen;6,500</td><td style="color:#16a34a;font-weight:700">&yen;5,525</td><td style="font-weight:700">23個</td><td style="font-weight:700">&yen;127,075</td><td>&yen;104,000</td><td class="effect-text">+22.2%</td>
+<td><div style="display:flex;gap:2px;align-items:flex-end;height:24px">
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:10px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:8px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:12px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:14px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:18px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:20px"></div>
+<div style="width:7px;background:#8b5cf6;border-radius:2px;height:10px"></div>
+</div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 時間帯別ヒートマップ -->
+<div class="card">
+<div class="card-title"><span class="icon">🕐</span>時間帯 × 曜日 売上ヒートマップ（POS実績）</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:8px">濃い緑ほど売上が高い時間帯。施策効果の時間帯分析に活用</p>
+<div style="display:grid;grid-template-columns:60px repeat(7,1fr);gap:3px;font-size:11px">
+<div></div><div style="text-align:center;font-weight:600;color:#64748b">月</div><div style="text-align:center;font-weight:600;color:#64748b">火</div><div style="text-align:center;font-weight:600;color:#64748b">水</div><div style="text-align:center;font-weight:600;color:#64748b">木</div><div style="text-align:center;font-weight:600;color:#64748b">金</div><div style="text-align:center;font-weight:600;color:#ef4444">土</div><div style="text-align:center;font-weight:600;color:#ef4444">日</div>
+<div style="font-size:11px;color:#64748b;text-align:right;padding:4px">10-12時</div>
+<div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;28K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;32K</div><div class="heatmap-cell" style="background:#bbf7d0;color:#166534">&yen;25K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;35K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;42K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;68K</div><div class="heatmap-cell" style="background:#22c55e;color:#fff">&yen;75K</div>
+<div style="font-size:11px;color:#64748b;text-align:right;padding:4px">12-14時</div>
+<div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;35K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;45K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;38K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;48K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;62K</div><div class="heatmap-cell" style="background:#16a34a;color:#fff">&yen;95K</div><div class="heatmap-cell" style="background:#15803d;color:#fff">&yen;102K</div>
+<div style="font-size:11px;color:#64748b;text-align:right;padding:4px">14-16時</div>
+<div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;22K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;28K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;30K</div><div class="heatmap-cell" style="background:#dcfce7;color:#166534">&yen;32K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;45K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;72K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;68K</div>
+<div style="font-size:11px;color:#64748b;text-align:right;padding:4px">16-18時</div>
+<div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;42K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;48K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;40K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;52K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;65K</div><div class="heatmap-cell" style="background:#22c55e;color:#fff">&yen;82K</div><div class="heatmap-cell" style="background:#22c55e;color:#fff">&yen;78K</div>
+<div style="font-size:11px;color:#64748b;text-align:right;padding:4px">18-20時</div>
+<div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;55K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;58K</div><div class="heatmap-cell" style="background:#86efac;color:#166534">&yen;48K</div><div class="heatmap-cell" style="background:#4ade80;color:#fff">&yen;62K</div><div class="heatmap-cell" style="background:#22c55e;color:#fff">&yen;78K</div><div class="heatmap-cell" style="background:#16a34a;color:#fff">&yen;92K</div><div class="heatmap-cell" style="background:#16a34a;color:#fff">&yen;88K</div>
+</div>
+<div class="alert alert-info" style="margin-top:12px">💡 <strong>AI分析:</strong> 土日12-14時が売上ピーク（¥95K-102K/2h）。この時間帯にPOP訴求・スタッフ増員を推奨。平日18-20時も高売上帯 — 仕事帰り層へのターゲティングが有効</div>
+</div>
+
+<!-- POS連携設定 -->
+<div class="card">
+<div class="card-title"><span class="icon">⚙️</span>POS連携設定（デモ）</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:16px">以下のPOSシステムとAPI連携が可能です</p>
+<table class="data-table">
+<thead><tr><th>POSシステム</th><th>連携方式</th><th>同期間隔</th><th>取得データ</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td><strong>スマレジ</strong></td><td>REST API v2.0</td><td>15分</td><td>売上・商品・顧客・在庫</td><td><span class="badge badge-green">● 接続済み</span></td></tr>
+<tr><td><strong>Airレジ</strong></td><td>CSV自動取込</td><td>1時間</td><td>売上・商品</td><td><span class="badge badge-gray">○ 未接続</span></td></tr>
+<tr><td><strong>Square</strong></td><td>REST API v2</td><td>30分</td><td>売上・商品・顧客</td><td><span class="badge badge-gray">○ 未接続</span></td></tr>
+<tr><td><strong>BCPOS</strong></td><td>ファイル連携</td><td>日次</td><td>売上・商品・在庫</td><td><span class="badge badge-gray">○ 未接続</span></td></tr>
+<tr><td><strong>汎用CSV</strong></td><td>手動アップロード</td><td>任意</td><td>カスタム</td><td><span class="badge badge-blue">利用可能</span></td></tr>
+</tbody>
+</table>
+<div style="margin-top:16px;display:flex;gap:12px">
+<button class="btn btn-green">📥 CSVアップロード（デモ）</button>
+<button class="btn btn-outline">⚙️ API設定</button>
+</div>
 </div>
 </div>
 
