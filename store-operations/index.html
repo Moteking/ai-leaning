@@ -108,6 +108,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 .pdca-check{background:#fffbeb;color:#d97706;border:2px solid #fcd34d}
 .pdca-act{background:#faf5ff;color:#7c3aed;border:2px solid #c4b5fd}
 .badge-purple{background:#faf5ff;color:#7c3aed}
+.period-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0}
+.period-card{border-radius:10px;padding:20px;text-align:center;border:2px solid #e2e8f0}
+.period-card h4{font-size:12px;color:#64748b;margin-bottom:8px;font-weight:600}
+.period-card .period-value{font-size:22px;font-weight:800}
+.period-card .period-sub{font-size:11px;margin-top:4px}
+.period-before{border-color:#cbd5e1;background:#f8fafc}
+.period-during{border-color:#22c55e;background:#f0fdf4}
+.period-after{border-color:#f59e0b;background:#fffbeb}
+.waterfall{display:flex;align-items:flex-end;gap:4px;height:180px;margin:16px 0}
+.waterfall-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.waterfall-bar .bar{width:100%;max-width:70px;border-radius:4px;text-align:center;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;min-height:24px}
+.waterfall-bar .wf-label{font-size:10px;color:#64748b;text-align:center;line-height:1.3}
+.impact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:16px 0}
+.impact-card{padding:16px;border-radius:8px;border:1px solid #e2e8f0}
+.impact-card h5{font-size:12px;color:#64748b;margin-bottom:4px;font-weight:600}
+.impact-card .impact-value{font-size:18px;font-weight:800}
+.timeline{position:relative;padding-left:24px;margin:16px 0}
+.timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:#e2e8f0}
+.timeline-item{position:relative;padding:12px 0 12px 16px;border-bottom:1px solid #f1f5f9}
+.timeline-item::before{content:"";position:absolute;left:-20px;top:16px;width:12px;height:12px;border-radius:50%;border:2px solid #22c55e;background:#fff}
+.timeline-item.warn::before{border-color:#f59e0b}
+.timeline-item.danger::before{border-color:#ef4444}
 .alert{padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:13px}
 .alert-danger{background:#fef2f2;border-left:3px solid #ef4444;color:#991b1b}
 .alert-warn{background:#fffbeb;border-left:3px solid #f59e0b;color:#92400e}
@@ -152,6 +174,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <ul class="sidebar-menu">
 <li><a href="#" data-page="page-loss"><span class="icon">📉</span>ロス率分析</a></li>
 <li><a href="#" data-page="page-pdca"><span class="icon">🔄</span>PDCAサイクル</a></li>
+<li><a href="#" data-page="page-verify"><span class="icon">✅</span>施策効果検証</a></li>
 <li><a href="#" data-page="page-planogram"><span class="icon">🗄️</span>プラノグラム</a></li>
 </ul>
 </div>
@@ -721,6 +744,171 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="stat-row"><span class="stat-label">平均達成率</span><span class="stat-value">72.3%</span></div>
 <div class="stat-row"><span class="stat-label">目標達成</span><span class="stat-value">1/3件</span></div>
 <div class="stat-row"><span class="stat-label">傾向</span><span class="stat-value" style="color:#16a34a">改善中</span></div>
+</div>
+</div>
+
+<!-- Page: 施策効果検証 -->
+<div class="page-content" id="page-verify" style="display:none">
+<div class="page-title">✅ 施策効果検証</div>
+<div class="page-subtitle">販促施策の実績データに基づく効果測定・ROI分析・PDCA連携</div>
+
+<!-- 検証サマリーKPI -->
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">📋 検証済み施策</div><div class="kpi-value">5<span style="font-size:14px;color:#64748b">件</span></div><div class="kpi-sub info">今月完了分</div></div>
+<div class="kpi-card"><div class="kpi-label">💰 総増分売上</div><div class="kpi-value" style="color:#16a34a">&yen;892,000</div><div class="kpi-sub up">施策なし比 +26.3%</div></div>
+<div class="kpi-card"><div class="kpi-label">📊 平均ROI</div><div class="kpi-value" style="color:#16a34a">2.4x</div><div class="kpi-sub up">投資対効果</div></div>
+<div class="kpi-card"><div class="kpi-label">⚠️ 反動減検知</div><div class="kpi-value" style="color:#f59e0b">2<span style="font-size:14px;color:#64748b">件</span></div><div class="kpi-sub" style="color:#f59e0b">施策後に売上低下</div></div>
+</div>
+
+<!-- 施策別効果一覧テーブル -->
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>施策別効果検証一覧</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>施策名</th><th>期間</th><th>施策前売上</th><th>施策中売上</th><th>増分売上</th><th>施策コスト</th><th>ROI</th><th>反動減</th><th>判定</th><th>詳細</th></tr></thead>
+<tbody>
+<tr><td><strong>スプリングセール（シューズ）</strong></td><td>4/1〜4/7</td><td>&yen;620,000</td><td>&yen;1,080,000</td><td class="effect-text">+&yen;460,000</td><td>&yen;185,000</td><td style="color:#16a34a;font-weight:700">2.5x</td><td><span class="badge badge-orange">-12%</span></td><td><span class="badge badge-green">成功</span></td><td><button class="btn btn-outline btn-sm" onclick="showDetail('spring')">分析</button></td></tr>
+<tr><td><strong>ポイント10倍（シューズ）</strong></td><td>4/1〜4/7</td><td>&yen;420,000</td><td>&yen;640,000</td><td class="effect-text">+&yen;220,000</td><td>&yen;122,000</td><td style="color:#f59e0b;font-weight:700">1.8x</td><td><span class="badge badge-red">-18%</span></td><td><span class="badge badge-orange">要改善</span></td><td><button class="btn btn-outline btn-sm" onclick="showDetail('point10')">分析</button></td></tr>
+<tr><td><strong>新規会員キャンペーン</strong></td><td>4/1〜4/30</td><td>-</td><td>&yen;186,000</td><td class="effect-text">+&yen;186,000</td><td>&yen;60,000</td><td style="color:#16a34a;font-weight:700">3.1x</td><td><span class="badge badge-green">なし</span></td><td><span class="badge badge-green">優秀</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+<tr><td><strong>在庫処分セール（ヨガマット）</strong></td><td>3/15〜3/31</td><td>&yen;85,000</td><td>&yen;142,000</td><td class="effect-text">+&yen;57,000</td><td>&yen;38,250</td><td style="color:#f59e0b;font-weight:700">1.5x</td><td><span class="badge badge-green">なし</span></td><td><span class="badge badge-orange">普通</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+<tr><td><strong>テニスフェア（棚替え+値引）</strong></td><td>4/8〜4/14</td><td>&yen;68,000</td><td>&yen;112,000</td><td class="effect-text">+&yen;44,000</td><td>&yen;16,800</td><td style="color:#16a34a;font-weight:700">2.6x</td><td><span class="badge badge-gray">測定中</span></td><td><span class="badge badge-green">成功</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 詳細分析: スプリングセール -->
+<div class="card" id="detail-spring">
+<div class="card-title"><span class="icon">🔎</span>詳細分析：スプリングセール（シューズ26.7%OFF）</div>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">① 3期間比較（施策前 → 施策中 → 施策後）</h3>
+<div class="period-compare">
+<div class="period-card period-before">
+<h4>📅 施策前2週間（3/18〜3/31）</h4>
+<div class="period-value">&yen;620,000</div>
+<div class="period-sub">日販 &yen;44,286 / 客数 82人 / 客単価 &yen;7,571</div>
+</div>
+<div class="period-card period-during">
+<h4>🎯 施策中（4/1〜4/7）</h4>
+<div class="period-value" style="color:#16a34a">&yen;1,080,000</div>
+<div class="period-sub" style="color:#16a34a">日販 &yen;154,286 / 客数 148人 / 客単価 &yen;7,297</div>
+</div>
+<div class="period-card period-after">
+<h4>📉 施策後2週間（4/8〜4/21）</h4>
+<div class="period-value" style="color:#f59e0b">&yen;545,600</div>
+<div class="period-sub" style="color:#f59e0b">日販 &yen;38,971 / 客数 70人 / 客単価 &yen;7,794</div>
+</div>
+</div>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">② 増分売上ウォーターフォール分析</h3>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">ベースライン推定: 施策前2週間の日販平均 &yen;44,286 × 7日 = &yen;310,000（施策がなかった場合の推定売上）</p>
+<div class="waterfall">
+<div class="waterfall-bar"><div class="bar" style="height:100px;background:#94a3b8">ベースライン<br>&yen;310K</div><div class="wf-label">施策なし<br>推定売上</div></div>
+<div class="waterfall-bar"><div class="bar" style="height:45px;background:#22c55e">+&yen;385K</div><div class="wf-label">セール<br>直接効果</div></div>
+<div class="waterfall-bar"><div class="bar" style="height:25px;background:#3b82f6">+&yen;75K</div><div class="wf-label">ハロー<br>効果</div></div>
+<div class="waterfall-bar"><div class="bar" style="height:55px;background:#ef4444">-&yen;185K</div><div class="wf-label">施策<br>コスト</div></div>
+<div class="waterfall-bar"><div class="bar" style="height:15px;background:#f59e0b">-&yen;74K</div><div class="wf-label">反動減<br>推定損失</div></div>
+<div class="waterfall-bar"><div class="bar" style="height:60px;background:linear-gradient(180deg,#16a34a,#22c55e)">純増分<br>&yen;201K</div><div class="wf-label"><b>最終<br>純効果</b></div></div>
+</div>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">③ 波及効果・カニバリゼーション分析</h3>
+<div class="impact-grid">
+<div class="impact-card" style="border-color:#22c55e">
+<h5>✅ ハロー効果（他カテゴリへの波及）</h5>
+<div class="impact-value" style="color:#16a34a">+&yen;75,000</div>
+<p style="font-size:12px;color:#64748b;margin-top:4px">シューズ購入者の28%がウェアも同時購入。ソックス・インソールのクロスセル増</p>
+</div>
+<div class="impact-card" style="border-color:#ef4444">
+<h5>⚠️ カニバリゼーション（共食い）</h5>
+<div class="impact-value" style="color:#ef4444">-&yen;32,000</div>
+<p style="font-size:12px;color:#64748b;margin-top:4px">定価購入予定だった既存顧客の一部がセール価格で購入。定価販売機会の損失</p>
+</div>
+<div class="impact-card" style="border-color:#f59e0b">
+<h5>📉 反動減（施策後の売上低下）</h5>
+<div class="impact-value" style="color:#f59e0b">-&yen;74,400</div>
+<p style="font-size:12px;color:#64748b;margin-top:4px">施策後2週間の日販がベースライン比-12%。セール待ち購買の前倒し効果</p>
+</div>
+<div class="impact-card" style="border-color:#3b82f6">
+<h5>👥 新規顧客獲得</h5>
+<div class="impact-value" style="color:#3b82f6">+18人</div>
+<p style="font-size:12px;color:#64748b;margin-top:4px">施策期間中の新規会員登録。うち8人がWeb会員。2回目購入率: 33.3%</p>
+</div>
+</div>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">④ 顧客行動変化</h3>
+<table class="data-table">
+<thead><tr><th>指標</th><th>施策前</th><th>施策中</th><th>施策後</th><th>変化</th><th>評価</th></tr></thead>
+<tbody>
+<tr><td><strong>日次来店客数</strong></td><td>82人/日</td><td>148人/日</td><td>70人/日</td><td style="color:#16a34a;font-weight:700">施策中 +80.5%</td><td><span class="badge badge-green">集客成功</span></td></tr>
+<tr><td><strong>客単価</strong></td><td>&yen;7,571</td><td>&yen;7,297</td><td>&yen;7,794</td><td style="color:#f59e0b;font-weight:700">施策中 -3.6%</td><td><span class="badge badge-orange">やや低下</span></td></tr>
+<tr><td><strong>購入点数/人</strong></td><td>1.3点</td><td>1.8点</td><td>1.2点</td><td style="color:#16a34a;font-weight:700">施策中 +38.5%</td><td><span class="badge badge-green">ついで買い増</span></td></tr>
+<tr><td><strong>新規顧客比率</strong></td><td>8.5%</td><td>12.2%</td><td>6.1%</td><td style="color:#16a34a;font-weight:700">施策中 +3.7pt</td><td><span class="badge badge-green">新規獲得</span></td></tr>
+<tr><td><strong>会員利用率</strong></td><td>62.0%</td><td>78.4%</td><td>65.3%</td><td style="color:#16a34a;font-weight:700">施策中 +16.4pt</td><td><span class="badge badge-green">会員活性化</span></td></tr>
+<tr><td><strong>ロス率</strong></td><td>2.1%</td><td>3.8%</td><td>2.0%</td><td style="color:#ef4444;font-weight:700">施策中 +1.7pt</td><td><span class="badge badge-red">値引ロス増</span></td></tr>
+</tbody>
+</table>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">⑤ ROI算出明細</h3>
+<div class="card" style="background:#f8fafc;box-shadow:none;border:1px solid #e2e8f0">
+<div class="stat-row"><span class="stat-label">A. 施策中売上</span><span class="stat-value">&yen;1,080,000</span></div>
+<div class="stat-row"><span class="stat-label">B. ベースライン売上（施策なし推定）</span><span class="stat-value">&yen;310,000</span></div>
+<div class="stat-row"><span class="stat-label">C. 増分売上（A-B）</span><span class="stat-value" style="color:#16a34a">&yen;770,000</span></div>
+<div class="stat-row"><span class="stat-label">D. ハロー効果（他カテゴリ波及）</span><span class="stat-value" style="color:#16a34a">+&yen;75,000</span></div>
+<div class="stat-row"><span class="stat-label">E. カニバリゼーション（共食い損失）</span><span class="stat-value" style="color:#ef4444">-&yen;32,000</span></div>
+<div class="stat-row"><span class="stat-label">F. 反動減（施策後の売上低下）</span><span class="stat-value" style="color:#ef4444">-&yen;74,400</span></div>
+<div class="stat-row"><span class="stat-label">G. 純増分売上（C+D+E+F）</span><span class="stat-value" style="color:#16a34a;font-size:16px">&yen;738,600</span></div>
+<div class="stat-row" style="border-bottom:2px solid #e2e8f0"><span class="stat-label">H. 施策コスト（値引原資+POP+人件費）</span><span class="stat-value" style="color:#ef4444">&yen;185,000</span></div>
+<div class="stat-row"><span class="stat-label" style="font-weight:700;color:#1e293b">I. 粗利ベースROI（G×粗利率47%÷H）</span><span class="stat-value" style="color:#16a34a;font-size:18px;font-weight:800">1.88x</span></div>
+<div class="stat-row"><span class="stat-label" style="font-weight:700;color:#1e293b">J. 売上ベースROI（G÷H）</span><span class="stat-value" style="color:#16a34a;font-size:18px;font-weight:800">3.99x</span></div>
+</div>
+
+<h3 style="font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px">⑥ AI改善提案（次回施策へのフィードバック）</h3>
+<div class="alert alert-danger">反動減-12%を検知。次回は値引率を20%→15%に抑え、期間を2週間に延長して需要の平準化を推奨</div>
+<div class="alert alert-warn">客単価が-3.6%低下。セール対象を在庫過多SKUに限定し、定価商品との抱き合わせ施策を検討</div>
+<div class="alert alert-warn">ロス率が+1.7pt上昇。次回は日次在庫モニタリングを強化し、セール終了3日前に値引率調整を実施</div>
+<div class="alert alert-info">新規会員+18人の獲得効果は高い。2回目購入促進のフォローアップメール（7日後自動配信）をCRMに設定済み</div>
+<div class="alert alert-info">ハロー効果+¥75,000。シューズセール時にウェア・アクセサリのクロスセルPOPを什器横に設置することを推奨</div>
+
+<div style="margin-top:20px;display:flex;gap:12px">
+<button class="btn btn-green">📤 PDCAに連携</button>
+<button class="btn btn-blue">📊 レポートPDF出力</button>
+<button class="btn btn-outline">📋 次回施策に反映</button>
+</div>
+</div>
+
+<!-- 施策効果タイムライン -->
+<div class="card">
+<div class="card-title"><span class="icon">📅</span>施策効果タイムライン</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">スプリングセール前後の主要イベントと売上変動</p>
+<div class="timeline">
+<div class="timeline-item"><strong>3/18</strong> ベースライン測定開始（施策前2週間）<span style="float:right;color:#64748b;font-size:12px">日販 &yen;44,286</span></div>
+<div class="timeline-item"><strong>3/31</strong> ベースライン測定完了 → 施策前売上確定 &yen;620,000</div>
+<div class="timeline-item"><strong>4/1</strong> スプリングセール開始（26.7%OFF）+ POP設置 + メール配信<span style="float:right;color:#16a34a;font-size:12px;font-weight:700">日販 &yen;142,000 ↑</span></div>
+<div class="timeline-item"><strong>4/3</strong> 売上ピーク日 &yen;198,000（週末効果）<span style="float:right;color:#16a34a;font-size:12px;font-weight:700">新規会員 +8人</span></div>
+<div class="timeline-item"><strong>4/5-4/6</strong> 土日で売上 &yen;380,000（平日の2.5倍）</div>
+<div class="timeline-item"><strong>4/7</strong> セール終了 → 施策中売上確定 &yen;1,080,000</div>
+<div class="timeline-item warn"><strong>4/8-4/10</strong> 反動減検知: 日販 &yen;35,200（ベースライン比-20.5%）<span style="float:right;color:#f59e0b;font-size:12px;font-weight:700">⚠️ 反動減</span></div>
+<div class="timeline-item warn"><strong>4/11-4/14</strong> 日販回復傾向 &yen;41,500（ベースライン比-6.3%）</div>
+<div class="timeline-item"><strong>4/15-4/21</strong> 日販 &yen;43,800 → ほぼベースラインに復帰<span style="float:right;color:#16a34a;font-size:12px">回復完了</span></div>
+<div class="timeline-item"><strong>4/22</strong> 効果検証レポート自動生成 → PDCA Check フェーズに連携</div>
+</div>
+</div>
+
+<!-- 施策別ROI比較 -->
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>施策タイプ別ROI比較</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">過去6ヶ月の施策タイプ別平均ROIと推奨度</p>
+<table class="data-table">
+<thead><tr><th>施策タイプ</th><th>実施回数</th><th>平均ROI</th><th>平均反動減</th><th>新規獲得率</th><th>ロス率影響</th><th>総合評価</th><th>推奨度</th></tr></thead>
+<tbody>
+<tr><td><strong>セール（値引）</strong></td><td>8回</td><td style="color:#16a34a;font-weight:700">2.3x</td><td style="color:#f59e0b">-12.5%</td><td>+3.2pt</td><td style="color:#ef4444">+1.5pt</td><td><span class="badge badge-green">良好</span></td><td>★★★☆☆</td></tr>
+<tr><td><strong>ポイント倍率UP</strong></td><td>5回</td><td style="color:#f59e0b;font-weight:700">1.7x</td><td style="color:#ef4444">-16.8%</td><td>+1.1pt</td><td>+0.2pt</td><td><span class="badge badge-orange">普通</span></td><td>★★☆☆☆</td></tr>
+<tr><td><strong>クーポン配布</strong></td><td>12回</td><td style="color:#16a34a;font-weight:700">2.8x</td><td style="color:#16a34a">-3.2%</td><td>+2.8pt</td><td>+0.5pt</td><td><span class="badge badge-green">優秀</span></td><td>★★★★☆</td></tr>
+<tr><td><strong>会員限定施策</strong></td><td>4回</td><td style="color:#16a34a;font-weight:700">3.5x</td><td style="color:#16a34a">-1.5%</td><td>+5.1pt</td><td>+0.1pt</td><td><span class="badge badge-green">最優秀</span></td><td>★★★★★</td></tr>
+<tr><td><strong>棚替え+連動施策</strong></td><td>3回</td><td style="color:#16a34a;font-weight:700">2.6x</td><td style="color:#16a34a">-2.0%</td><td>+0.5pt</td><td>-0.3pt</td><td><span class="badge badge-green">良好</span></td><td>★★★★☆</td></tr>
+</tbody>
+</table>
+<div class="alert alert-info" style="margin-top:16px">💡 <strong>AI分析結果:</strong> 会員限定施策のROI(3.5x)が最も高く、反動減も最小(-1.5%)。CRMセグメント連携で会員限定施策の比率を高めることを推奨します。一方、ポイント倍率UPはROI(1.7x)が低く反動減(-16.8%)が大きいため、10倍以上の倍率は避け3〜5倍に抑制を推奨。</div>
 </div>
 </div>
 
