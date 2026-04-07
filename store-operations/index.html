@@ -117,7 +117,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="sidebar-section">
 <div class="sidebar-section-label">販促・施策</div>
 <ul class="sidebar-menu">
-<li><a href="#" class="active"><span class="icon">🎯</span>販促レコメンド</a></li>
+<li><a href="#" data-page="page-promo"><span class="icon">🎯</span>販促レコメンド</a></li>
 <li><a href="#" data-page="page-sale"><span class="icon">🏷️</span>セール管理</a></li>
 <li><a href="#" data-page="page-coupon"><span class="icon">🎫</span>クーポン管理</a></li>
 <li><a href="#" data-page="page-birthday"><span class="icon">🎂</span>誕生日施策</a></li>
@@ -959,13 +959,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 </div>
 </div>
 <script>
-document.querySelectorAll('.sidebar-menu a').forEach(function(link){
+// SPA page switching
+document.querySelectorAll('.sidebar-menu a[data-page]').forEach(function(link){
 link.addEventListener('click',function(e){
 e.preventDefault();
+var pageId=this.getAttribute('data-page');
+if(!pageId) return;
 document.querySelectorAll('.sidebar-menu a').forEach(function(l){l.classList.remove('active')});
 this.classList.add('active');
+document.querySelectorAll('.page-content').forEach(function(p){p.style.display='none'});
+var target=document.getElementById(pageId);
+if(target) target.style.display='block';
+window.scrollTo(0,0);
 });
 });
+// Tab switching
 document.querySelectorAll('.tab-btn').forEach(function(btn){
 btn.addEventListener('click',function(){
 var tabId=this.getAttribute('data-tab');
@@ -975,12 +983,19 @@ this.closest('.card').querySelectorAll('.tab-content').forEach(function(tc){tc.c
 document.getElementById(tabId).classList.add('active');
 });
 });
+// POP form toggle
 function togglePopForm(){
 var form=document.getElementById('pop-form');
 form.classList.toggle('show');
 var btn=document.getElementById('btn-new-pop');
-btn.textContent=form.classList.contains('show')?'✕ 閉じる':'＋ 新規POP作成';
+btn.textContent=form.classList.contains('show')?'\u2715 閉じる':'\uff0b 新規POP作成';
 }
+// Show dashboard on load
+(function(){
+document.querySelectorAll('.page-content').forEach(function(p){p.style.display='none'});
+var dash=document.getElementById('page-dashboard');
+if(dash) dash.style.display='block';
+})();
 </script>
 </body>
 </html>
