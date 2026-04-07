@@ -378,6 +378,7 @@ body {
 .btn-dance { background: linear-gradient(135deg, #ffdd57, #f0c040); color: #333; }
 .btn-spin { background: linear-gradient(135deg, #6bff8a, #4ade6a); color: #333; }
 .btn-color { background: linear-gradient(135deg, #b06bff, #9040f0); }
+.btn-music { background: linear-gradient(135deg, #ff8ecf, #e060a0); }
 
 /* メッセージ */
 .message {
@@ -479,51 +480,295 @@ body {
   <button class="action-btn btn-dance" onclick="doDance()">💃 ダンス</button>
   <button class="action-btn btn-spin" onclick="doSpin()">🌀 くるくる</button>
   <button class="action-btn btn-color" onclick="doColor()">🎨 いろかえ</button>
+  <button class="action-btn btn-music" onclick="toggleBGM()">🎵 おんがく</button>
 </div>
 
 <script>
-// Web Audio でかわいい音を鳴らす
+// === Web Audio サウンドエンジン ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playTone(freq, duration, type = 'sine') {
+// リバーブ（残響）を作って音を柔らかくする
+const convolver = audioCtx.createConvolver();
+const reverbGain = audioCtx.createGain();
+reverbGain.gain.value = 0.15;
+const reverbLen = audioCtx.sampleRate * 0.6;
+const reverbBuf = audioCtx.createBuffer(2, reverbLen, audioCtx.sampleRate);
+for (let ch = 0; ch < 2; ch++) {
+  const data = reverbBuf.getChannelData(ch);
+  for (let i = 0; i < reverbLen; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.5);
+  }
+}
+convolver.buffer = reverbBuf;
+convolver.connect(reverbGain);
+reverbGain.connect(audioCtx.destination);
+
+// 基本のトーン再生（リバーブ付き）
+function playTone(freq, duration, type = 'sine', vol = 0.15, useReverb = false) {
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.type = type;
   osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
+  if (useReverb) gain.connect(convolver);
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
 }
 
+// ノイズバースト（シュッ、ポン系の効果音用）
+function playNoise(duration, vol = 0.08) {
+  const bufSize = audioCtx.sampleRate * duration;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 3);
+  }
+  const src = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  src.buffer = buf;
+  gain.gain.value = vol;
+  // バンドパスで音色を変える
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 3000;
+  filter.Q.value = 1;
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  src.start();
+}
+
+// === 効果音 ===
+
+// ジャンプ：ビヨーンと上がる音 + 着地のドスン
 function playJumpSound() {
-  playTone(300, 0.15);
-  setTimeout(() => playTone(500, 0.15), 80);
-  setTimeout(() => playTone(700, 0.2), 160);
+  // ビヨーン上昇音
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.25);
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  gain.connect(convolver);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.35);
+  // バネっぽい倍音
+  playTone(400, 0.2, 'triangle', 0.08);
+  setTimeout(() => playTone(600, 0.15, 'sine', 0.06), 60);
+  // キラッ（頂点）
+  setTimeout(() => {
+    playTone(1200, 0.15, 'sine', 0.06, true);
+    playTone(1500, 0.12, 'sine', 0.04, true);
+  }, 200);
+  // 着地ドスン
+  setTimeout(() => {
+    playNoise(0.12, 0.1);
+    playTone(80, 0.2, 'sine', 0.15);
+  }, 500);
 }
 
+// ダンス：リズミカルなメロディ + パーカッション
 function playDanceSound() {
-  const notes = [523, 587, 659, 698];
-  notes.forEach((n, i) => setTimeout(() => playTone(n, 0.15, 'square'), i * 120));
+  // メロディ（ドレミファソラ）
+  const melody = [523, 587, 659, 784, 880, 784, 659, 523];
+  melody.forEach((n, i) => {
+    setTimeout(() => {
+      playTone(n, 0.12, 'square', 0.08);
+      playTone(n * 2, 0.08, 'sine', 0.03); // オクターブ上でキラキラ
+    }, i * 100);
+  });
+  // パーカッション（タンタンタン）
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => playNoise(0.05, 0.12), i * 200);
+  }
+  // ベースライン
+  const bass = [262, 330, 392, 330];
+  bass.forEach((n, i) => {
+    setTimeout(() => playTone(n, 0.18, 'triangle', 0.1), i * 200);
+  });
 }
 
+// くるくる：上昇スウィープ + キラキラ
 function playSpinSound() {
-  for (let i = 0; i < 8; i++) {
-    setTimeout(() => playTone(400 + i * 80, 0.1, 'triangle'), i * 80);
+  // 連続上昇スウィープ
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.7);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime + 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  gain.connect(convolver);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.8);
+  // キラキラ音を散りばめる
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => {
+      const f = 800 + Math.random() * 1200;
+      playTone(f, 0.1, 'sine', 0.05, true);
+    }, i * 120);
+  }
+  // 最後にシャラーン
+  setTimeout(() => {
+    playTone(1047, 0.3, 'sine', 0.08, true);
+    playTone(1319, 0.3, 'sine', 0.06, true);
+    playTone(1568, 0.3, 'sine', 0.05, true);
+  }, 650);
+}
+
+// いろかえ：魔法っぽいキラキラ音
+function playColorSound() {
+  // シャララーン（アルペジオ）
+  const notes = [523, 659, 784, 1047, 1319];
+  notes.forEach((n, i) => {
+    setTimeout(() => playTone(n, 0.4 - i * 0.05, 'sine', 0.1, true), i * 60);
+  });
+  // キラッ
+  setTimeout(() => playNoise(0.08, 0.06), 250);
+  // 低いベル音
+  playTone(262, 0.5, 'triangle', 0.06, true);
+}
+
+// おなかボタン：楽器っぽい音
+function playBellySound(color) {
+  if (color === 'red') {
+    // 太鼓 ドン！
+    playTone(80, 0.3, 'sine', 0.25);
+    playNoise(0.08, 0.15);
+    setTimeout(() => playTone(60, 0.2, 'sine', 0.1), 50);
+  } else if (color === 'yellow') {
+    // ラッパ パパー！
+    const f = 523;
+    playTone(f, 0.05, 'sawtooth', 0.08);
+    setTimeout(() => {
+      playTone(f, 0.3, 'sawtooth', 0.1);
+      playTone(f * 2, 0.25, 'sine', 0.04);
+    }, 50);
+    setTimeout(() => playTone(f * 1.5, 0.2, 'sawtooth', 0.06), 200);
+  } else {
+    // ベル リーン♪
+    playTone(1047, 0.6, 'sine', 0.12, true);
+    playTone(1319, 0.5, 'sine', 0.08, true);
+    playTone(1568, 0.4, 'sine', 0.05, true);
+    setTimeout(() => playTone(2093, 0.3, 'sine', 0.04, true), 100);
   }
 }
 
-function playColorSound() {
-  playTone(880, 0.1);
-  setTimeout(() => playTone(1100, 0.15), 100);
+// === BGM（かわいいループ曲） ===
+let bgmPlaying = false;
+let bgmInterval = null;
+let bgmGainNode = null;
+
+function createBGM() {
+  bgmGainNode = audioCtx.createGain();
+  bgmGainNode.gain.value = 0.07;
+  bgmGainNode.connect(audioCtx.destination);
+
+  // メロディパターン（きらきら星風のシンプルなメロディ）
+  const melodyPattern = [
+    523, 523, 784, 784, 880, 880, 784, 0,
+    698, 698, 659, 659, 587, 587, 523, 0,
+    784, 784, 698, 698, 659, 659, 587, 0,
+    784, 784, 698, 698, 659, 659, 587, 0,
+    523, 523, 784, 784, 880, 880, 784, 0,
+    698, 698, 659, 659, 587, 587, 523, 0,
+  ];
+
+  // ベースパターン
+  const bassPattern = [
+    262, 0, 330, 0, 349, 0, 392, 0,
+    349, 0, 330, 0, 294, 0, 262, 0,
+    392, 0, 349, 0, 330, 0, 294, 0,
+    392, 0, 349, 0, 330, 0, 294, 0,
+    262, 0, 330, 0, 349, 0, 392, 0,
+    349, 0, 330, 0, 294, 0, 262, 0,
+  ];
+
+  let step = 0;
+  const tempo = 200; // ms per step
+
+  bgmInterval = setInterval(() => {
+    if (!bgmPlaying) return;
+    const t = audioCtx.currentTime;
+    const noteLen = tempo / 1000 * 0.8;
+
+    // メロディ
+    const mNote = melodyPattern[step % melodyPattern.length];
+    if (mNote > 0) {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = mNote;
+      g.gain.setValueAtTime(0.07, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + noteLen);
+      osc.connect(g);
+      g.connect(bgmGainNode);
+      g.connect(convolver);
+      osc.start(t);
+      osc.stop(t + noteLen);
+    }
+
+    // ベース
+    const bNote = bassPattern[step % bassPattern.length];
+    if (bNote > 0) {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = bNote;
+      g.gain.setValueAtTime(0.05, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + noteLen * 1.2);
+      osc.connect(g);
+      g.connect(bgmGainNode);
+      osc.start(t);
+      osc.stop(t + noteLen * 1.2);
+    }
+
+    // 軽いパーカッション（4拍ごと）
+    if (step % 4 === 0) {
+      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.03, audioCtx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+      const src = audioCtx.createBufferSource();
+      const g = audioCtx.createGain();
+      src.buffer = buf;
+      g.gain.value = 0.04;
+      src.connect(g);
+      g.connect(bgmGainNode);
+      src.start(t);
+    }
+
+    step++;
+  }, tempo);
 }
 
-function playBellySound(color) {
-  const freq = color === 'red' ? 523 : color === 'yellow' ? 659 : 784;
-  playTone(freq, 0.3);
-  setTimeout(() => playTone(freq * 1.25, 0.3), 150);
+function toggleBGM() {
+  audioCtx.resume();
+  bgmPlaying = !bgmPlaying;
+  const btn = document.querySelector('.btn-music');
+  if (bgmPlaying) {
+    if (!bgmInterval) createBGM();
+    btn.textContent = '🔇 おんがくとめる';
+    showMessage(['♪♪♪', 'るんるん♪', 'おんがくスタート！']);
+    // BGM開始音
+    playTone(523, 0.15, 'triangle', 0.1, true);
+    setTimeout(() => playTone(659, 0.15, 'triangle', 0.1, true), 100);
+    setTimeout(() => playTone(784, 0.2, 'triangle', 0.1, true), 200);
+  } else {
+    btn.textContent = '🎵 おんがく';
+    showMessage(['おんがくおやすみ', 'しーん...']);
+    // BGM停止音
+    playTone(784, 0.15, 'triangle', 0.08);
+    setTimeout(() => playTone(523, 0.2, 'triangle', 0.08), 120);
+  }
 }
 
 // 星をランダムに配置
