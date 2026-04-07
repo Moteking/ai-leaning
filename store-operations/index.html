@@ -109,39 +109,244 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="sidebar-section">
 <div class="sidebar-section-label">店舗運営</div>
 <ul class="sidebar-menu">
-<li><a href="#"><span class="icon">📊</span>ダッシュボード</a></li>
-<li><a href="#"><span class="icon">📦</span>在庫管理</a></li>
-<li><a href="#"><span class="icon">📈</span>需要予測</a></li>
+<li><a href="#" data-page="page-dashboard" class="active"><span class="icon">📊</span>ダッシュボード</a></li>
+<li><a href="#" data-page="page-inventory"><span class="icon">📦</span>在庫管理</a></li>
+<li><a href="#" data-page="page-forecast"><span class="icon">📈</span>需要予測</a></li>
 </ul>
 </div>
 <div class="sidebar-section">
 <div class="sidebar-section-label">販促・施策</div>
 <ul class="sidebar-menu">
 <li><a href="#" class="active"><span class="icon">🎯</span>販促レコメンド</a></li>
-<li><a href="#"><span class="icon">🏷️</span>セール管理</a></li>
-<li><a href="#"><span class="icon">🎫</span>クーポン管理</a></li>
-<li><a href="#"><span class="icon">🎂</span>誕生日施策</a></li>
-<li><a href="#"><span class="icon">⭐</span>ポイント管理</a></li>
+<li><a href="#" data-page="page-sale"><span class="icon">🏷️</span>セール管理</a></li>
+<li><a href="#" data-page="page-coupon"><span class="icon">🎫</span>クーポン管理</a></li>
+<li><a href="#" data-page="page-birthday"><span class="icon">🎂</span>誕生日施策</a></li>
+<li><a href="#" data-page="page-points"><span class="icon">⭐</span>ポイント管理</a></li>
 </ul>
 </div>
 <div class="sidebar-section">
 <div class="sidebar-section-label">分析・改善</div>
 <ul class="sidebar-menu">
-<li><a href="#"><span class="icon">📉</span>ロス率分析</a></li>
-<li><a href="#"><span class="icon">🔄</span>PDCAサイクル</a></li>
-<li><a href="#"><span class="icon">🗄️</span>プラノグラム</a></li>
+<li><a href="#" data-page="page-loss"><span class="icon">📉</span>ロス率分析</a></li>
+<li><a href="#" data-page="page-pdca"><span class="icon">🔄</span>PDCAサイクル</a></li>
+<li><a href="#" data-page="page-planogram"><span class="icon">🗄️</span>プラノグラム</a></li>
 </ul>
 </div>
 <div class="sidebar-section">
 <div class="sidebar-section-label">ツール</div>
 <ul class="sidebar-menu">
-<li><a href="#"><span class="icon">🖼️</span>POP画像生成</a></li>
-<li><a href="#"><span class="icon">👥</span>会員管理</a></li>
-<li><a href="#"><span class="icon">📋</span>SKUマスタ</a></li>
+<li><a href="#" data-page="page-pop"><span class="icon">🖼️</span>POP画像生成</a></li>
+<li><a href="#" data-page="page-members"><span class="icon">👥</span>会員管理</a></li>
+<li><a href="#" data-page="page-sku"><span class="icon">📋</span>SKUマスタ</a></li>
 </ul>
 </div>
 </nav>
 <div class="main">
+<!-- Page 1: ダッシュボード -->
+<div class="page-content" id="page-dashboard">
+<div class="page-title">📊 ダッシュボード</div>
+<div class="page-subtitle">福岡天神店 (ST-001) | 店舗運営状況の総合概要</div>
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">💰 今月売上</div><div class="kpi-value">&yen;3,450,000</div><div class="kpi-sub up">▲ 前月比 +8.2%</div></div>
+<div class="kpi-card"><div class="kpi-label">👥 来店客数</div><div class="kpi-value">4,230<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub up">▲ 前月比 +5.1%</div></div>
+<div class="kpi-card"><div class="kpi-label">📉 ロス率</div><div class="kpi-value">2.8<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub up">▼ 前月 3.1% から改善</div></div>
+<div class="kpi-card"><div class="kpi-label">🎫 会員数</div><div class="kpi-value">1,248<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub info">今月新規 +32人</div></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📈</span>月次売上推移</div>
+<div class="chart-area">
+<div class="chart-bar-group"><span class="chart-value">&yen;2.8M</span><div class="chart-bar actual" style="height:130px"></div><div class="chart-label">11月</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;3.2M</span><div class="chart-bar actual" style="height:148px"></div><div class="chart-label">12月</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;2.5M</span><div class="chart-bar actual" style="height:116px"></div><div class="chart-label">1月</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;2.9M</span><div class="chart-bar actual" style="height:134px"></div><div class="chart-label">2月</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;3.1M</span><div class="chart-bar actual" style="height:144px"></div><div class="chart-label">3月</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;3.45M</span><div class="chart-bar actual" style="height:160px"></div><div class="chart-label">4月</div></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🔔</span>今日のアラート</div>
+<div class="alert alert-danger">ロス率が2.8%で業界平均(2.0%)を超過しています。値引ロスの削減施策を検討してください</div>
+<div class="alert alert-warn">ポイント10倍キャンペーン(シューズ)が4/7に終了します。次の施策を準備してください</div>
+<div class="alert alert-warn">SKU-005 ヨガマットプレミアム / SKU-007 テニスラケットの在庫が適正水準を下回っています</div>
+<div class="alert alert-info">今月の誕生日会員4名中2名にクーポン未発行です。誕生日施策ページで確認してください</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span>直近の施策効果</div>
+<table class="data-table">
+<thead><tr><th>施策名</th><th>期間</th><th>売上増分</th><th>コスト</th><th>ROI</th><th>評価</th></tr></thead>
+<tbody>
+<tr><td><strong>スプリングセール</strong></td><td>4/1〜4/30</td><td class="effect-text">+&yen;450,000</td><td>&yen;195,000</td><td style="color:#16a34a;font-weight:700">2.3x</td><td><span class="badge badge-green">良好</span></td></tr>
+<tr><td><strong>ポイント10倍(シューズ)</strong></td><td>4/1〜4/7</td><td class="effect-text">+&yen;220,000</td><td>&yen;122,000</td><td style="color:#f59e0b;font-weight:700">1.8x</td><td><span class="badge badge-orange">普通</span></td></tr>
+<tr><td><strong>新規会員キャンペーン</strong></td><td>4/1〜4/30</td><td class="effect-text">+&yen;186,000</td><td>&yen;60,000</td><td style="color:#16a34a;font-weight:700">3.1x</td><td><span class="badge badge-green">優秀</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page 2: 在庫管理 -->
+<div class="page-content" id="page-inventory" style="display:none">
+<div class="page-title">📦 在庫管理</div>
+<div class="page-subtitle">SKU別在庫状況・適正在庫管理</div>
+<div class="card">
+<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+<select style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff"><option>全カテゴリ</option><option>シューズ</option><option>ウェア</option><option>用品</option><option>ゴルフ</option><option>フィットネス</option></select>
+<select style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff"><option>全ステータス</option><option>適正</option><option>僅少</option><option>過多</option><option>在庫切れ</option></select>
+<input type="text" placeholder="商品名・SKUで検索..." style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;width:220px">
+</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>SKU</th><th>商品名</th><th>カテゴリ</th><th>現在庫</th><th>適正在庫</th><th>ステータス</th><th>回転率</th><th>最終入荷</th></tr></thead>
+<tbody>
+<tr><td>SKU-001</td><td><strong>ランニングシューズ Pro</strong></td><td>シューズ</td><td>50</td><td>40</td><td><span class="badge badge-green">適正</span></td><td>3.2</td><td>2026-03-28</td></tr>
+<tr><td>SKU-002</td><td><strong>トレーニングウェア DRI-FIT</strong></td><td>ウェア</td><td>80</td><td>50</td><td><span class="badge badge-orange">過多</span></td><td>1.8</td><td>2026-03-15</td></tr>
+<tr><td>SKU-003</td><td><strong>サッカーボール 5号球</strong></td><td>用品</td><td>30</td><td>25</td><td><span class="badge badge-green">適正</span></td><td>2.5</td><td>2026-04-01</td></tr>
+<tr><td>SKU-004</td><td><strong>ゴルフクラブ ドライバー</strong></td><td>ゴルフ</td><td>15</td><td>10</td><td><span class="badge badge-green">適正</span></td><td>0.8</td><td>2026-02-20</td></tr>
+<tr><td>SKU-005</td><td><strong>ヨガマット プレミアム</strong></td><td>フィットネス</td><td>25</td><td>30</td><td><span class="badge badge-orange" style="background:#fefce8;color:#a16207">僅少</span></td><td>1.5</td><td>2026-03-10</td></tr>
+<tr><td>SKU-006</td><td><strong>バスケットボールシューズ AIR</strong></td><td>シューズ</td><td>20</td><td>15</td><td><span class="badge badge-green">適正</span></td><td>2.8</td><td>2026-04-02</td></tr>
+<tr><td>SKU-007</td><td><strong>テニスラケット PRO STAFF</strong></td><td>用品</td><td>10</td><td>15</td><td><span class="badge badge-orange" style="background:#fefce8;color:#a16207">僅少</span></td><td>1.2</td><td>2026-03-05</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Page 3: 需要予測 -->
+<div class="page-content" id="page-forecast" style="display:none">
+<div class="page-title">📈 需要予測</div>
+<div class="page-subtitle">AIによる売上・カテゴリ別需要の予測分析</div>
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">📈 来週予測売上</div><div class="kpi-value">&yen;2,850,000</div><div class="kpi-sub up">▲ 前週比 +12.3%</div></div>
+<div class="kpi-card"><div class="kpi-label">🎯 予測精度</div><div class="kpi-value">87.3<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub info">過去3ヶ月平均</div></div>
+<div class="kpi-card"><div class="kpi-label">🔥 需要増カテゴリ</div><div class="kpi-value" style="font-size:20px">シューズ</div><div class="kpi-sub up">▲ +23%</div></div>
+<div class="kpi-card"><div class="kpi-label">📉 需要減カテゴリ</div><div class="kpi-value" style="font-size:20px">ゴルフ</div><div class="kpi-sub" style="color:#ef4444">▼ -8%</div></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>日別売上予測トレンド</div>
+<div class="chart-area">
+<div class="chart-bar-group"><span class="chart-value">&yen;380K</span><div class="chart-bar actual" style="height:100px"></div><div class="chart-label">4/1(火)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;350K</span><div class="chart-bar actual" style="height:92px"></div><div class="chart-label">4/2(水)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;420K</span><div class="chart-bar actual" style="height:110px"></div><div class="chart-label">4/3(木)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;510K</span><div class="chart-bar actual" style="height:134px"></div><div class="chart-label">4/4(金)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;680K</span><div class="chart-bar actual" style="height:179px"></div><div class="chart-label">4/5(土)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;720K</span><div class="chart-bar actual" style="height:189px"></div><div class="chart-label">4/6(日)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;390K</span><div class="chart-bar actual" style="height:103px"></div><div class="chart-label">4/7(月)</div></div>
+<div class="divider"></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;400K</span><div class="chart-bar predicted" style="height:105px"></div><div class="chart-label">4/8(火)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;370K</span><div class="chart-bar predicted" style="height:97px"></div><div class="chart-label">4/9(水)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;430K</span><div class="chart-bar predicted" style="height:113px"></div><div class="chart-label">4/10(木)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;520K</span><div class="chart-bar predicted" style="height:137px"></div><div class="chart-label">4/11(金)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;710K</span><div class="chart-bar predicted" style="height:187px"></div><div class="chart-label">4/12(土)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;750K</span><div class="chart-bar predicted" style="height:197px"></div><div class="chart-label">4/13(日)</div></div>
+<div class="chart-bar-group"><span class="chart-value">&yen;410K</span><div class="chart-bar predicted" style="height:108px"></div><div class="chart-label">4/14(月)</div></div>
+</div>
+<div class="chart-legend"><span class="leg-actual">実績（今週）</span><span class="leg-predicted">予測（来週）</span></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>カテゴリ別需要予測</div>
+<table class="data-table">
+<thead><tr><th>カテゴリ</th><th>今週実績</th><th>来週予測</th><th>増減率</th><th>トレンド</th><th>要因</th></tr></thead>
+<tbody>
+<tr><td><strong>シューズ</strong></td><td>&yen;890,000</td><td>&yen;1,095,000</td><td class="effect-text">+23%</td><td style="font-size:18px;color:#16a34a">↑</td><td class="reason-text">春シーズン需要増・新作入荷効果</td></tr>
+<tr><td><strong>ウェア</strong></td><td>&yen;650,000</td><td>&yen;618,000</td><td style="color:#ef4444;font-weight:700">-5%</td><td style="font-size:18px;color:#ef4444">↓</td><td class="reason-text">シーズン切替期・冬物在庫処分終了</td></tr>
+<tr><td><strong>用品</strong></td><td>&yen;420,000</td><td>&yen;445,000</td><td class="effect-text">+6%</td><td style="font-size:18px;color:#64748b">→</td><td class="reason-text">安定推移・サッカーシーズン継続</td></tr>
+<tr><td><strong>ゴルフ</strong></td><td>&yen;380,000</td><td>&yen;350,000</td><td style="color:#ef4444;font-weight:700">-8%</td><td style="font-size:18px;color:#ef4444">↓</td><td class="reason-text">来週天候不順予報・気温低下</td></tr>
+<tr><td><strong>フィットネス</strong></td><td>&yen;310,000</td><td>&yen;342,000</td><td class="effect-text">+10%</td><td style="font-size:18px;color:#16a34a">↑</td><td class="reason-text">新商品ヨガマット効果・SNS話題</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page 5: セール管理 -->
+<div class="page-content" id="page-sale" style="display:none">
+<div class="page-title">🏷️ セール管理</div>
+<div class="page-subtitle">セール価格販売の設定・管理・効果測定</div>
+<div style="margin-bottom:20px"><button class="btn btn-green">＋ 新規セール作成</button></div>
+<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+<div class="kpi-card"><div class="kpi-label">実施中セール</div><div class="kpi-value">2<span style="font-size:14px;color:#64748b">件</span></div></div>
+<div class="kpi-card"><div class="kpi-label">総値引額</div><div class="kpi-value" style="color:#ef4444">&yen;128,000</div></div>
+<div class="kpi-card"><div class="kpi-label">増分売上</div><div class="kpi-value" style="color:#16a34a">&yen;450,000</div></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>セール一覧</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>セールID</th><th>セール名</th><th>対象SKU</th><th>定価</th><th>セール価格</th><th>値引率</th><th>期間</th><th>ステータス</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td>SALE-001</td><td><strong>スプリングセール</strong></td><td>SKU-001</td><td>&yen;15,000</td><td style="color:#16a34a">&yen;11,000</td><td><span class="badge badge-orange">26.7%</span></td><td>4/1〜4/30</td><td><span class="badge badge-green">実施中</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+<tr><td>SALE-002</td><td><strong>GW先行セール</strong></td><td>全商品</td><td>-</td><td>-</td><td><span class="badge badge-red">最大30%</span></td><td>4/19〜4/27</td><td><span class="badge badge-blue">予定</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SALE-003</td><td><strong>在庫処分セール</strong></td><td>SKU-005</td><td>&yen;8,500</td><td style="color:#16a34a">&yen;5,950</td><td><span class="badge badge-red">30%</span></td><td>3/15〜3/31</td><td><span class="badge badge-gray">終了</span></td><td><button class="btn btn-outline btn-sm">効果</button></td></tr>
+<tr><td>SALE-004</td><td><strong>テニスフェア</strong></td><td>SKU-007</td><td>&yen;28,000</td><td style="color:#16a34a">&yen;25,200</td><td><span class="badge badge-orange">10%</span></td><td>4/8〜4/14</td><td><span class="badge badge-green">実施中</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Page 6: クーポン管理 -->
+<div class="page-content" id="page-coupon" style="display:none">
+<div class="page-title">🎫 クーポン管理</div>
+<div class="page-subtitle">クーポンの発行・利用状況・効果分析</div>
+<div style="margin-bottom:20px"><button class="btn btn-green">＋ 新規クーポン作成</button></div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>クーポン一覧</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>クーポンID</th><th>コード</th><th>種別</th><th>値引内容</th><th>対象</th><th>利用数/上限</th><th>利用率</th><th>有効期間</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td>CPN-001</td><td>WS-PER-001</td><td><span class="badge badge-blue">定率</span></td><td>15%OFF</td><td>ウェア</td><td>23/1000</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill green" style="width:2.3%"></div></div> 2.3%</td><td>4/1〜4/30</td><td><span class="badge badge-green">実施中</span></td></tr>
+<tr><td>CPN-002</td><td>WS-FIX-001</td><td><span class="badge badge-green">定額</span></td><td>&yen;1,000引</td><td>シニア誕生日</td><td>1/1</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill green" style="width:100%"></div></div> 100%</td><td>4/7〜5/7</td><td><span class="badge badge-green">発行済</span></td></tr>
+<tr><td>CPN-003</td><td>WS-FIX-002</td><td><span class="badge badge-green">定額</span></td><td>&yen;300引</td><td>新規会員</td><td>0/1</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill yellow" style="width:0%"></div></div> 0%</td><td>4/7〜6/6</td><td><span class="badge badge-blue">未使用</span></td></tr>
+<tr><td>CPN-004</td><td>WS-PER-002</td><td><span class="badge badge-blue">定率</span></td><td>20%OFF</td><td>シューズ</td><td>0/500</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill yellow" style="width:0%"></div></div> 0%</td><td>4/12〜4/13</td><td><span class="badge badge-blue">予定</span></td></tr>
+<tr><td>CPN-005</td><td>WS-FIX-003</td><td><span class="badge badge-green">定額</span></td><td>&yen;500引</td><td>フィットネス</td><td>0/200</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill yellow" style="width:0%"></div></div> 0%</td><td>雨天時自動</td><td><span class="badge badge-gray">待機中</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">💰</span>クーポン効果分析</div>
+<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+<div class="kpi-card"><div class="kpi-label">総値引額</div><div class="kpi-value" style="color:#ef4444">&yen;45,000</div></div>
+<div class="kpi-card"><div class="kpi-label">利用起因売上</div><div class="kpi-value" style="color:#16a34a">&yen;312,000</div></div>
+<div class="kpi-card"><div class="kpi-label">ROI</div><div class="kpi-value" style="color:#16a34a">6.9x</div></div>
+</div>
+</div>
+</div>
+
+<!-- Page 7: 誕生日施策 -->
+<div class="page-content" id="page-birthday" style="display:none">
+<div class="page-title">🎂 誕生日施策</div>
+<div class="page-subtitle">誕生日クーポン・シニア特別割引の管理</div>
+<div class="card">
+<div class="card-title"><span class="icon">🎉</span>今月の誕生日会員 (4月)</div>
+<table class="data-table">
+<thead><tr><th>会員名</th><th>誕生日</th><th>年齢</th><th>ランク</th><th>シニア</th><th>発行状況</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td><strong>鈴木一郎</strong></td><td>4月15日</td><td>66歳</td><td><span class="badge badge-orange">ゴールド</span></td><td>○</td><td><span class="badge badge-green">発行済（&yen;1,000）</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+<tr><td><strong>高橋美咲</strong></td><td>4月8日</td><td>26歳</td><td><span class="badge badge-gray">レギュラー</span></td><td>-</td><td><span class="badge badge-green">発行済（&yen;500）</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+<tr><td><strong>山本健太</strong></td><td>4月22日</td><td>45歳</td><td><span class="badge badge-blue">シルバー</span></td><td>-</td><td><span class="badge badge-red">未発行</span></td><td><button class="btn btn-green btn-sm">発行</button></td></tr>
+<tr><td><strong>中村由美</strong></td><td>4月28日</td><td>62歳</td><td><span class="badge badge-orange">ゴールド</span></td><td>○</td><td><span class="badge badge-red">未発行</span></td><td><button class="btn btn-green btn-sm">発行</button></td></tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">⚙️</span>誕生日施策設定</div>
+<div class="stat-row"><span class="stat-label">通常クーポン金額</span><span class="stat-value">&yen;500</span></div>
+<div class="stat-row"><span class="stat-label">シニア特別金額（60歳以上）</span><span class="stat-value" style="color:#16a34a">&yen;1,000</span></div>
+<div class="stat-row"><span class="stat-label">有効期間</span><span class="stat-value">30日間</span></div>
+<div class="stat-row"><span class="stat-label">自動発行</span><span class="stat-value" style="color:#16a34a">● 有効</span></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>先月実績（3月）</div>
+<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+<div class="kpi-card"><div class="kpi-label">発行数</div><div class="kpi-value">8<span style="font-size:14px;color:#64748b">件</span></div></div>
+<div class="kpi-card"><div class="kpi-label">利用率</div><div class="kpi-value">62.5<span style="font-size:14px;color:#64748b">%</span></div></div>
+<div class="kpi-card"><div class="kpi-label">売上貢献</div><div class="kpi-value" style="color:#16a34a">&yen;48,000</div></div>
+</div>
+</div>
+</div>
+
+
+<div class="page-content" id="page-promo" style="display:none">
 <div class="page-title">🎯 販促レコメンド</div>
 <div class="page-subtitle">AIが需要予測・在庫分析・顧客データから最適な販促施策を提案します</div>
 <div class="kpi-row">
@@ -333,6 +538,423 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <h4>👥 顧客行動分析</h4>
 <p>会員購買履歴とセグメント分析から最適なターゲティング</p>
 </div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Page 8: ポイント管理 -->
+<div class="page-content" id="page-points">
+<div class="page-title">⭐ ポイント管理</div>
+<div class="page-subtitle">ポイント発行・利用状況とキャンペーン管理</div>
+<div class="kpi-row">
+<div class="kpi-card">
+<div class="kpi-label">⭐ 総発行ポイント</div>
+<div class="kpi-value">2,450,000<span style="font-size:14px;font-weight:500;color:#64748b">pt</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">💰 ポイント債務</div>
+<div class="kpi-value">&yen;1,820,000</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">📊 今月利用率</div>
+<div class="kpi-value">12.3<span style="font-size:14px;font-weight:500;color:#64748b">%</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">🎯 キャンペーン</div>
+<div class="kpi-value">2<span style="font-size:14px;font-weight:500;color:#64748b">件</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span>ポイントキャンペーン</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>ID</th><th>名称</th><th>倍率</th><th>対象カテゴリ</th><th>対象ランク</th><th>期間</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td>PM-001</td><td><strong>シューズポイント10倍</strong></td><td>10.0倍</td><td>シューズ</td><td>全ランク</td><td>4/1-4/7</td><td><span class="badge badge-gray">終了</span></td></tr>
+<tr><td>PM-002</td><td><strong>GWポイント5倍</strong></td><td>5.0倍</td><td>全カテゴリ</td><td>ゴールド以上</td><td>4/19-4/27</td><td><span class="badge badge-blue">予定</span></td></tr>
+<tr><td>PM-003</td><td><strong>新生活応援3倍</strong></td><td>3.0倍</td><td>ウェア</td><td>全ランク</td><td>4/1-4/30</td><td><span class="badge badge-green">実施中</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>ポイント利用サマリー</div>
+<div class="stat-row"><span class="stat-label">今月発行</span><span class="stat-value">320,000pt</span></div>
+<div class="stat-row"><span class="stat-label">今月利用</span><span class="stat-value">180,000pt</span></div>
+<div class="stat-row"><span class="stat-label">失効予定（3ヶ月内）</span><span class="stat-value" style="color:#ea580c">95,000pt</span></div>
+</div>
+</div>
+
+<!-- Page 9: ロス率分析 -->
+<div class="page-content" id="page-loss">
+<div class="page-title">📉 ロス率分析</div>
+<div class="page-subtitle">商品ロスの分析と改善トラッキング</div>
+<div class="kpi-row">
+<div class="kpi-card">
+<div class="kpi-label">📉 今月ロス率</div>
+<div class="kpi-value">2.8<span style="font-size:14px;font-weight:500;color:#64748b">%</span></div>
+<div class="kpi-sub"><span class="badge badge-orange">注意</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">💸 総ロス金額</div>
+<div class="kpi-value">&yen;33,750</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">📊 前月比</div>
+<div class="kpi-value" style="font-size:20px">-0.3%</div>
+<div class="kpi-sub up">改善↓</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">📅 年間累計</div>
+<div class="kpi-value">&yen;285,000</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>ロス種別内訳</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>種別</th><th>件数</th><th>金額</th><th>構成比</th></tr></thead>
+<tbody>
+<tr><td>値引ロス</td><td>5個</td><td style="color:#ef4444">&yen;16,250</td><td><div class="progress-bar"><div class="progress-fill red" style="width:48%"></div></div>48%</td></tr>
+<tr><td>棚卸ロス</td><td>2個</td><td style="color:#f59e0b">&yen;9,000</td><td><div class="progress-bar"><div class="progress-fill yellow" style="width:27%"></div></div>27%</td></tr>
+<tr><td>廃棄ロス</td><td>1個</td><td style="color:#f59e0b">&yen;8,500</td><td><div class="progress-bar"><div class="progress-fill yellow" style="width:25%"></div></div>25%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🔍</span>ロス上位SKU</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>#</th><th>SKU</th><th>商品名</th><th>金額</th><th>主因</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>SKU-002</td><td>ウェアDRI-FIT</td><td style="color:#ef4444">&yen;16,250</td><td><span class="badge badge-warn">シーズン終了値引</span></td></tr>
+<tr><td>2</td><td>SKU-003</td><td>サッカーボール</td><td style="color:#ef4444">&yen;9,000</td><td><span class="badge badge-red">在庫差異</span></td></tr>
+<tr><td>3</td><td>SKU-005</td><td>ヨガマット</td><td style="color:#f59e0b">&yen;8,500</td><td><span class="badge badge-info">商品破損</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📈</span>月次推移チャート</div>
+<div class="chart-area" style="height:180px">
+<div class="chart-bar-group"><span class="chart-value">2.1%</span><div class="chart-bar actual" style="height:68px"></div><div class="chart-label">11月</div></div>
+<div class="chart-bar-group"><span class="chart-value">2.5%</span><div class="chart-bar actual" style="height:81px"></div><div class="chart-label">12月</div></div>
+<div class="chart-bar-group"><span class="chart-value">1.8%</span><div class="chart-bar actual" style="height:58px"></div><div class="chart-label">1月</div></div>
+<div class="chart-bar-group"><span class="chart-value">2.2%</span><div class="chart-bar actual" style="height:71px"></div><div class="chart-label">2月</div></div>
+<div class="chart-bar-group"><span class="chart-value">3.1%</span><div class="chart-bar actual" style="height:100px"></div><div class="chart-label">3月</div></div>
+<div class="chart-bar-group"><span class="chart-value">2.8%</span><div class="chart-bar actual" style="height:90px"></div><div class="chart-label">4月</div></div>
+</div>
+</div>
+</div>
+
+<!-- Page 10: PDCAサイクル -->
+<div class="page-content" id="page-pdca">
+<div class="page-title">🔄 PDCAサイクル</div>
+<div class="page-subtitle">施策のPDCAサイクル管理と進捗トラッキング</div>
+<div class="card">
+<div class="card-title"><span class="icon">🔄</span>PDCAフロー</div>
+<div style="display:flex;gap:12px;margin-bottom:16px">
+<div class="pdca-step pdca-plan"><b>Plan</b><br>施策設計<br>目標設定</div>
+<div class="pdca-step pdca-do"><b>Do</b><br>施策実行<br>データ収集</div>
+<div class="pdca-step pdca-check"><b>Check</b><br>効果検証<br>KPI確認</div>
+<div class="pdca-step pdca-act"><b>Act</b><br>改善実行<br>次サイクルへ</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>施策PDCA</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>施策名</th><th>フェーズ</th><th>目標KPI</th><th>目標値</th><th>実績値</th><th>達成率</th><th>次アクション</th></tr></thead>
+<tbody>
+<tr><td><strong>スプリングセール</strong></td><td><span class="badge badge-orange">Check</span></td><td>ロス率</td><td>1.5%</td><td>2.8%</td><td style="color:#ef4444">53.6%</td><td>値引率引下げ</td></tr>
+<tr><td><strong>テニスラケットフェア</strong></td><td><span class="badge badge-green">Do</span></td><td>売上増</td><td>&yen;85,000</td><td>-</td><td>実施中</td><td>効果測定待ち</td></tr>
+<tr><td><strong>GW先行セール</strong></td><td><span class="badge badge-blue">Plan</span></td><td>売上増</td><td>&yen;1,200,000</td><td>-</td><td>未開始</td><td>施策設計中</td></tr>
+<tr><td><strong>ウェア在庫処分</strong></td><td><span class="badge badge-purple">Act</span></td><td>在庫回転率</td><td>3.0</td><td>2.2</td><td style="color:#ea580c">73.3%</td><td>対象SKU見直し</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>スコアカード</div>
+<div class="stat-row"><span class="stat-label">総サイクル数</span><span class="stat-value">3</span></div>
+<div class="stat-row"><span class="stat-label">平均達成率</span><span class="stat-value">72.3%</span></div>
+<div class="stat-row"><span class="stat-label">目標達成</span><span class="stat-value">1/3件</span></div>
+<div class="stat-row"><span class="stat-label">傾向</span><span class="stat-value" style="color:#16a34a">改善中</span></div>
+</div>
+</div>
+
+<!-- Page 11: プラノグラム -->
+<div class="page-content" id="page-planogram">
+<div class="page-title">🗄️ プラノグラム</div>
+<div class="page-subtitle">棚割り最適化とゾーン別パフォーマンス分析</div>
+<div class="kpi-row" style="grid-template-columns:repeat(2,1fr)">
+<div class="kpi-card">
+<div class="kpi-label">🎯 最適化スコア</div>
+<div class="kpi-value">90<span style="font-size:14px;font-weight:500;color:#64748b">/100</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">⭐ ゴールデンゾーン平均単価</div>
+<div class="kpi-value">&yen;38,500</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🗄️</span>什器ビジュアル</div>
+<p style="font-size:13px;color:#64748b;margin-bottom:12px">入口正面A列 ゴンドラ 180&times;200cm</p>
+<div class="shelf-visual">
+<div class="shelf-item shelf-upper">上段<br><b>ウェアDRI-FIT</b><br>&yen;6,500 &times;3face</div>
+<div class="shelf-item shelf-upper" style="opacity:0.3"></div>
+<div class="shelf-item shelf-golden">★ゴールデン<br><b>ゴルフクラブドライバー</b><br>&yen;55,000 &times;2face</div>
+<div class="shelf-item shelf-golden">★ゴールデン<br><b>バスケシューズAIR</b><br>&yen;22,000 &times;3face</div>
+<div class="shelf-item shelf-middle">中段<br><b>ランニングシューズPro</b><br>&yen;15,000 &times;4face</div>
+<div class="shelf-item shelf-middle">中段<br><b>ヨガマットプレミアム</b><br>&yen;8,500 &times;3face</div>
+<div class="shelf-item shelf-lower">下段<br><b>テニスラケットPROSTAFF</b><br>&yen;28,000 &times;2face</div>
+<div class="shelf-item shelf-lower">下段<br><b>サッカーボール5号球</b><br>&yen;4,500 &times;4face</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">💡</span>改善提案</div>
+<div class="alert alert-warn" style="margin-bottom:8px">テニスラケットPROSTAFF（&yen;28,000）が下段に配置 → ゴールデンゾーンへ移動推奨</div>
+<div class="alert alert-warn">ランニングシューズPro（&yen;15,000）が中段に配置 → ゴールデンゾーンへ移動推奨</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>ゾーン別パフォーマンス</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>ゾーン</th><th>商品数</th><th>売上</th><th>フェイス当たり売上</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-warn">ゴールデン</span></td><td>2</td><td>&yen;77,000</td><td>&yen;15,400</td></tr>
+<tr><td><span class="badge badge-info">中段</span></td><td>2</td><td>&yen;19,500</td><td>&yen;2,786</td></tr>
+<tr><td><span class="badge badge-blue">上段</span></td><td>1</td><td>&yen;13,000</td><td>&yen;4,333</td></tr>
+<tr><td><span class="badge badge-gray">下段</span></td><td>2</td><td>&yen;13,500</td><td>&yen;2,250</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Page 12: POP画像生成 -->
+<div class="page-content" id="page-pop">
+<div class="page-title">🖼️ POP画像生成</div>
+<div class="page-subtitle">販促施策に合わせたPOP・店頭ポスターを自動生成します</div>
+<div class="pop-grid">
+<div class="pop-card">
+<div class="pop-poster pop1">
+<span class="deco" style="top:-10px;right:-10px">👟</span>
+<span class="deco" style="bottom:-10px;left:-10px;font-size:40px">🔥</span>
+<h3>週末限定!<br>シューズ20%OFF</h3>
+<p>4/12(土) - 4/13(日)</p>
+</div>
+<div class="pop-actions">
+<button class="btn btn-outline btn-sm">ダウンロード</button>
+<button class="btn btn-outline btn-sm">編集</button>
+<button class="btn btn-outline btn-sm">印刷</button>
+</div>
+</div>
+<div class="pop-card">
+<div class="pop-poster pop2">
+<span class="deco" style="top:5px;left:5px">🎉</span>
+<span class="deco" style="bottom:0;right:0;font-size:50px">🏃</span>
+<h3>GW先行セール<br>開催中!</h3>
+<p>4/19(土) - 4/27(日)</p>
+</div>
+<div class="pop-actions">
+<button class="btn btn-outline btn-sm">ダウンロード</button>
+<button class="btn btn-outline btn-sm">編集</button>
+<button class="btn btn-outline btn-sm">印刷</button>
+</div>
+</div>
+<div class="pop-card">
+<div class="pop-poster pop3">
+<span class="deco" style="top:0;right:10px;font-size:50px">⭐</span>
+<span class="deco" style="bottom:-5px;left:5px;font-size:45px">👕</span>
+<h3>ポイント5倍デー<br>ウェア限定</h3>
+<p>4/10(木) 一日限り</p>
+</div>
+<div class="pop-actions">
+<button class="btn btn-outline btn-sm">ダウンロード</button>
+<button class="btn btn-outline btn-sm">編集</button>
+<button class="btn btn-outline btn-sm">印刷</button>
+</div>
+</div>
+<div class="pop-card">
+<div class="pop-poster" style="background:linear-gradient(135deg,#059669,#0d9488)">
+<span class="deco" style="top:5px;right:5px;font-size:50px">☔</span>
+<span class="deco" style="bottom:-5px;left:10px;font-size:40px">🏋️</span>
+<h3>雨の日クーポン<br>フィットネス用品</h3>
+<p>雨天時自動配布</p>
+</div>
+<div class="pop-actions">
+<button class="btn btn-outline btn-sm">ダウンロード</button>
+<button class="btn btn-outline btn-sm">編集</button>
+<button class="btn btn-outline btn-sm">印刷</button>
+</div>
+</div>
+<div class="pop-card">
+<div class="pop-poster" style="background:linear-gradient(135deg,#dc2626,#f59e0b)">
+<span class="deco" style="top:0;right:5px;font-size:50px">🎖️</span>
+<span class="deco" style="bottom:0;left:10px;font-size:45px">🧓</span>
+<h3>シニア感謝デー<br>特別割引</h3>
+<p>4/15(火)</p>
+</div>
+<div class="pop-actions">
+<button class="btn btn-outline btn-sm">ダウンロード</button>
+<button class="btn btn-outline btn-sm">編集</button>
+<button class="btn btn-outline btn-sm">印刷</button>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🎨</span>POP作成フォーム</div>
+<div class="form-grid">
+<div class="form-group">
+<label>施策選択</label>
+<select>
+<option>シューズカテゴリ 週末限定20%OFF</option>
+<option>ゴールデンウィーク先行セール</option>
+<option>ポイント5倍デー（ウェア限定）</option>
+<option>雨の日クーポン配布</option>
+<option>シニア会員感謝デー</option>
+</select>
+</div>
+<div class="form-group">
+<label>サイズ選択</label>
+<select>
+<option>A4</option>
+<option>A3</option>
+<option>B4</option>
+<option>ポスター</option>
+</select>
+</div>
+<div class="form-group">
+<label>テンプレート選択</label>
+<select>
+<option>セール</option>
+<option>ポイント</option>
+<option>季節イベント</option>
+<option>新商品</option>
+</select>
+</div>
+<div class="form-group">
+<label>カラーテーマ</label>
+<select>
+<option>赤系</option>
+<option>青系</option>
+<option>緑系</option>
+<option>ゴールド</option>
+</select>
+</div>
+</div>
+<button class="btn btn-green" style="padding:10px 32px;font-size:14px">🤖 AI生成</button>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>生成履歴</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>生成日</th><th>施策名</th><th>サイズ</th><th>テンプレート</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td>2026-04-07</td><td>シューズ20%OFF</td><td>A3</td><td>セール</td><td><span class="badge badge-green">完了</span></td></tr>
+<tr><td>2026-04-06</td><td>GW先行セール</td><td>ポスター</td><td>季節イベント</td><td><span class="badge badge-green">完了</span></td></tr>
+<tr><td>2026-04-05</td><td>ポイント5倍</td><td>A4</td><td>ポイント</td><td><span class="badge badge-green">完了</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Page 13: 会員管理 -->
+<div class="page-content" id="page-members">
+<div class="page-title">👥 会員管理</div>
+<div class="page-subtitle">会員情報とランク別分布の管理</div>
+<div class="kpi-row">
+<div class="kpi-card">
+<div class="kpi-label">👥 総会員数</div>
+<div class="kpi-value">1,248<span style="font-size:14px;font-weight:500;color:#64748b">人</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">🆕 今月新規</div>
+<div class="kpi-value">32<span style="font-size:14px;font-weight:500;color:#64748b">人</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">📊 アクティブ率</div>
+<div class="kpi-value">68.5<span style="font-size:14px;font-weight:500;color:#64748b">%</span></div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">💰 平均購入額</div>
+<div class="kpi-value">&yen;28,500</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>会員テーブル</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>会員ID</th><th>氏名</th><th>年齢</th><th>ランク</th><th>保有ポイント</th><th>累計購入額</th><th>最終来店</th><th>店舗</th></tr></thead>
+<tbody>
+<tr><td>MEM-001</td><td><strong>鈴木一郎</strong></td><td>66歳</td><td><span class="badge badge-warn">ゴールド</span></td><td>15,000pt</td><td>&yen;350,000</td><td>2026-04-05</td><td>福岡天神</td></tr>
+<tr><td>MEM-002</td><td><strong>佐藤花子</strong></td><td>35歳</td><td><span class="badge badge-info">シルバー</span></td><td>5,000pt</td><td>&yen;120,000</td><td>2026-04-03</td><td>福岡天神</td></tr>
+<tr><td>MEM-003</td><td><strong>田中次郎</strong></td><td>70歳</td><td><span class="badge badge-ok">プラチナ</span></td><td>30,000pt</td><td>&yen;800,000</td><td>2026-04-06</td><td>福岡天神</td></tr>
+<tr><td>MEM-004</td><td><strong>高橋美咲</strong></td><td>26歳</td><td><span class="badge badge-gray">レギュラー</span></td><td>500pt</td><td>&yen;15,000</td><td>2026-04-07</td><td>福岡天神</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>ランク別分布</div>
+<div class="stat-row"><span class="stat-label">レギュラー</span><span class="stat-value">748人 (60%)</span></div>
+<div class="progress-bar"><div class="progress-fill green" style="width:60%"></div></div>
+<div class="stat-row"><span class="stat-label">シルバー</span><span class="stat-value">312人 (25%)</span></div>
+<div class="progress-bar"><div class="progress-fill green" style="width:25%"></div></div>
+<div class="stat-row"><span class="stat-label">ゴールド</span><span class="stat-value">125人 (10%)</span></div>
+<div class="progress-bar"><div class="progress-fill yellow" style="width:10%"></div></div>
+<div class="stat-row"><span class="stat-label">プラチナ</span><span class="stat-value">63人 (5%)</span></div>
+<div class="progress-bar"><div class="progress-fill red" style="width:5%"></div></div>
+</div>
+</div>
+
+<!-- Page 14: SKUマスタ -->
+<div class="page-content" id="page-sku">
+<div class="page-title">📋 SKUマスタ</div>
+<div class="page-subtitle">商品マスタデータの管理と編集</div>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+<button class="btn btn-green">＋ 新規SKU登録</button>
+<div class="form-group" style="margin:0">
+<select style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff;color:#1e293b">
+<option>カテゴリ：すべて</option>
+<option>シューズ</option>
+<option>ウェア</option>
+<option>用品</option>
+<option>ゴルフ</option>
+<option>フィットネス</option>
+</select>
+</div>
+<div class="form-group" style="margin:0">
+<select style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff;color:#1e293b">
+<option>ブランド：すべて</option>
+<option>ナイキ</option>
+<option>アディダス</option>
+<option>テーラーメイド</option>
+<option>マンドゥカ</option>
+<option>ウィルソン</option>
+</select>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>SKU一覧</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>SKU</th><th>商品名</th><th>カテゴリ</th><th>サブカテゴリ</th><th>ブランド</th><th>原価</th><th>定価</th><th>粗利率</th><th>在庫</th><th>リードタイム</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td>SKU-001</td><td><strong>ランニングシューズPro</strong></td><td>シューズ</td><td>ランニング</td><td>ナイキ</td><td>&yen;8,000</td><td>&yen;15,000</td><td><span style="color:#16a34a;font-weight:700">46.7%</span></td><td>50</td><td>14日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-002</td><td><strong>ウェアDRI-FIT</strong></td><td>ウェア</td><td>トレーニング</td><td>ナイキ</td><td>&yen;3,000</td><td>&yen;6,500</td><td><span style="color:#16a34a;font-weight:700">53.8%</span></td><td>80</td><td>14日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-003</td><td><strong>サッカーボール5号球</strong></td><td>用品</td><td>サッカー</td><td>アディダス</td><td>&yen;2,000</td><td>&yen;4,500</td><td><span style="color:#16a34a;font-weight:700">55.6%</span></td><td>30</td><td>7日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-004</td><td><strong>ゴルフクラブドライバー</strong></td><td>ゴルフ</td><td>クラブ</td><td>テーラーメイド</td><td>&yen;25,000</td><td>&yen;55,000</td><td><span style="color:#16a34a;font-weight:700">54.5%</span></td><td>15</td><td>21日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-005</td><td><strong>ヨガマットプレミアム</strong></td><td>フィットネス</td><td>ヨガ</td><td>マンドゥカ</td><td>&yen;4,000</td><td>&yen;8,500</td><td><span style="color:#16a34a;font-weight:700">52.9%</span></td><td>25</td><td>10日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-006</td><td><strong>バスケシューズAIR</strong></td><td>シューズ</td><td>バスケ</td><td>ナイキ</td><td>&yen;10,000</td><td>&yen;22,000</td><td><span style="color:#16a34a;font-weight:700">54.5%</span></td><td>20</td><td>14日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>SKU-007</td><td><strong>テニスラケットPROSTAFF</strong></td><td>用品</td><td>テニス</td><td>ウィルソン</td><td>&yen;12,000</td><td>&yen;28,000</td><td><span style="color:#16a34a;font-weight:700">57.1%</span></td><td>10</td><td>14日</td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
