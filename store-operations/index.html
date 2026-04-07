@@ -93,6 +93,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 .sidebar::-webkit-scrollbar{width:4px}
 .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
 .divider{width:2px;background:#cbd5e1;align-self:stretch;margin:0 4px;border-radius:2px;flex-shrink:0}
+.stat-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.stat-label{color:#64748b;font-size:13px}
+.stat-value{font-weight:600;font-size:14px;color:#1e293b}
+.shelf-visual{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:8px}
+.shelf-golden{background:linear-gradient(135deg,#854d0e,#a16207);color:#fef3c7;padding:12px;border-radius:6px;font-size:12px;text-align:center}
+.shelf-upper{background:#1e3a5f;color:#93c5fd;padding:12px;border-radius:6px;font-size:12px;text-align:center}
+.shelf-middle{background:#475569;color:#e2e8f0;padding:12px;border-radius:6px;font-size:12px;text-align:center}
+.shelf-lower{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1;padding:12px;border-radius:6px;font-size:12px;text-align:center}
+.pdca-flow{display:flex;gap:8px;margin:16px 0}
+.pdca-step{flex:1;text-align:center;padding:16px 8px;border-radius:10px;font-size:12px;line-height:1.5}
+.pdca-plan{background:#eff6ff;color:#2563eb;border:2px solid #93c5fd}
+.pdca-do{background:#f0fdf4;color:#16a34a;border:2px solid #86efac}
+.pdca-check{background:#fffbeb;color:#d97706;border:2px solid #fcd34d}
+.pdca-act{background:#faf5ff;color:#7c3aed;border:2px solid #c4b5fd}
+.badge-purple{background:#faf5ff;color:#7c3aed}
+.alert{padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:13px}
+.alert-danger{background:#fef2f2;border-left:3px solid #ef4444;color:#991b1b}
+.alert-warn{background:#fffbeb;border-left:3px solid #f59e0b;color:#92400e}
+.alert-info{background:#eff6ff;border-left:3px solid #3b82f6;color:#1e40af}
+.crm-funnel{display:flex;gap:4px;align-items:flex-end;margin:16px 0}
+.crm-funnel-step{flex:1;text-align:center;padding:14px 6px;color:#fff;font-size:11px;font-weight:600;border-radius:6px}
+.segment-bar{display:flex;border-radius:6px;overflow:hidden;height:28px;margin:6px 0}
+.segment-bar div{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
 @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}.pop-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -117,7 +140,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="sidebar-section">
 <div class="sidebar-section-label">販促・施策</div>
 <ul class="sidebar-menu">
-<li><a href="#" class="active"><span class="icon">🎯</span>販促レコメンド</a></li>
+<li><a href="#" data-page="page-promo"><span class="icon">🎯</span>販促レコメンド</a></li>
 <li><a href="#" data-page="page-sale"><span class="icon">🏷️</span>セール管理</a></li>
 <li><a href="#" data-page="page-coupon"><span class="icon">🎫</span>クーポン管理</a></li>
 <li><a href="#" data-page="page-birthday"><span class="icon">🎂</span>誕生日施策</a></li>
@@ -130,6 +153,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <li><a href="#" data-page="page-loss"><span class="icon">📉</span>ロス率分析</a></li>
 <li><a href="#" data-page="page-pdca"><span class="icon">🔄</span>PDCAサイクル</a></li>
 <li><a href="#" data-page="page-planogram"><span class="icon">🗄️</span>プラノグラム</a></li>
+</ul>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-section-label">CRM・顧客管理</div>
+<ul class="sidebar-menu">
+<li><a href="#" data-page="page-crm"><span class="icon">💎</span>CRMダッシュボード</a></li>
+<li><a href="#" data-page="page-segment"><span class="icon">🎯</span>顧客セグメント</a></li>
+<li><a href="#" data-page="page-mail"><span class="icon">✉️</span>メール配信</a></li>
+<li><a href="#" data-page="page-churn"><span class="icon">🚨</span>離脱防止</a></li>
+</ul>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-section-label">競合分析</div>
+<ul class="sidebar-menu">
+<li><a href="#" data-page="page-competitor"><span class="icon">🔍</span>競合ベンチマーク</a></li>
 </ul>
 </div>
 <div class="sidebar-section">
@@ -958,14 +996,220 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 </div>
 </div>
 </div>
+
+<!-- Page: CRMダッシュボード -->
+<div class="page-content" id="page-crm" style="display:none">
+<div class="page-title">💎 CRMダッシュボード</div>
+<div class="page-subtitle">Web会員・店舗会員の統合顧客管理とLTV分析</div>
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">👥 総会員数</div><div class="kpi-value">1,248<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub up">Web会員 823 / 店舗 425</div></div>
+<div class="kpi-card"><div class="kpi-label">💰 平均LTV</div><div class="kpi-value">&yen;68,500</div><div class="kpi-sub up">▲ 前年比 +12.4%</div></div>
+<div class="kpi-card"><div class="kpi-label">🔄 リピート率</div><div class="kpi-value">42.3<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub info">3ヶ月以内再購入</div></div>
+<div class="kpi-card"><div class="kpi-label">🚨 離脱リスク</div><div class="kpi-value" style="color:#ef4444">87<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub" style="color:#ef4444">90日以上未来店</div></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>顧客ファネル</div>
+<div class="crm-funnel">
+<div class="crm-funnel-step" style="background:#3b82f6;height:120px">新規会員<br><b>32人</b></div>
+<div class="crm-funnel-step" style="background:#22c55e;height:100px">初回購入<br><b>28人</b></div>
+<div class="crm-funnel-step" style="background:#f59e0b;height:80px">2回目購入<br><b>18人</b></div>
+<div class="crm-funnel-step" style="background:#8b5cf6;height:60px">リピーター<br><b>12人</b></div>
+<div class="crm-funnel-step" style="background:#ec4899;height:45px">ロイヤル<br><b>5人</b></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📈</span>チャネル別会員推移</div>
+<table class="data-table">
+<thead><tr><th>チャネル</th><th>会員数</th><th>構成比</th><th>月間購入額</th><th>平均LTV</th><th>リピート率</th></tr></thead>
+<tbody>
+<tr><td><strong>Web会員（EC）</strong></td><td>823人</td><td>65.9%</td><td>&yen;1,850,000</td><td style="color:#16a34a;font-weight:700">&yen;72,300</td><td>38.5%</td></tr>
+<tr><td><strong>店舗会員</strong></td><td>425人</td><td>34.1%</td><td>&yen;1,600,000</td><td style="color:#16a34a;font-weight:700">&yen;61,200</td><td>48.7%</td></tr>
+<tr style="background:#f8fafc;font-weight:600"><td>合計</td><td>1,248人</td><td>100%</td><td>&yen;3,450,000</td><td>&yen;68,500</td><td>42.3%</td></tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🏆</span>LTVランキング TOP5</div>
+<table class="data-table">
+<thead><tr><th>#</th><th>会員</th><th>ランク</th><th>累計購入額</th><th>来店回数</th><th>直近来店</th><th>推奨アクション</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>田中次郎</strong></td><td><span class="badge badge-green">プラチナ</span></td><td>&yen;800,000</td><td>156回</td><td>4/6</td><td><span class="badge badge-blue">VIP特別案内</span></td></tr>
+<tr><td>2</td><td><strong>鈴木一郎</strong></td><td><span class="badge badge-orange">ゴールド</span></td><td>&yen;350,000</td><td>89回</td><td>4/5</td><td><span class="badge badge-blue">誕生日施策</span></td></tr>
+<tr><td>3</td><td><strong>木村直樹</strong></td><td><span class="badge badge-orange">ゴールド</span></td><td>&yen;280,000</td><td>72回</td><td>4/3</td><td><span class="badge badge-green">安定顧客</span></td></tr>
+<tr><td>4</td><td><strong>渡辺裕子</strong></td><td><span class="badge badge-blue">シルバー</span></td><td>&yen;195,000</td><td>45回</td><td>3/28</td><td><span class="badge badge-orange">来店促進</span></td></tr>
+<tr><td>5</td><td><strong>佐藤花子</strong></td><td><span class="badge badge-blue">シルバー</span></td><td>&yen;120,000</td><td>32回</td><td>4/3</td><td><span class="badge badge-green">安定顧客</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page: 顧客セグメント -->
+<div class="page-content" id="page-segment" style="display:none">
+<div class="page-title">🎯 顧客セグメント</div>
+<div class="page-subtitle">RFM分析に基づく顧客セグメンテーションとターゲティング</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>セグメント分布</div>
+<div class="segment-bar" style="margin-bottom:20px">
+<div style="width:8%;background:#ec4899">VIP</div>
+<div style="width:15%;background:#8b5cf6">優良</div>
+<div style="width:25%;background:#3b82f6">安定</div>
+<div style="width:20%;background:#22c55e">成長</div>
+<div style="width:18%;background:#f59e0b">休眠</div>
+<div style="width:14%;background:#ef4444">離脱危険</div>
+</div>
+<table class="data-table">
+<thead><tr><th>セグメント</th><th>人数</th><th>構成比</th><th>平均購入額</th><th>平均来店頻度</th><th>直近購入</th><th>推奨施策</th></tr></thead>
+<tbody>
+<tr><td><span class="badge" style="background:#fce7f3;color:#be185d">VIP</span></td><td>100人</td><td>8%</td><td>&yen;185,000</td><td>月4.2回</td><td>7日以内</td><td>特別招待・先行セール案内</td></tr>
+<tr><td><span class="badge" style="background:#f3e8ff;color:#7c3aed">優良</span></td><td>187人</td><td>15%</td><td>&yen;95,000</td><td>月2.8回</td><td>14日以内</td><td>ランクアップ促進・限定クーポン</td></tr>
+<tr><td><span class="badge badge-blue">安定</span></td><td>312人</td><td>25%</td><td>&yen;52,000</td><td>月1.5回</td><td>30日以内</td><td>ポイントキャンペーン</td></tr>
+<tr><td><span class="badge badge-green">成長</span></td><td>250人</td><td>20%</td><td>&yen;28,000</td><td>月1.0回</td><td>45日以内</td><td>2回目購入特典・レコメンド</td></tr>
+<tr><td><span class="badge badge-orange">休眠</span></td><td>225人</td><td>18%</td><td>&yen;15,000</td><td>月0.3回</td><td>90日以内</td><td>復帰クーポン・メール配信</td></tr>
+<tr><td><span class="badge badge-red">離脱危険</span></td><td>174人</td><td>14%</td><td>&yen;8,500</td><td>-</td><td>90日超</td><td>最終クーポン・アンケート</td></tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span>Web会員セグメント別施策</div>
+<table class="data-table">
+<thead><tr><th>対象セグメント</th><th>施策</th><th>チャネル</th><th>予測効果</th><th>ステータス</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-red">離脱危険</span></td><td><strong>復帰限定30%OFFクーポン</strong></td><td>メール+LINE</td><td class="effect-text">復帰率 15%</td><td><span class="badge badge-green">配信中</span></td><td><button class="btn btn-outline btn-sm">効果確認</button></td></tr>
+<tr><td><span class="badge badge-orange">休眠</span></td><td><strong>お忘れではないですか？メール</strong></td><td>メール</td><td class="effect-text">開封率 22%</td><td><span class="badge badge-green">配信中</span></td><td><button class="btn btn-outline btn-sm">効果確認</button></td></tr>
+<tr><td><span class="badge badge-green">成長</span></td><td><strong>2回目購入で500ptプレゼント</strong></td><td>アプリPush</td><td class="effect-text">CVR +8%</td><td><span class="badge badge-blue">準備中</span></td><td><button class="btn btn-green btn-sm">配信</button></td></tr>
+<tr><td><span class="badge" style="background:#fce7f3;color:#be185d">VIP</span></td><td><strong>GW先行プレセール招待</strong></td><td>DM+メール</td><td class="effect-text">来店率 65%</td><td><span class="badge badge-blue">準備中</span></td><td><button class="btn btn-green btn-sm">配信</button></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page: メール配信 -->
+<div class="page-content" id="page-mail" style="display:none">
+<div class="page-title">✉️ メール配信</div>
+<div class="page-subtitle">Web会員へのメール・LINE・Push通知の配信管理</div>
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">📧 今月配信数</div><div class="kpi-value">3,420<span style="font-size:14px;color:#64748b">通</span></div></div>
+<div class="kpi-card"><div class="kpi-label">📬 平均開封率</div><div class="kpi-value">24.8<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub up">▲ 前月比 +2.1pt</div></div>
+<div class="kpi-card"><div class="kpi-label">🖱️ 平均クリック率</div><div class="kpi-value">5.2<span style="font-size:14px;color:#64748b">%</span></div></div>
+<div class="kpi-card"><div class="kpi-label">💰 メール経由売上</div><div class="kpi-value">&yen;286,000</div><div class="kpi-sub up">▲ +18.5%</div></div>
+</div>
+<div style="margin-bottom:20px"><button class="btn btn-green">＋ 新規メール作成</button></div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>配信履歴</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>配信日</th><th>件名</th><th>対象</th><th>配信数</th><th>開封率</th><th>クリック率</th><th>CV数</th><th>売上</th></tr></thead>
+<tbody>
+<tr><td>4/7</td><td><strong>【本日限定】ポイント5倍デー</strong></td><td>全Web会員</td><td>823通</td><td style="color:#16a34a;font-weight:700">28.3%</td><td>6.8%</td><td>12件</td><td>&yen;86,000</td></tr>
+<tr><td>4/5</td><td><strong>スプリングセール開催中！</strong></td><td>全会員</td><td>1,248通</td><td>22.1%</td><td>4.5%</td><td>18件</td><td>&yen;124,000</td></tr>
+<tr><td>4/3</td><td><strong>お誕生日おめでとうございます</strong></td><td>誕生月会員</td><td>4通</td><td style="color:#16a34a;font-weight:700">75.0%</td><td>50.0%</td><td>2件</td><td>&yen;32,000</td></tr>
+<tr><td>4/1</td><td><strong>4月の新着アイテムをチェック</strong></td><td>Web会員</td><td>823通</td><td>19.5%</td><td>3.8%</td><td>8件</td><td>&yen;44,000</td></tr>
+<tr><td>3/28</td><td><strong>【復帰特典】30%OFFクーポン</strong></td><td>休眠会員</td><td>225通</td><td style="color:#16a34a;font-weight:700">31.2%</td><td>8.4%</td><td>6件</td><td>&yen;52,000</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">⏰</span>配信予定</div>
+<table class="data-table">
+<thead><tr><th>配信予定日</th><th>件名</th><th>対象セグメント</th><th>配信数</th><th>ステータス</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td>4/10</td><td><strong>ウェアポイント5倍デー告知</strong></td><td>ウェア購入履歴あり</td><td>340通</td><td><span class="badge badge-blue">予約済</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td>4/12</td><td><strong>週末シューズセール案内</strong></td><td>シューズ興味層</td><td>520通</td><td><span class="badge badge-gray">下書き</span></td><td><button class="btn btn-green btn-sm">予約</button></td></tr>
+<tr><td>4/18</td><td><strong>GW先行セールVIP招待</strong></td><td>VIP+優良</td><td>287通</td><td><span class="badge badge-gray">下書き</span></td><td><button class="btn btn-green btn-sm">予約</button></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page: 離脱防止 -->
+<div class="page-content" id="page-churn" style="display:none">
+<div class="page-title">🚨 離脱防止</div>
+<div class="page-subtitle">離脱リスク会員の検知と自動フォローアップ</div>
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">🚨 離脱リスク会員</div><div class="kpi-value" style="color:#ef4444">87<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub" style="color:#ef4444">全会員の7.0%</div></div>
+<div class="kpi-card"><div class="kpi-label">📧 フォロー済</div><div class="kpi-value">52<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub info">クーポン送付済</div></div>
+<div class="kpi-card"><div class="kpi-label">🔄 復帰成功</div><div class="kpi-value" style="color:#16a34a">18<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub up">復帰率 34.6%</div></div>
+<div class="kpi-card"><div class="kpi-label">💰 復帰顧客売上</div><div class="kpi-value">&yen;142,000</div><div class="kpi-sub up">▲ 施策効果</div></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">⚠️</span>離脱リスク会員一覧（上位）</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>会員</th><th>ランク</th><th>最終来店</th><th>未来店日数</th><th>過去LTV</th><th>リスクスコア</th><th>フォロー</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td><strong>松田健一</strong></td><td><span class="badge badge-blue">シルバー</span></td><td>2025-12-15</td><td style="color:#ef4444;font-weight:700">113日</td><td>&yen;95,000</td><td><span class="badge badge-red">高</span></td><td><span class="badge badge-green">クーポン送付済</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+<tr><td><strong>山田理恵</strong></td><td><span class="badge badge-orange">ゴールド</span></td><td>2026-01-08</td><td style="color:#ef4444;font-weight:700">89日</td><td>&yen;220,000</td><td><span class="badge badge-red">高</span></td><td><span class="badge badge-red">未対応</span></td><td><button class="btn btn-green btn-sm">フォロー</button></td></tr>
+<tr><td><strong>石井大輔</strong></td><td><span class="badge badge-gray">レギュラー</span></td><td>2026-01-20</td><td style="color:#f59e0b;font-weight:700">77日</td><td>&yen;32,000</td><td><span class="badge badge-orange">中</span></td><td><span class="badge badge-green">メール送付済</span></td><td><button class="btn btn-outline btn-sm">詳細</button></td></tr>
+<tr><td><strong>佐々木瞳</strong></td><td><span class="badge badge-blue">シルバー</span></td><td>2026-01-25</td><td style="color:#f59e0b;font-weight:700">72日</td><td>&yen;68,000</td><td><span class="badge badge-orange">中</span></td><td><span class="badge badge-red">未対応</span></td><td><button class="btn btn-green btn-sm">フォロー</button></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">⚙️</span>自動フォロー設定</div>
+<div class="stat-row"><span class="stat-label">離脱判定基準</span><span class="stat-value">90日以上未来店</span></div>
+<div class="stat-row"><span class="stat-label">自動クーポン発行</span><span class="stat-value" style="color:#16a34a">● 有効（30%OFFクーポン）</span></div>
+<div class="stat-row"><span class="stat-label">自動メール配信</span><span class="stat-value" style="color:#16a34a">● 有効（60日時点で警告メール）</span></div>
+<div class="stat-row"><span class="stat-label">LINE通知</span><span class="stat-value" style="color:#16a34a">● 有効（75日時点で限定クーポン）</span></div>
+</div>
+</div>
+
+<!-- Page: 競合ベンチマーク -->
+<div class="page-content" id="page-competitor" style="display:none">
+<div class="page-title">🔍 競合ベンチマーク</div>
+<div class="page-subtitle">競合店舗の販促施策分析と自社との比較</div>
+<div class="card">
+<div class="card-title"><span class="icon">🏬</span>競合店舗比較</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>店舗</th><th>推定月商</th><th>主力カテゴリ</th><th>セール頻度</th><th>ポイント倍率</th><th>Web会員</th><th>アプリ</th><th>脅威度</th></tr></thead>
+<tbody>
+<tr style="background:#f0fdf4"><td><strong>ワールドスポーツ（自社）</strong></td><td>&yen;3,450,000</td><td>シューズ・ゴルフ</td><td>月2回</td><td>最大10倍</td><td>823人</td><td>なし</td><td>-</td></tr>
+<tr><td><strong>スポーツデポ 天神店</strong></td><td>&yen;8,200,000</td><td>全カテゴリ</td><td>毎週</td><td>最大20倍</td><td>推定5,000+</td><td>あり</td><td><span class="badge badge-red">高</span></td></tr>
+<tr><td><strong>ゼビオ 福岡店</strong></td><td>&yen;6,500,000</td><td>ウェア・シューズ</td><td>月3回</td><td>最大15倍</td><td>推定3,500+</td><td>あり</td><td><span class="badge badge-red">高</span></td></tr>
+<tr><td><strong>ヒマラヤ 博多店</strong></td><td>&yen;4,800,000</td><td>アウトドア・ゴルフ</td><td>月2回</td><td>最大10倍</td><td>推定2,000+</td><td>あり</td><td><span class="badge badge-orange">中</span></td></tr>
+<tr><td><strong>ABC-MART 天神</strong></td><td>&yen;5,100,000</td><td>シューズ特化</td><td>常時</td><td>最大5倍</td><td>推定8,000+</td><td>あり</td><td><span class="badge badge-orange">中（シューズのみ）</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📊</span>競合の販促施策（直近）</div>
+<table class="data-table">
+<thead><tr><th>競合</th><th>施策名</th><th>種別</th><th>内容</th><th>期間</th><th>自社への影響</th><th>対抗策</th></tr></thead>
+<tbody>
+<tr><td>スポーツデポ</td><td><strong>春の大感謝祭</strong></td><td><span class="badge badge-red">セール</span></td><td>全品最大40%OFF</td><td>4/5〜4/13</td><td><span class="badge badge-red">大</span></td><td><button class="btn btn-green btn-sm">対抗施策作成</button></td></tr>
+<tr><td>ゼビオ</td><td><strong>アプリ会員限定ポイント20倍</strong></td><td><span class="badge badge-blue">ポイント</span></td><td>アプリ限定</td><td>4/10〜4/13</td><td><span class="badge badge-orange">中</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+<tr><td>ヒマラヤ</td><td><strong>ゴルフフェア</strong></td><td><span class="badge badge-red">セール</span></td><td>ゴルフ用品20%OFF</td><td>4/12〜4/20</td><td><span class="badge badge-orange">中</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+<tr><td>ABC-MART</td><td><strong>新作シューズポイント還元</strong></td><td><span class="badge badge-blue">ポイント</span></td><td>新作購入で10%還元</td><td>通年</td><td><span class="badge badge-orange">中</span></td><td><button class="btn btn-outline btn-sm">分析</button></td></tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">💡</span>AI推奨：対抗施策</div>
+<div class="alert alert-danger">スポーツデポの春の大感謝祭(最大40%OFF)への対抗が急務。シューズカテゴリの週末20%OFF施策の前倒しを推奨</div>
+<div class="alert alert-warn">ゼビオのアプリ限定施策に対し、Web会員限定クーポンで差別化を検討してください</div>
+<div class="alert alert-info">ヒマラヤのゴルフフェアと時期が重複。ゴルフクラブのゴールデンゾーン配置と組み合わせた施策が効果的です</div>
+</div>
+</div>
+
 <script>
-document.querySelectorAll('.sidebar-menu a').forEach(function(link){
+// SPA page switching
+document.querySelectorAll('.sidebar-menu a[data-page]').forEach(function(link){
 link.addEventListener('click',function(e){
 e.preventDefault();
+var pageId=this.getAttribute('data-page');
+if(!pageId) return;
 document.querySelectorAll('.sidebar-menu a').forEach(function(l){l.classList.remove('active')});
 this.classList.add('active');
+document.querySelectorAll('.page-content').forEach(function(p){p.style.display='none'});
+var target=document.getElementById(pageId);
+if(target) target.style.display='block';
+window.scrollTo(0,0);
 });
 });
+// Tab switching
 document.querySelectorAll('.tab-btn').forEach(function(btn){
 btn.addEventListener('click',function(){
 var tabId=this.getAttribute('data-tab');
@@ -975,12 +1219,19 @@ this.closest('.card').querySelectorAll('.tab-content').forEach(function(tc){tc.c
 document.getElementById(tabId).classList.add('active');
 });
 });
+// POP form toggle
 function togglePopForm(){
 var form=document.getElementById('pop-form');
 form.classList.toggle('show');
 var btn=document.getElementById('btn-new-pop');
-btn.textContent=form.classList.contains('show')?'✕ 閉じる':'＋ 新規POP作成';
+btn.textContent=form.classList.contains('show')?'\u2715 閉じる':'\uff0b 新規POP作成';
 }
+// Show dashboard on load
+(function(){
+document.querySelectorAll('.page-content').forEach(function(p){p.style.display='none'});
+var dash=document.getElementById('page-dashboard');
+if(dash) dash.style.display='block';
+})();
 </script>
 </body>
 </html>
