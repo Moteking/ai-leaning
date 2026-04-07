@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ロボットとあそぼう！</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  overflow: hidden;
+  font-family: 'Rounded Mplus 1c', 'Hiragino Maru Gothic Pro', 'Yu Gothic', sans-serif;
+  background: linear-gradient(180deg, #1a1a3e 0%, #2d2d6b 40%, #3a3a8a 100%);
+  height: 100vh;
+  width: 100vw;
+}
+
+/* 星空 */
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+/* 地面 */
+.ground {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  background: linear-gradient(180deg, #4a7c3f, #3a6a2f);
+  border-top: 4px solid #5a9c4f;
+  z-index: 1;
+}
+
+/* タイトル */
+.title {
+  position: fixed;
+  top: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: clamp(24px, 5vw, 48px);
+  color: #ffdd57;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ロボット */
+.robot-container {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  cursor: pointer;
+  transition: bottom 0.3s ease;
+}
+
+.robot {
+  position: relative;
+  width: clamp(120px, 30vw, 200px);
+  height: clamp(180px, 45vw, 300px);
+}
+
+/* ロボット頭 */
+.robot-head {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 35%;
+  background: linear-gradient(135deg, #7ec8e3, #5ba3c9);
+  border-radius: 20px 20px 15px 15px;
+  border: 3px solid #4a8aaa;
+  box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1);
+}
+
+/* アンテナ */
+.antenna {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 20px;
+  background: #888;
+}
+.antenna::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  animation: antenna-glow 1s infinite alternate;
+}
+@keyframes antenna-glow {
+  0% { background: #ff6b6b; box-shadow: 0 0 5px #ff6b6b; }
+  100% { background: #ffaa00; box-shadow: 0 0 15px #ffaa00; }
+}
+
+/* 目 */
+.eyes {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+}
+.eye {
+  width: clamp(20px, 5vw, 35px);
+  height: clamp(20px, 5vw, 35px);
+  background: white;
+  border-radius: 50%;
+  position: relative;
+  border: 2px solid #333;
+}
+.pupil {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background: #333;
+  border-radius: 50%;
+  top: 25%;
+  left: 25%;
+  transition: all 0.2s;
+}
+.eye-shine {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  background: white;
+  border-radius: 50%;
+  top: 15%;
+  right: 15%;
+}
+
+/* 口 */
+.mouth {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 12%;
+  background: #333;
+  border-radius: 0 0 20px 20px;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+.mouth.happy {
+  border-radius: 0 0 20px 20px;
+  height: 15%;
+}
+.mouth.happy::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 40%;
+  background: #ff6b8a;
+  border-radius: 0 0 15px 15px;
+}
+
+/* ロボット体 */
+.robot-body {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 40%;
+  background: linear-gradient(135deg, #7ec8e3, #5ba3c9);
+  border-radius: 15px;
+  border: 3px solid #4a8aaa;
+  box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1);
+}
+
+/* おなかのボタン */
+.belly-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 8px;
+}
+.belly-btn {
+  width: clamp(18px, 4vw, 28px);
+  height: clamp(18px, 4vw, 28px);
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.belly-btn:active {
+  transform: scale(0.9);
+}
+.belly-btn.red { background: #ff6b6b; box-shadow: 0 0 8px #ff6b6b; }
+.belly-btn.yellow { background: #ffdd57; box-shadow: 0 0 8px #ffdd57; }
+.belly-btn.green { background: #6bff8a; box-shadow: 0 0 8px #6bff8a; }
+
+/* 腕 */
+.arm {
+  position: absolute;
+  top: 38%;
+  width: 15%;
+  height: 30%;
+  background: linear-gradient(135deg, #7ec8e3, #5ba3c9);
+  border: 3px solid #4a8aaa;
+  border-radius: 10px;
+  transform-origin: top center;
+  transition: transform 0.3s;
+}
+.arm.left { left: 2%; transform: rotate(10deg); }
+.arm.right { right: 2%; transform: rotate(-10deg); }
+.arm.wave-left { animation: wave-left 0.5s ease-in-out; }
+.arm.wave-right { animation: wave-right 0.5s ease-in-out; }
+
+@keyframes wave-left {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(-40deg); }
+}
+@keyframes wave-right {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(40deg); }
+}
+
+/* 手 */
+.hand {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 20%;
+  background: #5ba3c9;
+  border-radius: 50%;
+  border: 2px solid #4a8aaa;
+}
+
+/* 脚 */
+.leg {
+  position: absolute;
+  bottom: 2%;
+  width: 22%;
+  height: 22%;
+  background: linear-gradient(135deg, #7ec8e3, #5ba3c9);
+  border: 3px solid #4a8aaa;
+  border-radius: 8px 8px 12px 12px;
+}
+.leg.left { left: 18%; }
+.leg.right { right: 18%; }
+
+/* 足 */
+.foot {
+  position: absolute;
+  bottom: -5px;
+  width: 120%;
+  height: 30%;
+  background: #4a8aaa;
+  border-radius: 5px 5px 10px 10px;
+}
+.leg.left .foot { left: -10%; }
+.leg.right .foot { right: -10%; }
+
+/* ジャンプ */
+.robot-container.jump {
+  animation: jump 0.6s ease;
+}
+@keyframes jump {
+  0%, 100% { bottom: 80px; }
+  40% { bottom: 180px; }
+}
+
+/* ダンス */
+.robot-container.dance {
+  animation: dance 0.8s ease;
+}
+@keyframes dance {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-10deg); }
+  75% { transform: translateX(-50%) rotate(10deg); }
+}
+
+/* くるくる */
+.robot-container.spin {
+  animation: spin 0.8s ease;
+}
+@keyframes spin {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+/* ハートエフェクト */
+.heart {
+  position: fixed;
+  font-size: 30px;
+  pointer-events: none;
+  z-index: 20;
+  animation: float-up 1.5s ease-out forwards;
+}
+@keyframes float-up {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
+}
+
+/* 星エフェクト */
+.sparkle {
+  position: fixed;
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 20;
+  animation: sparkle-anim 0.8s ease-out forwards;
+}
+@keyframes sparkle-anim {
+  0% { opacity: 1; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(360deg); }
+}
+
+/* ボタンエリア */
+.button-area {
+  position: fixed;
+  bottom: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 20px);
+  z-index: 10;
+  flex-wrap: wrap;
+  padding: 0 10px;
+}
+
+.action-btn {
+  padding: clamp(10px, 2vw, 18px) clamp(16px, 3vw, 28px);
+  font-size: clamp(16px, 3.5vw, 26px);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.action-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.btn-jump { background: linear-gradient(135deg, #ff6b6b, #ee5a5a); }
+.btn-dance { background: linear-gradient(135deg, #ffdd57, #f0c040); color: #333; }
+.btn-spin { background: linear-gradient(135deg, #6bff8a, #4ade6a); color: #333; }
+.btn-color { background: linear-gradient(135deg, #b06bff, #9040f0); }
+
+/* メッセージ */
+.message {
+  position: fixed;
+  top: clamp(60px, 12vw, 100px);
+  width: 100%;
+  text-align: center;
+  font-size: clamp(20px, 4vw, 36px);
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.message.show {
+  opacity: 1;
+  animation: bounce-msg 0.5s ease;
+}
+@keyframes bounce-msg {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* 色変え */
+.robot.color-pink .robot-head,
+.robot.color-pink .robot-body,
+.robot.color-pink .arm {
+  background: linear-gradient(135deg, #ffaacc, #ff88aa) !important;
+  border-color: #dd6699 !important;
+}
+.robot.color-orange .robot-head,
+.robot.color-orange .robot-body,
+.robot.color-orange .arm {
+  background: linear-gradient(135deg, #ffcc77, #ffaa44) !important;
+  border-color: #dd8822 !important;
+}
+.robot.color-purple .robot-head,
+.robot.color-purple .robot-body,
+.robot.color-purple .arm {
+  background: linear-gradient(135deg, #cc99ff, #aa66ff) !important;
+  border-color: #8844dd !important;
+}
+.robot.color-green .robot-head,
+.robot.color-green .robot-body,
+.robot.color-green .arm {
+  background: linear-gradient(135deg, #88eebb, #55cc88) !important;
+  border-color: #33aa66 !important;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="ground"></div>
+
+<div class="title">🤖 ロボットとあそぼう！</div>
+<div class="message" id="message"></div>
+
+<div class="robot-container" id="robotContainer">
+  <div class="robot" id="robot">
+    <!-- 頭 -->
+    <div class="robot-head">
+      <div class="antenna"></div>
+      <div class="eyes">
+        <div class="eye">
+          <div class="pupil" id="pupilL"></div>
+          <div class="eye-shine"></div>
+        </div>
+        <div class="eye">
+          <div class="pupil" id="pupilR"></div>
+          <div class="eye-shine"></div>
+        </div>
+      </div>
+      <div class="mouth happy" id="mouth"></div>
+    </div>
+
+    <!-- 体 -->
+    <div class="robot-body">
+      <div class="belly-buttons">
+        <div class="belly-btn red" data-color="red"></div>
+        <div class="belly-btn yellow" data-color="yellow"></div>
+        <div class="belly-btn green" data-color="green"></div>
+      </div>
+    </div>
+
+    <!-- 腕 -->
+    <div class="arm left" id="armL"><div class="hand"></div></div>
+    <div class="arm right" id="armR"><div class="hand"></div></div>
+
+    <!-- 脚 -->
+    <div class="leg left"><div class="foot"></div></div>
+    <div class="leg right"><div class="foot"></div></div>
+  </div>
+</div>
+
+<div class="button-area">
+  <button class="action-btn btn-jump" onclick="doJump()">⬆️ ジャンプ</button>
+  <button class="action-btn btn-dance" onclick="doDance()">💃 ダンス</button>
+  <button class="action-btn btn-spin" onclick="doSpin()">🌀 くるくる</button>
+  <button class="action-btn btn-color" onclick="doColor()">🎨 いろかえ</button>
+</div>
+
+<script>
+// Web Audio でかわいい音を鳴らす
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, duration, type = 'sine') {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playJumpSound() {
+  playTone(300, 0.15);
+  setTimeout(() => playTone(500, 0.15), 80);
+  setTimeout(() => playTone(700, 0.2), 160);
+}
+
+function playDanceSound() {
+  const notes = [523, 587, 659, 698];
+  notes.forEach((n, i) => setTimeout(() => playTone(n, 0.15, 'square'), i * 120));
+}
+
+function playSpinSound() {
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => playTone(400 + i * 80, 0.1, 'triangle'), i * 80);
+  }
+}
+
+function playColorSound() {
+  playTone(880, 0.1);
+  setTimeout(() => playTone(1100, 0.15), 100);
+}
+
+function playBellySound(color) {
+  const freq = color === 'red' ? 523 : color === 'yellow' ? 659 : 784;
+  playTone(freq, 0.3);
+  setTimeout(() => playTone(freq * 1.25, 0.3), 150);
+}
+
+// 星をランダムに配置
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 3 + 1;
+  s.style.width = size + 'px';
+  s.style.height = size + 'px';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 60 + '%';
+  s.style.animationDelay = Math.random() * 2 + 's';
+  s.style.animationDuration = (1.5 + Math.random()) + 's';
+  starsEl.appendChild(s);
+}
+
+const container = document.getElementById('robotContainer');
+const robot = document.getElementById('robot');
+const msgEl = document.getElementById('message');
+let busy = false;
+
+// メッセージ表示
+const jumpMessages = ['やったー！', 'たかーい！', 'ぴょーん！', 'すごーい！'];
+const danceMessages = ['ノリノリ♪', 'たのしー！', 'おどろう！', 'イェーイ！'];
+const spinMessages = ['くるくる～！', 'まわるよ！', 'ぐるーん！', 'わーい！'];
+const colorMessages = ['きれい！', 'すてき！', 'かわいい！', 'ぴかぴか！'];
+
+function showMessage(messages) {
+  msgEl.classList.remove('show');
+  void msgEl.offsetWidth;
+  msgEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+  msgEl.classList.add('show');
+  setTimeout(() => msgEl.classList.remove('show'), 1500);
+}
+
+// エフェクト
+function spawnHearts(x, y) {
+  const emojis = ['❤️', '💛', '💚', '💜', '⭐', '🌟'];
+  for (let i = 0; i < 5; i++) {
+    const el = document.createElement('div');
+    el.className = 'heart';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
+    el.style.top = (y + (Math.random() - 0.5) * 40) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  }
+}
+
+function spawnSparkles(x, y) {
+  const emojis = ['✨', '⭐', '🌟', '💫'];
+  for (let i = 0; i < 8; i++) {
+    const el = document.createElement('div');
+    el.className = 'sparkle';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (x + (Math.random() - 0.5) * 120) + 'px';
+    el.style.top = (y + (Math.random() - 0.5) * 120) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+}
+
+// アクション
+function doJump() {
+  if (busy) return;
+  busy = true;
+  audioCtx.resume();
+  playJumpSound();
+  container.classList.remove('jump', 'dance', 'spin');
+  void container.offsetWidth;
+  container.classList.add('jump');
+  showMessage(jumpMessages);
+  const rect = container.getBoundingClientRect();
+  spawnHearts(rect.left + rect.width / 2, rect.top);
+  setTimeout(() => { container.classList.remove('jump'); busy = false; }, 700);
+}
+
+function doDance() {
+  if (busy) return;
+  busy = true;
+  audioCtx.resume();
+  playDanceSound();
+  container.classList.remove('jump', 'dance', 'spin');
+  void container.offsetWidth;
+  container.classList.add('dance');
+  document.getElementById('armL').classList.add('wave-left');
+  document.getElementById('armR').classList.add('wave-right');
+  showMessage(danceMessages);
+  const rect = container.getBoundingClientRect();
+  spawnSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  setTimeout(() => {
+    container.classList.remove('dance');
+    document.getElementById('armL').classList.remove('wave-left');
+    document.getElementById('armR').classList.remove('wave-right');
+    busy = false;
+  }, 900);
+}
+
+function doSpin() {
+  if (busy) return;
+  busy = true;
+  audioCtx.resume();
+  playSpinSound();
+  container.classList.remove('jump', 'dance', 'spin');
+  void container.offsetWidth;
+  container.classList.add('spin');
+  showMessage(spinMessages);
+  const rect = container.getBoundingClientRect();
+  spawnSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  setTimeout(() => { container.classList.remove('spin'); busy = false; }, 900);
+}
+
+const colors = ['color-pink', 'color-orange', 'color-purple', 'color-green'];
+let colorIdx = -1;
+function doColor() {
+  audioCtx.resume();
+  playColorSound();
+  colors.forEach(c => robot.classList.remove(c));
+  colorIdx = (colorIdx + 1) % colors.length;
+  robot.classList.add(colors[colorIdx]);
+  showMessage(colorMessages);
+  const rect = container.getBoundingClientRect();
+  spawnSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+}
+
+// おなかボタン
+document.querySelectorAll('.belly-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    audioCtx.resume();
+    playBellySound(btn.dataset.color);
+    const rect = btn.getBoundingClientRect();
+    spawnHearts(rect.left + rect.width / 2, rect.top);
+    showMessage(['ピッ！', 'ポッ！', 'プッ！', 'うふふ！']);
+  });
+});
+
+// ロボットをタップ/クリックでも反応
+container.addEventListener('click', (e) => {
+  if (e.target.classList.contains('belly-btn')) return;
+  if (busy) return;
+  const actions = [doJump, doDance, doSpin];
+  actions[Math.floor(Math.random() * actions.length)]();
+});
+
+// 目がマウス/タッチを追う
+function movePupils(x, y) {
+  const pupils = [document.getElementById('pupilL'), document.getElementById('pupilR')];
+  pupils.forEach(p => {
+    const eye = p.parentElement;
+    const rect = eye.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const dist = Math.min(Math.sqrt(dx * dx + dy * dy), rect.width * 0.2);
+    const angle = Math.atan2(dy, dx);
+    p.style.left = (50 + (dist / rect.width) * 100 * Math.cos(angle) - 25) + '%';
+    p.style.top = (50 + (dist / rect.height) * 100 * Math.sin(angle) - 25) + '%';
+  });
+}
+
+document.addEventListener('mousemove', e => movePupils(e.clientX, e.clientY));
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 0) movePupils(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+</script>
+</body>
+</html>
