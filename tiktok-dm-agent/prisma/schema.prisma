@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Affiliator {
+  id           String   @id @default(cuid())
+  tiktokHandle String   @unique
+  name         String
+  followers    Int
+  niche        String
+  avgViews     Int
+  engageRate   Float
+  email        String?
+  notes        String?
+  status       String   @default("new")
+  createdAt    DateTime @default(now())
+  dms          DM[]
+}
+
+model DM {
+  id           String     @id @default(cuid())
+  affiliatorId String
+  affiliator   Affiliator @relation(fields: [affiliatorId], references: [id])
+  campaignType String
+  product      String
+  commission   String?
+  content      String
+  sentAt       DateTime?
+  status       String     @default("draft")
+  createdAt    DateTime   @default(now())
+}
