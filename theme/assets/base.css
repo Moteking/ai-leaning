@@ -1055,10 +1055,19 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   overflow: hidden;
   color: #FFFFFF;
   background: #000;
+  /* Mobile: slightly taller ratio so heading stays legible */
+  aspect-ratio: 4 / 5;
+  width: 100%;
 }
-.hero-slider--medium { height: 520px; }
-.hero-slider--large { height: 720px; }
-.hero-slider--full { height: calc(100vh - 120px); }
+@media (min-width: 750px) {
+  .hero-slider {
+    /* Desktop: wide cinematic ratio matching reference hero image */
+    aspect-ratio: 1920 / 820;
+  }
+}
+.hero-slider--medium { max-height: 640px; }
+.hero-slider--large { max-height: 820px; }
+.hero-slider--full { max-height: calc(100vh - 120px); }
 
 .hero-slider__track {
   position: relative;
