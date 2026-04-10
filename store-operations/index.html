@@ -67,6 +67,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 .btn-blue{background:#3b82f6;color:#fff}.btn-blue:hover{background:#2563eb}
 .btn-sm{padding:4px 10px;font-size:11px}
 .action-btns{display:flex;gap:6px}
+.badge-warn{background:#fefce8;color:#a16207}
+.badge-info{background:#eff6ff;color:#2563eb}
+.badge-ok{background:#f0fdf4;color:#16a34a}
+.progress-bar{height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;position:relative;min-width:60px;display:inline-block;vertical-align:middle}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.progress-fill.green{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.progress-fill.yellow{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.progress-fill.red{background:linear-gradient(90deg,#f87171,#ef4444)}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;color:#475569;margin-bottom:4px;font-weight:600}
+.form-group select,.form-group input{width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;background:#fff;color:#1e293b}
+.shelf-item{padding:12px;border-radius:6px;font-size:12px;text-align:center}
+.ma-flow{display:flex;gap:0;align-items:center;flex-wrap:wrap;margin:16px 0}
+.ma-node{background:#fff;border:2px solid #22c55e;border-radius:10px;padding:12px 16px;min-width:140px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.ma-node.trigger{border-color:#3b82f6;background:#eff6ff}
+.ma-node.action{border-color:#22c55e;background:#f0fdf4}
+.ma-node.wait{border-color:#f59e0b;background:#fffbeb}
+.ma-node.branch{border-color:#8b5cf6;background:#faf5ff}
+.ma-node .ma-type{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+.ma-node .ma-label{font-size:12px;font-weight:700;color:#1e293b}
+.ma-arrow{font-size:20px;color:#cbd5e1;padding:0 8px}
+.journey-steps{position:relative;margin:20px 0}
+.journey-step{display:flex;gap:16px;padding:16px;border-radius:8px;margin-bottom:8px;background:#fff;border:1px solid #e2e8f0}
+.journey-num{width:40px;height:40px;border-radius:50%;background:#22c55e;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.journey-body{flex:1}
+.journey-body h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.journey-body p{font-size:12px;color:#64748b;line-height:1.5}
+.journey-meta{display:flex;gap:12px;margin-top:8px;font-size:11px;color:#475569}
+.journey-meta span{background:#f1f5f9;padding:3px 8px;border-radius:4px}
+.nps-gauge{display:flex;align-items:center;gap:16px;margin:12px 0}
+.nps-score{font-size:56px;font-weight:900;color:#22c55e;line-height:1}
+.nps-label{font-size:13px;color:#64748b}
+.nps-bar{display:flex;height:32px;border-radius:6px;overflow:hidden;margin:12px 0}
+.nps-detractor{background:#ef4444}
+.nps-passive{background:#f59e0b}
+.nps-promoter{background:#22c55e}
+.nps-bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
 .pop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px}
 .pop-card{border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);transition:transform .15s}
 .pop-card:hover{transform:translateY(-2px)}
@@ -198,6 +235,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <li><a href="#" data-page="page-crm"><span class="icon">💎</span>CRMダッシュボード</a></li>
 <li><a href="#" data-page="page-segment"><span class="icon">🎯</span>顧客セグメント</a></li>
 <li><a href="#" data-page="page-mail"><span class="icon">✉️</span>メール配信</a></li>
+<li><a href="#" data-page="page-ma"><span class="icon">🤖</span>MAシナリオ</a></li>
+<li><a href="#" data-page="page-journey"><span class="icon">🗺️</span>カスタマージャーニー</a></li>
+<li><a href="#" data-page="page-nps"><span class="icon">📝</span>NPS・アンケート</a></li>
 <li><a href="#" data-page="page-churn"><span class="icon">🚨</span>離脱防止</a></li>
 </ul>
 </div>
@@ -865,7 +905,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 <div class="basis-card">
 <h4>👥 顧客行動分析</h4>
 <p>会員購買履歴とセグメント分析から最適なターゲティング</p>
-</div>
 </div>
 </div>
 </div>
@@ -1578,6 +1617,202 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hi
 </div>
 
 <!-- Page: 離脱防止 -->
+<!-- Page: MAシナリオ -->
+<div class="page-content" id="page-ma" style="display:none">
+<div class="page-title">🤖 マーケティングオートメーション</div>
+<div class="page-subtitle">顧客行動をトリガーとした自動シナリオ配信・ステップ施策管理</div>
+
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">🤖 稼働中シナリオ</div><div class="kpi-value">6<span style="font-size:14px;color:#64748b">本</span></div><div class="kpi-sub info">自動配信中</div></div>
+<div class="kpi-card"><div class="kpi-label">📧 月間自動配信</div><div class="kpi-value">1,284<span style="font-size:14px;color:#64748b">通</span></div><div class="kpi-sub up">▲ 前月比 +18.5%</div></div>
+<div class="kpi-card"><div class="kpi-label">💰 MA経由売上</div><div class="kpi-value" style="color:#16a34a">&yen;425,000</div><div class="kpi-sub up">▲ 月間CV 58件</div></div>
+<div class="kpi-card"><div class="kpi-label">📊 平均CVR</div><div class="kpi-value">4.5<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub up">業界平均2.1%</div></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span>稼働中シナリオ一覧</div>
+<div style="overflow-x:auto">
+<table class="data-table">
+<thead><tr><th>シナリオ名</th><th>トリガー</th><th>ステップ数</th><th>対象セグメント</th><th>配信チャネル</th><th>CVR</th><th>売上貢献</th><th>ステータス</th><th>アクション</th></tr></thead>
+<tbody>
+<tr><td><strong>新規会員ウェルカム</strong></td><td>新規登録</td><td>4ステップ</td><td>新規会員</td><td>メール+LINE</td><td class="effect-text">8.2%</td><td>&yen;128,000</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td><strong>カート放棄リマインド</strong></td><td>カート放棄後24h</td><td>3ステップ</td><td>ECユーザー</td><td>メール</td><td class="effect-text">12.5%</td><td>&yen;86,500</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td><strong>誕生日月シナリオ</strong></td><td>誕生月1日</td><td>2ステップ</td><td>全会員</td><td>メール+LINE+DM</td><td class="effect-text">45.8%</td><td>&yen;52,000</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td><strong>2回目購入促進</strong></td><td>初回購入後7日</td><td>3ステップ</td><td>成長セグメント</td><td>メール+Push</td><td class="effect-text">6.8%</td><td>&yen;45,000</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td><strong>VIP特別招待</strong></td><td>累計購入10万円超</td><td>2ステップ</td><td>VIP</td><td>DM+メール</td><td class="effect-text">28.5%</td><td>&yen;92,500</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+<tr><td><strong>離脱予兆フォロー</strong></td><td>最終来店60日</td><td>3ステップ</td><td>休眠予備軍</td><td>メール+LINE</td><td class="effect-text">15.2%</td><td>&yen;21,000</td><td><span class="badge badge-green">稼働中</span></td><td><button class="btn btn-outline btn-sm">編集</button></td></tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:16px"><button class="btn btn-green">＋ 新規シナリオ作成</button></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">🔀</span>シナリオフロー：新規会員ウェルカム（詳細）</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">新規会員登録から初回購入までの4ステップ自動シナリオ</p>
+<div class="ma-flow">
+<div class="ma-node trigger"><div class="ma-type">🎯 TRIGGER</div><div class="ma-label">新規会員登録</div></div>
+<div class="ma-arrow">→</div>
+<div class="ma-node action"><div class="ma-type">📧 Step 1</div><div class="ma-label">即時ウェルカム<br>メール配信</div></div>
+<div class="ma-arrow">→</div>
+<div class="ma-node wait"><div class="ma-type">⏱️ WAIT</div><div class="ma-label">3日後</div></div>
+<div class="ma-arrow">→</div>
+<div class="ma-node branch"><div class="ma-type">🔀 BRANCH</div><div class="ma-label">初回購入<br>あり? なし?</div></div>
+</div>
+<div class="ma-flow" style="margin-top:8px;padding-left:40px">
+<div class="ma-node action"><div class="ma-type">📧 Step 2A</div><div class="ma-label">購入お礼<br>+関連商品</div></div>
+<div class="ma-arrow">→</div>
+<div class="ma-node wait"><div class="ma-type">⏱️ 7日後</div><div class="ma-label">再購入促進</div></div>
+<div class="ma-arrow">　</div>
+<div class="ma-node action" style="border-color:#f59e0b;background:#fffbeb"><div class="ma-type">📧 Step 2B</div><div class="ma-label">¥500クーポン<br>付き再案内</div></div>
+</div>
+<div class="alert alert-info" style="margin-top:16px">💡 このシナリオは過去3ヶ月で132人の新規会員に配信され、CVR 8.2%（業界平均3.5%の約2.3倍）を達成しています</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">📚</span>シナリオテンプレート</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">業界ベストプラクティスに基づくテンプレート。クリック1つで導入可能</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+<div style="background:#f8fafc;padding:16px;border-radius:8px;border:1px solid #e2e8f0"><h4 style="font-size:13px;font-weight:700">🛒 カート放棄リマインド</h4><p style="font-size:11px;color:#64748b;margin:6px 0">放棄24h/48h/72hの3段階配信</p><button class="btn btn-green btn-sm">導入</button></div>
+<div style="background:#f8fafc;padding:16px;border-radius:8px;border:1px solid #e2e8f0"><h4 style="font-size:13px;font-weight:700">🎁 購入後フォロー</h4><p style="font-size:11px;color:#64748b;margin:6px 0">レビュー依頼+関連商品レコメンド</p><button class="btn btn-green btn-sm">導入</button></div>
+<div style="background:#f8fafc;padding:16px;border-radius:8px;border:1px solid #e2e8f0"><h4 style="font-size:13px;font-weight:700">📅 季節イベント告知</h4><p style="font-size:11px;color:#64748b;margin:6px 0">GW/夏/年末年始などの季節施策</p><button class="btn btn-green btn-sm">導入</button></div>
+<div style="background:#f8fafc;padding:16px;border-radius:8px;border:1px solid #e2e8f0"><h4 style="font-size:13px;font-weight:700">⭐ ランクアップ促進</h4><p style="font-size:11px;color:#64748b;margin:6px 0">あと¥10,000でゴールド等</p><button class="btn btn-green btn-sm">導入</button></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">🧪</span>A/Bテスト進行中</div>
+<table class="data-table">
+<thead><tr><th>テスト名</th><th>バリエーション</th><th>配信数</th><th>開封率</th><th>CVR</th><th>有意差</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td rowspan="2"><strong>ウェルカムメール件名</strong></td><td>A: 「ご登録ありがとうございます」</td><td>66通</td><td>24.5%</td><td>6.1%</td><td rowspan="2">あり(p&lt;0.05)</td><td rowspan="2"><span class="badge badge-green">Bが勝利</span></td></tr>
+<tr><td>B: 「【500ptプレゼント】ワールドスポーツへようこそ」</td><td>66通</td><td style="color:#16a34a;font-weight:700">42.3%</td><td style="color:#16a34a;font-weight:700">10.3%</td></tr>
+<tr><td rowspan="2"><strong>CTA文言</strong></td><td>A: 「詳しく見る」</td><td>412通</td><td>-</td><td>3.8%</td><td rowspan="2">測定中</td><td rowspan="2"><span class="badge badge-blue">継続中</span></td></tr>
+<tr><td>B: 「今すぐクーポンを使う」</td><td>412通</td><td>-</td><td>4.6%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Page: カスタマージャーニー -->
+<div class="page-content" id="page-journey" style="display:none">
+<div class="page-title">🗺️ カスタマージャーニー</div>
+<div class="page-subtitle">顧客の認知〜ロイヤル化までの行動追跡とタッチポイント最適化</div>
+
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">👥 月間新規訪問者</div><div class="kpi-value">2,850<span style="font-size:14px;color:#64748b">人</span></div><div class="kpi-sub info">Web+店舗</div></div>
+<div class="kpi-card"><div class="kpi-label">🎯 会員化率</div><div class="kpi-value">18.5<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub up">▲ +2.3pt</div></div>
+<div class="kpi-card"><div class="kpi-label">🛒 初回購入率</div><div class="kpi-value">42.3<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub info">会員→購入</div></div>
+<div class="kpi-card"><div class="kpi-label">🏆 ロイヤル化率</div><div class="kpi-value">8.2<span style="font-size:14px;color:#64748b">%</span></div><div class="kpi-sub up">▲ +1.1pt</div></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">🗺️</span>カスタマージャーニーマップ</div>
+<p style="font-size:12px;color:#64748b;margin-bottom:16px">認知→興味→比較→購入→リピート→ロイヤルの各ステージでの顧客行動と施策タッチポイント</p>
+<div class="journey-steps">
+<div class="journey-step"><div class="journey-num">1</div><div class="journey-body"><h4>💡 認知（Awareness）</h4><p>SNS広告・検索・店頭看板・口コミで商品やブランドを初めて知る段階</p><div class="journey-meta"><span>月間リーチ: 18,500人</span><span>チャネル: Google広告・Instagram・店舗前通行</span><span>CPA: ¥320</span></div></div></div>
+<div class="journey-step"><div class="journey-num">2</div><div class="journey-body"><h4>🔍 興味・関心（Interest）</h4><p>Webサイト訪問・商品ページ閲覧・店舗立ち寄りで詳細情報を収集</p><div class="journey-meta"><span>月間セッション: 5,200</span><span>平均滞在: 3分42秒</span><span>直帰率: 48.2%</span></div></div></div>
+<div class="journey-step"><div class="journey-num">3</div><div class="journey-body"><h4>⚖️ 比較検討（Consideration）</h4><p>他社商品との比較・レビュー確認・価格チェック・サイズ確認</p><div class="journey-meta"><span>カート追加率: 12.8%</span><span>LINE友だち追加: 280人/月</span><span>メルマガ登録: 428人/月</span></div></div></div>
+<div class="journey-step"><div class="journey-num">4</div><div class="journey-body"><h4>💳 初回購入（Purchase）</h4><p>会員登録・カート決済・店舗レジで商品を購入</p><div class="journey-meta"><span>新規会員: 32人/月</span><span>初回平均単価: ¥8,200</span><span>決済離脱: 18.5%</span></div></div></div>
+<div class="journey-step"><div class="journey-num">5</div><div class="journey-body"><h4>🔁 リピート（Retention）</h4><p>2回目以降の購入・会員ランクアップ・他カテゴリへの横展開</p><div class="journey-meta"><span>2回目購入率: 42.3%</span><span>平均購入間隔: 58日</span><span>客単価上昇率: +15%</span></div></div></div>
+<div class="journey-step"><div class="journey-num">6</div><div class="journey-body"><h4>💎 ロイヤル化（Loyalty）</h4><p>VIP会員化・紹介・口コミ発信・複数カテゴリの常連</p><div class="journey-meta"><span>ロイヤル会員: 100人</span><span>年間LTV: ¥185,000</span><span>紹介成約率: 22%</span></div></div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span>ステージ別タッチポイント施策</div>
+<table class="data-table">
+<thead><tr><th>ステージ</th><th>主要施策</th><th>チャネル</th><th>効果指標</th><th>実績</th><th>改善余地</th></tr></thead>
+<tbody>
+<tr><td>認知</td><td>Instagram広告</td><td>SNS</td><td>リーチ数</td><td>18,500/月</td><td><span class="badge badge-green">良好</span></td></tr>
+<tr><td>興味</td><td>リターゲティング広告</td><td>Web広告</td><td>サイト再訪率</td><td>12.5%</td><td><span class="badge badge-orange">改善余地</span></td></tr>
+<tr><td>比較</td><td>LINE友だち追加誘導</td><td>店頭POP・Web</td><td>追加率</td><td>5.4%/訪問</td><td><span class="badge badge-orange">改善余地</span></td></tr>
+<tr><td>購入</td><td>初回限定クーポン</td><td>メール・LINE</td><td>CVR</td><td>42.3%</td><td><span class="badge badge-green">良好</span></td></tr>
+<tr><td>リピート</td><td>MAシナリオ（2回目促進）</td><td>メール+Push</td><td>CVR</td><td>6.8%</td><td><span class="badge badge-green">良好</span></td></tr>
+<tr><td>ロイヤル</td><td>VIP特別招待</td><td>DM+メール</td><td>来店率</td><td>28.5%</td><td><span class="badge badge-green">優秀</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">💡</span>AI改善提案</div>
+<div class="alert alert-warn">⚠️ 興味→比較のフェーズで直帰率が48.2%と高め。商品ページのコンテンツ強化（動画・比較表）を推奨</div>
+<div class="alert alert-warn">⚠️ 決済離脱率18.5%（業界平均15%）。カート内クーポン自動適用・送料無料ライン表示で改善可能</div>
+<div class="alert alert-info">💡 LINE友だち追加率5.4%は業界平均並み。店頭POP刷新+初回クーポン訴求で10%以上を狙えます</div>
+<div class="alert alert-info">💡 ロイヤル会員の紹介成約率22%は優秀。紹介プログラムの拡大で新規獲得コストを下げられます</div>
+</div>
+</div>
+
+<!-- Page: NPS・アンケート -->
+<div class="page-content" id="page-nps" style="display:none">
+<div class="page-title">📝 NPS・アンケート</div>
+<div class="page-subtitle">顧客満足度・推奨度（NPS）の測定と改善アクション</div>
+
+<div class="kpi-row">
+<div class="kpi-card"><div class="kpi-label">⭐ NPSスコア</div><div class="kpi-value" style="color:#22c55e">+42</div><div class="kpi-sub up">▲ 前月 +38</div></div>
+<div class="kpi-card"><div class="kpi-label">📝 回答数</div><div class="kpi-value">284<span style="font-size:14px;color:#64748b">件</span></div><div class="kpi-sub info">回答率 22.8%</div></div>
+<div class="kpi-card"><div class="kpi-label">😊 推奨者比率</div><div class="kpi-value" style="color:#16a34a">52<span style="font-size:14px;color:#64748b">%</span></div></div>
+<div class="kpi-card"><div class="kpi-label">😞 批判者比率</div><div class="kpi-value" style="color:#ef4444">10<span style="font-size:14px;color:#64748b">%</span></div></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">⭐</span>NPSスコア内訳</div>
+<div class="nps-gauge">
+<div class="nps-score">+42</div>
+<div>
+<div class="nps-label">Net Promoter Score</div>
+<div style="font-size:12px;color:#64748b">業界平均 +25 / 前月 +38</div>
+</div>
+</div>
+<div class="nps-bar">
+<div class="nps-detractor" style="width:10%">批判者 10%</div>
+<div class="nps-passive" style="width:38%">中立者 38%</div>
+<div class="nps-promoter" style="width:52%">推奨者 52%</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;font-size:12px">
+<div style="background:#fef2f2;padding:12px;border-radius:6px;border-left:3px solid #ef4444"><strong>批判者（0-6点）</strong><br>28人（10%） - 離脱リスク高</div>
+<div style="background:#fffbeb;padding:12px;border-radius:6px;border-left:3px solid #f59e0b"><strong>中立者（7-8点）</strong><br>108人（38%） - 育成対象</div>
+<div style="background:#f0fdf4;padding:12px;border-radius:6px;border-left:3px solid #22c55e"><strong>推奨者（9-10点）</strong><br>148人（52%） - 紹介依頼対象</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">📋</span>実施中アンケート</div>
+<table class="data-table">
+<thead><tr><th>アンケート名</th><th>種別</th><th>対象</th><th>配信数</th><th>回答数</th><th>回答率</th><th>期間</th><th>ステータス</th></tr></thead>
+<tbody>
+<tr><td><strong>購入体験NPS調査</strong></td><td><span class="badge badge-purple">NPS</span></td><td>購入後7日</td><td>1,245通</td><td>284件</td><td class="effect-text">22.8%</td><td>通年</td><td><span class="badge badge-green">稼働中</span></td></tr>
+<tr><td><strong>店舗満足度調査</strong></td><td><span class="badge badge-blue">CSAT</span></td><td>来店後</td><td>680通</td><td>142件</td><td>20.9%</td><td>4/1〜4/30</td><td><span class="badge badge-green">稼働中</span></td></tr>
+<tr><td><strong>離脱理由ヒアリング</strong></td><td><span class="badge badge-orange">離脱</span></td><td>90日未来店</td><td>87通</td><td>23件</td><td>26.4%</td><td>4/1〜4/30</td><td><span class="badge badge-green">稼働中</span></td></tr>
+<tr><td><strong>新商品ニーズ調査</strong></td><td><span class="badge badge-info">ニーズ</span></td><td>アクティブ会員</td><td>420通</td><td>-</td><td>-</td><td>4/15〜4/30</td><td><span class="badge badge-blue">予約中</span></td></tr>
+</tbody>
+</table>
+<div style="margin-top:16px"><button class="btn btn-green">＋ 新規アンケート作成</button></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">💬</span>最近のコメント（自由記述）</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="background:#f0fdf4;padding:16px;border-radius:8px;border-left:3px solid #22c55e"><div style="font-size:11px;color:#16a34a;font-weight:700">😊 推奨者（10点） - 田中次郎様</div><p style="font-size:12px;color:#1e293b;margin-top:6px">「スタッフの商品知識が豊富で相談しやすい。ゴルフクラブ選びで的確なアドバイスをいただけました」</p></div>
+<div style="background:#f0fdf4;padding:16px;border-radius:8px;border-left:3px solid #22c55e"><div style="font-size:11px;color:#16a34a;font-weight:700">😊 推奨者（9点） - 佐藤花子様</div><p style="font-size:12px;color:#1e293b;margin-top:6px">「ポイント還元率が高く、セール情報も定期的に届くので買い物がお得」</p></div>
+<div style="background:#fffbeb;padding:16px;border-radius:8px;border-left:3px solid #f59e0b"><div style="font-size:11px;color:#f59e0b;font-weight:700">😐 中立者（7点） - 匿名</div><p style="font-size:12px;color:#1e293b;margin-top:6px">「品揃えは良いが、他店の方が若干安い。ポイント還元を加味するとトントン」</p></div>
+<div style="background:#fef2f2;padding:16px;border-radius:8px;border-left:3px solid #ef4444"><div style="font-size:11px;color:#ef4444;font-weight:700">😞 批判者（4点） - 匿名</div><p style="font-size:12px;color:#1e293b;margin-top:6px">「レジ待ちが長い時がある。土日のスタッフ配置を増やしてほしい」</p></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">💡</span>AIインサイト・改善アクション</div>
+<div class="alert alert-info">✅ NPS +42は業界平均(+25)を大きく上回る優良水準。推奨者のクチコミ活用を強化してください</div>
+<div class="alert alert-warn">⚠️ 批判者10%の主要クレームは「レジ待ち時間」。土日12-14時のスタッフ増員で改善可能</div>
+<div class="alert alert-warn">⚠️ 中立者38%の不満は「他店との価格差」。ポイント還元額の見える化で差別化訴求を</div>
+<div class="alert alert-info">💡 推奨者148人に紹介プログラム案内を送付すると、新規獲得+推定30人/月が見込めます</div>
+<div style="margin-top:12px;display:flex;gap:12px">
+<button class="btn btn-green">📤 推奨者に紹介依頼を送信</button>
+<button class="btn btn-blue">📋 批判者フォローリスト作成</button>
+</div>
+</div>
+</div>
+
 <div class="page-content" id="page-churn" style="display:none">
 <div class="page-title">🚨 離脱防止</div>
 <div class="page-subtitle">離脱リスク会員の検知と自動フォローアップ</div>
