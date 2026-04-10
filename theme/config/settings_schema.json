@@ -1,0 +1,183 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Watch Store Custom",
+    "theme_version": "1.0.0",
+    "theme_author": "Custom Development",
+    "theme_documentation_url": "https://shopify.dev/themes",
+    "theme_support_url": "https://shopify.dev/themes"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "colors_background",
+        "label": "Background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "colors_foreground",
+        "label": "Foreground (text)",
+        "default": "#0A0A0A"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent",
+        "label": "Accent",
+        "default": "#E60012"
+      },
+      {
+        "type": "color",
+        "id": "colors_header_bg",
+        "label": "Header background",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "colors_header_fg",
+        "label": "Header text",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "colors_footer_bg",
+        "label": "Footer background",
+        "default": "#0A0A0A"
+      },
+      {
+        "type": "color",
+        "id": "colors_footer_fg",
+        "label": "Footer text",
+        "default": "#CCCCCC"
+      },
+      {
+        "type": "color",
+        "id": "colors_border",
+        "label": "Border",
+        "default": "#E5E5E5"
+      },
+      {
+        "type": "color",
+        "id": "colors_muted",
+        "label": "Muted text",
+        "default": "#6B6B6B"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "label": "Heading font",
+        "default": "helvetica_n7"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Body font",
+        "default": "helvetica_n4"
+      },
+      {
+        "type": "range",
+        "id": "type_header_scale",
+        "label": "Heading scale",
+        "min": 100,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "default": 120
+      },
+      {
+        "type": "range",
+        "id": "type_body_scale",
+        "label": "Body scale",
+        "min": 90,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Page width",
+        "min": 1000,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "default": 1440
+      },
+      {
+        "type": "range",
+        "id": "spacing_sections",
+        "label": "Section spacing",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "default": 48
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "buttons_radius",
+        "label": "Button corner radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_border_thickness",
+        "label": "Button border thickness",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "default": 1
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook",
+        "info": "https://facebook.com/yourstore"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/yourstore"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "YouTube"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "X (Twitter)"
+      }
+    ]
+  }
+]

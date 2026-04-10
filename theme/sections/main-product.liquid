@@ -1,0 +1,145 @@
+<div class="product-detail section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="product-detail__grid">
+      <div class="product-detail__media">
+        {%- if product.media.size > 0 -%}
+          <div class="product-gallery" data-product-gallery>
+            <div class="product-gallery__main">
+              {%- for media in product.media -%}
+                <div class="product-gallery__slide{% if forloop.first %} is-active{% endif %}" data-media-id="{{ media.id }}">
+                  {%- case media.media_type -%}
+                    {%- when 'image' -%}
+                      {{ media | image_url: width: 1600 | image_tag:
+                        loading: 'lazy',
+                        widths: '400, 600, 800, 1000, 1200, 1600',
+                        sizes: '(min-width: 750px) 50vw, 100vw',
+                        class: 'product-gallery__image'
+                      }}
+                    {%- when 'video', 'external_video' -%}
+                      {{ media | media_tag: image_size: '1600x', autoplay: false, loop: false, controls: true, preload: 'metadata' }}
+                    {%- when 'model' -%}
+                      {{ media | media_tag: image_size: '1600x', toggleable: true }}
+                  {%- endcase -%}
+                </div>
+              {%- endfor -%}
+            </div>
+            {%- if product.media.size > 1 -%}
+              <div class="product-gallery__thumbnails">
+                {%- for media in product.media -%}
+                  <button
+                    type="button"
+                    class="product-gallery__thumb{% if forloop.first %} is-active{% endif %}"
+                    data-thumb-target="{{ media.id }}"
+                    aria-label="Image {{ forloop.index }}">
+                    {{ media | image_url: width: 200 | image_tag:
+                      loading: 'lazy',
+                      width: 100,
+                      height: 100
+                    }}
+                  </button>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          <div class="product-detail__placeholder"></div>
+        {%- endif -%}
+      </div>
+
+      <div class="product-detail__info">
+        {%- if product.vendor != blank -%}
+          <p class="product-detail__vendor">{{ product.vendor }}</p>
+        {%- endif -%}
+        <h1 class="product-detail__title">{{ product.title }}</h1>
+
+        <div class="product-detail__price">
+          {%- if product.compare_at_price > product.price -%}
+            <s class="price--compare">{{ product.compare_at_price | money }}</s>
+          {%- endif -%}
+          <span class="price">{{ product.price | money }}</span>
+        </div>
+
+        {%- if product.selected_or_first_available_variant.sku != blank -%}
+          <p class="product-detail__sku">SKU: {{ product.selected_or_first_available_variant.sku }}</p>
+        {%- endif -%}
+
+        {%- form 'product', product, class: 'product-form', data-product-form: '' -%}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-variant-id>
+
+          {%- unless product.has_only_default_variant -%}
+            <div class="product-form__options">
+              {%- for option in product.options_with_values -%}
+                <div class="product-form__option">
+                  <label class="product-form__label">{{ option.name }}</label>
+                  <div class="product-form__values">
+                    {%- for value in option.values -%}
+                      <button
+                        type="button"
+                        class="product-form__value{% if option.selected_value == value %} is-selected{% endif %}"
+                        data-option-index="{{ forloop.index0 }}"
+                        data-option-value="{{ value | escape }}">
+                        {{ value }}
+                      </button>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endunless -%}
+
+          <div class="product-form__quantity">
+            <label class="product-form__label" for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+            <div class="quantity-input">
+              <button type="button" class="quantity-input__button" data-quantity="decrease" aria-label="Decrease quantity">−</button>
+              <input
+                type="number"
+                id="Quantity-{{ section.id }}"
+                name="quantity"
+                value="1"
+                min="1"
+                class="quantity-input__input"
+                data-quantity-input>
+              <button type="button" class="quantity-input__button" data-quantity="increase" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            name="add"
+            class="button button--primary product-form__submit"
+            {% if product.selected_or_first_available_variant.available == false %}disabled{% endif %}>
+            {%- if product.selected_or_first_available_variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </button>
+        {%- endform -%}
+
+        {%- if product.description != blank -%}
+          <div class="product-detail__description">
+            <h2 class="product-detail__section-title">{{ 'products.product.description' | t }}</h2>
+            <div class="rte">{{ product.description }}</div>
+          </div>
+        {%- endif -%}
+
+        {%- if product.metafields.specs.table -%}
+          <div class="product-detail__specs">
+            <h2 class="product-detail__section-title">{{ 'products.product.specifications' | t }}</h2>
+            {{ product.metafields.specs.table }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

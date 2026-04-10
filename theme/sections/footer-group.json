@@ -1,0 +1,40 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "shop-links": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer"
+          }
+        },
+        "support-links": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Support"
+          }
+        },
+        "company-links": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Company"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Newsletter",
+            "subheading": "Sign up for exclusive updates and offers."
+          }
+        }
+      },
+      "block_order": ["shop-links", "support-links", "company-links", "newsletter"],
+      "settings": {}
+    }
+  },
+  "order": ["footer"]
+}

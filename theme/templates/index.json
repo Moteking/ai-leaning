@@ -1,0 +1,93 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "height": "large",
+        "overlay_opacity": 35,
+        "content_position": "middle",
+        "text_align": "left",
+        "subheading": "New arrivals",
+        "heading": "Engineered for every moment",
+        "body": "<p>Discover timepieces built for durability, precision, and everyday life.</p>",
+        "button_label": "Shop now",
+        "button_link": "shopify://collections/all"
+      }
+    },
+    "featured-categories": {
+      "type": "featured-categories",
+      "blocks": {
+        "block-1": {
+          "type": "category",
+          "settings": {
+            "title": "Sport",
+            "description": "Built to withstand",
+            "link": "shopify://collections/sport"
+          }
+        },
+        "block-2": {
+          "type": "category",
+          "settings": {
+            "title": "Classic",
+            "description": "Timeless style",
+            "link": "shopify://collections/classic"
+          }
+        },
+        "block-3": {
+          "type": "category",
+          "settings": {
+            "title": "Digital",
+            "description": "Precision meets tech",
+            "link": "shopify://collections/digital"
+          }
+        },
+        "block-4": {
+          "type": "category",
+          "settings": {
+            "title": "Analog",
+            "description": "Refined craftsmanship",
+            "link": "shopify://collections/analog"
+          }
+        }
+      },
+      "block_order": ["block-1", "block-2", "block-3", "block-4"],
+      "settings": {
+        "heading": "Shop by category",
+        "subheading": "Find the watch that fits your moment"
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Featured products",
+        "products_to_show": 8,
+        "columns_desktop": "4"
+      }
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image-left",
+        "subheading": "Craftsmanship",
+        "heading": "Precision engineering",
+        "body": "<p>Every timepiece is engineered with precision and tested to the highest standards of durability, accuracy, and style.</p>",
+        "button_label": "Our story",
+        "button_link": "shopify://pages/about"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Stay in the loop",
+        "subheading": "Get updates on new arrivals and exclusive offers."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "featured-categories",
+    "featured-collection",
+    "image-with-text",
+    "newsletter"
+  ]
+}

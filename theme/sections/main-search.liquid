@@ -1,0 +1,42 @@
+<div class="search-page section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <header class="collection-page__header">
+      <h1 class="collection-page__title">Search</h1>
+      <form action="{{ routes.search_url }}" method="get" class="site-search__form" role="search">
+        <input
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="{{ 'general.search.placeholder' | t }}"
+          class="site-search__input">
+        <button type="submit" class="site-search__submit button button--primary">{{ 'general.search.search' | t }}</button>
+      </form>
+    </header>
+
+    {%- if search.performed -%}
+      <p class="collection-page__count">{{ search.results_count }} results</p>
+
+      {%- if search.results.size > 0 -%}
+        <div class="product-grid product-grid--4-col">
+          {%- for item in search.results -%}
+            {%- if item.object_type == 'product' -%}
+              {% render 'product-card', product: item %}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <p class="collection-page__empty">No results found for "{{ search.terms | escape }}"</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["search"]
+  }
+}
+{% endschema %}

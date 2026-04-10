@@ -1,0 +1,28 @@
+{
+  "current": {
+    "colors_background": "#FFFFFF",
+    "colors_foreground": "#0A0A0A",
+    "colors_accent": "#E60012",
+    "colors_header_bg": "#000000",
+    "colors_header_fg": "#FFFFFF",
+    "colors_footer_bg": "#0A0A0A",
+    "colors_footer_fg": "#CCCCCC",
+    "colors_border": "#E5E5E5",
+    "colors_muted": "#6B6B6B",
+    "type_header_font": "helvetica_n7",
+    "type_body_font": "helvetica_n4",
+    "type_header_scale": 120,
+    "type_body_scale": 100,
+    "page_width": 1440,
+    "spacing_sections": 48,
+    "buttons_radius": 0,
+    "buttons_border_thickness": 1
+  },
+  "presets": {
+    "Default": {
+      "colors_background": "#FFFFFF",
+      "colors_foreground": "#0A0A0A",
+      "colors_accent": "#E60012"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+<div class="related-products section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <div class="section-heading">
+        <h2 class="section-heading__title">{{ section.settings.heading }}</h2>
+      </div>
+    {%- endif -%}
+
+    {%- assign related_products = recommendations.products | default: product.collections.first.products -%}
+    <div class="product-grid product-grid--4-col">
+      {%- for related in related_products limit: section.settings.products_to_show -%}
+        {%- if related.id != product.id -%}
+          {% render 'product-card', product: related %}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Related products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "You may also like"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    }
+  ]
+}
+{% endschema %}

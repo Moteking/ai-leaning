@@ -1,0 +1,44 @@
+<div class="collections-list section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <header class="collection-page__header">
+      <h1 class="collection-page__title">{{ 'collections.general.all' | t | default: 'Collections' }}</h1>
+    </header>
+
+    <div class="collections-list__grid">
+      {%- for collection in collections -%}
+        <a href="{{ collection.url }}" class="category-card">
+          <div class="category-card__media">
+            {%- if collection.image -%}
+              {{ collection.image | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                widths: '200, 400, 600, 800',
+                class: 'category-card__image'
+              }}
+            {%- elsif collection.products.first.featured_media -%}
+              {{ collection.products.first.featured_media | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                widths: '200, 400, 600, 800',
+                class: 'category-card__image'
+              }}
+            {%- else -%}
+              <div class="category-card__placeholder"></div>
+            {%- endif -%}
+          </div>
+          <div class="category-card__content">
+            <h3 class="category-card__title">{{ collection.title }}</h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["list-collections"]
+  }
+}
+{% endschema %}

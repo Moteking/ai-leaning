@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="{{ settings.colors_header_bg }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+
+    {%- unless settings.type_body_font.system? -%}
+      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
+    {%- endunless -%}
+
+    {%- style -%}
+      :root {
+        --color-background: {{ settings.colors_background }};
+        --color-foreground: {{ settings.colors_foreground }};
+        --color-accent: {{ settings.colors_accent }};
+        --color-header-bg: {{ settings.colors_header_bg }};
+        --color-header-fg: {{ settings.colors_header_fg }};
+        --color-footer-bg: {{ settings.colors_footer_bg }};
+        --color-footer-fg: {{ settings.colors_footer_fg }};
+        --color-border: {{ settings.colors_border }};
+        --color-muted: {{ settings.colors_muted }};
+
+        --font-heading: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+        --font-heading-weight: {{ settings.type_header_font.weight }};
+        --font-heading-style: {{ settings.type_header_font.style }};
+        --font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+        --font-body-weight: {{ settings.type_body_font.weight }};
+
+        --heading-scale: {{ settings.type_header_scale | divided_by: 100.0 }};
+        --body-scale: {{ settings.type_body_scale | divided_by: 100.0 }};
+
+        --page-width: {{ settings.page_width }}px;
+        --section-spacing: {{ settings.spacing_sections }}px;
+
+        --button-radius: {{ settings.buttons_radius }}px;
+        --button-border: {{ settings.buttons_border_thickness }}px;
+      }
+    {%- endstyle -%}
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="template-{{ template | replace: '.', '-' | handle }}">
+    <a class="skip-to-content" href="#MainContent">{{ 'general.accessibility.skip_to_text' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" role="main">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+  </body>
+</html>
