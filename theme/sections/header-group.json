@@ -2,11 +2,20 @@
   "type": "header",
   "name": "Header group",
   "sections": {
-    "announcement-bar": {
-      "type": "announcement-bar",
-      "settings": {
-        "text": "Free shipping on orders over $100 | 30-day returns"
-      }
+    "utility-bar": {
+      "type": "utility-bar",
+      "blocks": {
+        "link-1": { "type": "link", "settings": { "label": "My Account" } },
+        "link-2": { "type": "link", "settings": { "label": "Online Store", "has_dropdown": true } },
+        "link-3": { "type": "link", "settings": { "label": "Important Notice" } },
+        "link-4": { "type": "link", "settings": { "label": "Service", "has_dropdown": true } },
+        "link-5": { "type": "link", "settings": { "label": "Customer Support" } },
+        "link-6": { "type": "link", "settings": { "label": "News Releases" } },
+        "link-7": { "type": "link", "settings": { "label": "About Us", "has_dropdown": true } },
+        "link-8": { "type": "link", "settings": { "label": "Company Info", "has_dropdown": true } }
+      },
+      "block_order": ["link-1", "link-2", "link-3", "link-4", "link-5", "link-6", "link-7", "link-8"],
+      "settings": {}
     },
     "header": {
       "type": "header",
@@ -17,5 +26,5 @@
       }
     }
   },
-  "order": ["announcement-bar", "header"]
+  "order": ["utility-bar", "header"]
 }

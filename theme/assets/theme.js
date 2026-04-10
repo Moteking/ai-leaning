@@ -152,4 +152,88 @@
       { passive: true }
     );
   }
+
+  /* =========================================================================
+     Hero slider
+     ========================================================================= */
+  document.querySelectorAll('[data-hero-slider]').forEach((slider) => {
+    const slides = slider.querySelectorAll('[data-slider-slide]');
+    const dots = slider.querySelectorAll('[data-slider-dot]');
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    let timer = null;
+    const autoplay = slider.dataset.autoplay === 'true';
+    const interval = (parseInt(slider.dataset.interval, 10) || 6) * 1000;
+
+    function show(index) {
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === index));
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
+      current = index;
+    }
+    function next() { show((current + 1) % slides.length); }
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const idx = parseInt(dot.dataset.sliderDot, 10);
+        show(idx);
+        if (autoplay) restart();
+      });
+    });
+
+    function start() { if (autoplay) timer = setInterval(next, interval); }
+    function stop() { if (timer) clearInterval(timer); timer = null; }
+    function restart() { stop(); start(); }
+
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+    start();
+  });
+
+  /* =========================================================================
+     Product carousel arrows
+     ========================================================================= */
+  document.querySelectorAll('.product-carousel__viewport').forEach((viewport) => {
+    const track = viewport.querySelector('[data-carousel-track]');
+    const prev = viewport.querySelector('[data-carousel-prev]');
+    const next = viewport.querySelector('[data-carousel-next]');
+    if (!track) return;
+
+    const scrollAmount = () => {
+      const item = track.querySelector('.product-carousel__item');
+      if (!item) return 300;
+      return item.getBoundingClientRect().width + 20;
+    };
+
+    if (prev) {
+      prev.addEventListener('click', () => {
+        track.scrollBy({ left: -scrollAmount() * 2, behavior: 'smooth' });
+      });
+    }
+    if (next) {
+      next.addEventListener('click', () => {
+        track.scrollBy({ left: scrollAmount() * 2, behavior: 'smooth' });
+      });
+    }
+  });
+
+  /* =========================================================================
+     Floating newsletter bar
+     ========================================================================= */
+  document.querySelectorAll('[data-floating-bar]').forEach((bar) => {
+    const closeBtn = bar.querySelector('[data-floating-bar-close]');
+    if (!closeBtn) return;
+
+    const HIDDEN_KEY = 'floating-newsletter-bar-hidden';
+    if (sessionStorage.getItem(HIDDEN_KEY) === '1') {
+      bar.classList.add('is-hidden');
+      document.body.classList.add('newsletter-bar-hidden');
+    }
+
+    closeBtn.addEventListener('click', () => {
+      bar.classList.add('is-hidden');
+      document.body.classList.add('newsletter-bar-hidden');
+      sessionStorage.setItem(HIDDEN_KEY, '1');
+    });
+  });
 })();

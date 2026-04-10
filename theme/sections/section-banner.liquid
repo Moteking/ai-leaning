@@ -1,0 +1,46 @@
+<div class="section-banner" data-section-id="{{ section.id }}" style="background: {{ section.settings.background }}; color: {{ section.settings.text_color }};">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-banner__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="section-banner__subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Section banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Section title"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Section banner"
+    }
+  ]
+}
+{% endschema %}

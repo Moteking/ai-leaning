@@ -1,0 +1,112 @@
+<div class="brand-tile-grid section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="brand-tile-grid__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="brand-tile-grid__list" style="--columns: {{ section.settings.columns }};">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.url | default: '#' }}" class="brand-tile" {{ block.shopify_attributes }}>
+          <div class="brand-tile__media">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                widths: '300, 500, 700, 800',
+                sizes: '(min-width: 990px) 25vw, 50vw',
+                class: 'brand-tile__image'
+              }}
+            {%- else -%}
+              <div class="brand-tile__placeholder"></div>
+            {%- endif -%}
+          </div>
+          <div class="brand-tile__overlay">
+            {%- if block.settings.logo != blank -%}
+              {{ block.settings.logo | image_url: width: 400 | image_tag:
+                loading: 'lazy',
+                widths: '150, 250, 400',
+                class: 'brand-tile__logo'
+              }}
+            {%- elsif block.settings.name != blank -%}
+              <span class="brand-tile__name">{{ block.settings.name }}</span>
+            {%- endif -%}
+            {%- if block.settings.tagline != blank -%}
+              <span class="brand-tile__tagline">{{ block.settings.tagline }}</span>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Brand tile grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Watch Brands"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background image"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Brand logo (overlay)"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Brand name (used if no logo)"
+        },
+        {
+          "type": "text",
+          "id": "tagline",
+          "label": "Tagline"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Brand tile grid",
+      "blocks": [
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" }
+      ]
+    }
+  ]
+}
+{% endschema %}

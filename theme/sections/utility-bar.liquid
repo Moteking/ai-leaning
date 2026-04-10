@@ -1,0 +1,70 @@
+<div class="utility-bar" data-section-id="{{ section.id }}">
+  <div class="page-width utility-bar__inner">
+    <nav class="utility-bar__nav" aria-label="Utility">
+      <ul class="utility-bar__list">
+        {%- for block in section.blocks -%}
+          <li class="utility-bar__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.url != blank -%}
+              <a href="{{ block.settings.url }}" class="utility-bar__link">
+                {{ block.settings.label }}
+                {%- if block.settings.has_dropdown -%}
+                  <span class="utility-bar__caret" aria-hidden="true">⌄</span>
+                {%- endif -%}
+              </a>
+            {%- else -%}
+              <span class="utility-bar__link">{{ block.settings.label }}</span>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Utility bar",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Link"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "has_dropdown",
+          "label": "Show dropdown caret",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "default": {
+    "blocks": [
+      { "type": "link", "settings": { "label": "My Account" } },
+      { "type": "link", "settings": { "label": "Online Store", "has_dropdown": true } },
+      { "type": "link", "settings": { "label": "Important Notice" } },
+      { "type": "link", "settings": { "label": "Service", "has_dropdown": true } },
+      { "type": "link", "settings": { "label": "Customer Support" } },
+      { "type": "link", "settings": { "label": "News Releases" } },
+      { "type": "link", "settings": { "label": "About Us", "has_dropdown": true } },
+      { "type": "link", "settings": { "label": "Company Info", "has_dropdown": true } }
+    ]
+  },
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}

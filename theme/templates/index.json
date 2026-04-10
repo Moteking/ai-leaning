@@ -1,93 +1,162 @@
 {
   "sections": {
-    "hero": {
-      "type": "hero",
-      "settings": {
-        "height": "large",
-        "overlay_opacity": 35,
-        "content_position": "middle",
-        "text_align": "left",
-        "subheading": "New arrivals",
-        "heading": "Engineered for every moment",
-        "body": "<p>Discover timepieces built for durability, precision, and everyday life.</p>",
-        "button_label": "Shop now",
-        "button_link": "shopify://collections/all"
-      }
-    },
-    "featured-categories": {
-      "type": "featured-categories",
+    "hero-slider": {
+      "type": "hero-slider",
       "blocks": {
-        "block-1": {
-          "type": "category",
+        "slide-1": {
+          "type": "slide",
           "settings": {
-            "title": "Sport",
-            "description": "Built to withstand",
-            "link": "shopify://collections/sport"
+            "subheading": "",
+            "heading": "",
+            "button_label": "",
+            "text_position": "bottom-left"
           }
         },
-        "block-2": {
-          "type": "category",
+        "slide-2": {
+          "type": "slide",
           "settings": {
-            "title": "Classic",
-            "description": "Timeless style",
-            "link": "shopify://collections/classic"
+            "text_position": "bottom-left"
           }
         },
-        "block-3": {
-          "type": "category",
+        "slide-3": {
+          "type": "slide",
           "settings": {
-            "title": "Digital",
-            "description": "Precision meets tech",
-            "link": "shopify://collections/digital"
-          }
-        },
-        "block-4": {
-          "type": "category",
-          "settings": {
-            "title": "Analog",
-            "description": "Refined craftsmanship",
-            "link": "shopify://collections/analog"
+            "text_position": "bottom-left"
           }
         }
       },
-      "block_order": ["block-1", "block-2", "block-3", "block-4"],
+      "block_order": ["slide-1", "slide-2", "slide-3"],
       "settings": {
-        "heading": "Shop by category",
-        "subheading": "Find the watch that fits your moment"
+        "height": "large",
+        "autoplay": true,
+        "interval": 6
       }
     },
-    "featured-collection": {
-      "type": "featured-collection",
+    "section-banner": {
+      "type": "section-banner",
       "settings": {
-        "heading": "Featured products",
-        "products_to_show": 8,
-        "columns_desktop": "4"
+        "heading": "CASIO Watches",
+        "subheading": "",
+        "background": "#0A0A0A",
+        "text_color": "#FFFFFF"
       }
     },
-    "image-with-text": {
-      "type": "image-with-text",
+    "product-carousel": {
+      "type": "product-carousel",
       "settings": {
-        "layout": "image-left",
-        "subheading": "Craftsmanship",
-        "heading": "Precision engineering",
-        "body": "<p>Every timepiece is engineered with precision and tested to the highest standards of durability, accuracy, and style.</p>",
-        "button_label": "Our story",
-        "button_link": "shopify://pages/about"
+        "heading": "New Products",
+        "products_to_show": 10,
+        "badge_label": "NEW"
       }
     },
-    "newsletter": {
-      "type": "newsletter",
+    "cta-stack": {
+      "type": "cta-stack",
+      "blocks": {
+        "button-1": {
+          "type": "button",
+          "settings": {
+            "label": "View all new products",
+            "external": false
+          }
+        },
+        "button-2": {
+          "type": "button",
+          "settings": {
+            "label": "G-Series new products",
+            "external": true
+          }
+        }
+      },
+      "block_order": ["button-1", "button-2"],
+      "settings": {}
+    },
+    "feature-grid": {
+      "type": "feature-grid",
+      "blocks": {
+        "feature-1": { "type": "feature", "settings": { "title": "Watch Park", "description": "Community for watch fans" } },
+        "feature-2": { "type": "feature", "settings": { "title": "Brand World", "description": "Latest news & culture" } },
+        "feature-3": { "type": "feature", "settings": { "title": "Classic Moments", "description": "Timeless style stories" } },
+        "feature-4": { "type": "feature", "settings": { "title": "Color Collection", "description": "Express your personality" } },
+        "feature-5": { "type": "feature", "settings": { "title": "Solar Technology", "description": "Radio-controlled solar" } }
+      },
+      "block_order": ["feature-1", "feature-2", "feature-3", "feature-4", "feature-5"],
       "settings": {
-        "heading": "Stay in the loop",
-        "subheading": "Get updates on new arrivals and exclusive offers."
+        "heading": "Special Content",
+        "columns": 5
+      }
+    },
+    "brand-tile-grid": {
+      "type": "brand-tile-grid",
+      "blocks": {
+        "brand-1": { "type": "brand", "settings": { "name": "Brand 1", "tagline": "Absolute Toughness" } },
+        "brand-2": { "type": "brand", "settings": { "name": "Brand 2", "tagline": "Be you. Be Me." } },
+        "brand-3": { "type": "brand", "settings": { "name": "Brand 3", "tagline": "Elegance, Technology" } },
+        "brand-4": { "type": "brand", "settings": { "name": "Brand 4", "tagline": "One with Nature" } },
+        "brand-5": { "type": "brand", "settings": { "name": "Brand 5", "tagline": "" } },
+        "brand-6": { "type": "brand", "settings": { "name": "Brand 6", "tagline": "" } },
+        "brand-7": { "type": "brand", "settings": { "name": "Brand 7", "tagline": "" } },
+        "brand-8": { "type": "brand", "settings": { "name": "Brand 8", "tagline": "" } }
+      },
+      "block_order": ["brand-1", "brand-2", "brand-3", "brand-4", "brand-5", "brand-6", "brand-7", "brand-8"],
+      "settings": {
+        "heading": "Watch Brands",
+        "columns": 4
+      }
+    },
+    "ranking-products": {
+      "type": "ranking-products",
+      "settings": {
+        "heading": "Access Ranking",
+        "products_to_show": 7
+      }
+    },
+    "cta-stack-2": {
+      "type": "cta-stack",
+      "blocks": {
+        "button-1": {
+          "type": "button",
+          "settings": {
+            "label": "View ranking by brand",
+            "external": false
+          }
+        }
+      },
+      "block_order": ["button-1"],
+      "settings": {}
+    },
+    "lifestyle-gallery": {
+      "type": "lifestyle-gallery",
+      "blocks": {
+        "photo-1": { "type": "photo", "settings": {} },
+        "photo-2": { "type": "photo", "settings": {} },
+        "photo-3": { "type": "photo", "settings": {} },
+        "photo-4": { "type": "photo", "settings": {} },
+        "photo-5": { "type": "photo", "settings": {} }
+      },
+      "block_order": ["photo-1", "photo-2", "photo-3", "photo-4", "photo-5"],
+      "settings": {
+        "heading": "Staff Styling",
+        "columns": 5
+      }
+    },
+    "floating-newsletter-bar": {
+      "type": "floating-newsletter-bar",
+      "settings": {
+        "text": "Subscribe to our newsletter",
+        "button_label": "Subscribe Now"
       }
     }
   },
   "order": [
-    "hero",
-    "featured-categories",
-    "featured-collection",
-    "image-with-text",
-    "newsletter"
+    "hero-slider",
+    "section-banner",
+    "product-carousel",
+    "cta-stack",
+    "feature-grid",
+    "brand-tile-grid",
+    "ranking-products",
+    "cta-stack-2",
+    "lifestyle-gallery",
+    "floating-newsletter-bar"
   ]
 }

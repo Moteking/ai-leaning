@@ -1,0 +1,51 @@
+{%- comment -%}
+  Product card variant for horizontal carousel.
+  Accepts:
+  - product
+  - badge_label (optional)
+{%- endcomment -%}
+
+<article class="product-card-carousel" data-product-id="{{ product.id }}">
+  <a href="{{ product.url }}" class="product-card-carousel__link">
+    <div class="product-card-carousel__media">
+      {%- if badge_label != blank -%}
+        <span class="product-card-carousel__badge">{{ badge_label }}</span>
+      {%- endif -%}
+      <button type="button" class="product-card-carousel__wishlist" aria-label="Add to wishlist" onclick="event.preventDefault();">
+        {% render 'icon-heart' %}
+      </button>
+
+      {%- if product.featured_media -%}
+        {{ product.featured_media | image_url: width: 600 | image_tag:
+          loading: 'lazy',
+          widths: '200, 300, 400, 600',
+          sizes: '(min-width: 990px) 20vw, 50vw',
+          class: 'product-card-carousel__image'
+        }}
+      {%- else -%}
+        <div class="product-card-carousel__placeholder"></div>
+      {%- endif -%}
+    </div>
+
+    <div class="product-card-carousel__info">
+      {%- if product.vendor != blank -%}
+        <p class="product-card-carousel__vendor">{{ product.vendor }}</p>
+      {%- endif -%}
+      <h3 class="product-card-carousel__title">{{ product.title }}</h3>
+      <p class="product-card-carousel__price-label">Online Store Price</p>
+      <div class="product-card-carousel__price">
+        {%- if product.price_varies -%}
+          <span class="price">{{ product.price_min | money }}</span>
+        {%- else -%}
+          <span class="price">{{ product.price | money }}</span>
+        {%- endif -%}
+        {%- if product.compare_at_price > product.price -%}
+          <s class="price--compare">{{ product.compare_at_price | money }}</s>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+  <button type="button" class="product-card-carousel__cart" aria-label="Add to cart" data-product-handle="{{ product.handle }}">
+    {% render 'icon-cart' %}
+  </button>
+</article>

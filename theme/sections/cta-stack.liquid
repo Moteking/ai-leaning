@@ -1,0 +1,61 @@
+<div class="cta-stack section-spacing" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="cta-stack__inner">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.label != blank -%}
+          <a
+            href="{{ block.settings.url | default: '#' }}"
+            class="cta-stack__button"
+            {{ block.shopify_attributes }}>
+            {{ block.settings.label }}
+            {%- if block.settings.external -%}
+              <span class="cta-stack__external" aria-hidden="true">↗</span>
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTA stack",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "View All"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "external",
+          "label": "External link icon",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "CTA stack",
+      "blocks": [
+        { "type": "button" },
+        { "type": "button" }
+      ]
+    }
+  ]
+}
+{% endschema %}
