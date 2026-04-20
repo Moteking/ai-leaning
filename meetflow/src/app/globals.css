@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbfaf7;
+  --foreground: #0e1a2b;
+  --muted: #6b7280;
+  --muted-foreground: #475569;
+  --border: #e5e1d8;
+  --card: #ffffff;
+  --card-foreground: #0e1a2b;
+  --primary: #17263f;
+  --primary-foreground: #fbfaf7;
+  --accent: #1e3a5f;
+  --accent-foreground: #fbfaf7;
+  --ring: #1e3a5f;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --radius-md: var(--radius);
+  --font-sans: var(--font-noto-sans-jp);
+  --font-serif: var(--font-shippori-mincho);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-sans-jp), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "palt";
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif {
+  font-family: var(--font-shippori-mincho), "Noto Serif JP", serif;
+  letter-spacing: 0.01em;
+}
+
+/* Thin horizontal rule used in the landing page for a quiet, editorial feel. */
+.rule {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
