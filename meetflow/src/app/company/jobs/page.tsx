@@ -59,9 +59,14 @@ export default async function JobsPage() {
                   年収 {job.salaryMin}〜{job.salaryMax} 万円 / 必要スキル {job.requiredSkills.length}件
                 </p>
               </div>
-              <Link href={`/company/jobs/${job.id}`}>
-                <Button variant="outline">編集</Button>
-              </Link>
+              <div className="flex gap-2">
+                <Link href={`/company/jobs/${job.id}/candidates`}>
+                  <Button variant="ghost">候補者</Button>
+                </Link>
+                <Link href={`/company/jobs/${job.id}`}>
+                  <Button variant="outline">編集</Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         ))}

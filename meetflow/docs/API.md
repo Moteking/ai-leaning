@@ -25,10 +25,10 @@ in-handler `auth()` call.
 | DELETE | `/api/jobs/:id`                       | Company admin  | Delete a job posting                              |
 | POST   | `/api/invites`                        | Company admin  | Issue a hiring-manager invite token               |
 | POST   | `/api/invites/accept`                 | Hiring manager | Redeem an invite and attach to the company        |
-| GET    | `/api/matches`                        | Candidate/Co.  | List matches (Phase 3)                            |
-| POST   | `/api/matches/:id/accept`             | Candidate      | Accept match (Phase 3)                            |
+| POST   | `/api/matches/:id/respond`            | Candidate      | Accept / decline an approved match                |
+| POST   | `/api/admin/matches/:id/audit`        | Platform admin | Approve or invalidate (REJECTED_BY_AUDIT) a match  |
+| POST   | `/api/cron/generate-matches`          | Cron / Admin   | Weekly matching batch (Bearer CRON_SECRET or Admin) |
 | POST   | `/api/meetings/:id/feedback`          | Both           | Post-meeting feedback (Phase 6)                   |
-| POST   | `/api/admin/matches/:id/audit`        | Platform admin | Approve / reject match (Phase 3)                  |
 
 ## Conventions
 

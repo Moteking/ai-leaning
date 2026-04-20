@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { jobInputSchema } from "@/lib/validations/job";
+import { buildJobEmbeddingText, setJobEmbedding } from "@/lib/embeddings/store";
 
 async function resolveAdminOwnedJob(clerkId: string, jobId: string) {
-  const admin = await prisma.companyAdmin.findFirst({ where: { user: { clerkId } } });
+  const admin = await prisma.companyAdmin.findFirst({
+    where: { user: { clerkId } },
+    include: { company: true },
+  });
   if (!admin) return null;
   const job = await prisma.jobPosting.findFirst({
     where: { id: jobId, companyId: admin.companyId },
@@ -51,6 +55,24 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       metadata: { title: job.title },
     },
   });
+
+  try {
+    const text = buildJobEmbeddingText({
+      title: job.title,
+      description: job.description,
+      requiredSkills: job.requiredSkills,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      workStyle: job.workStyle,
+      companyName: record.admin.company.name,
+      companyIndustry: record.admin.company.industry,
+      companyDescription: record.admin.company.description,
+    });
+    await setJobEmbedding(job.id, text);
+  } catch (error) {
+    console.warn("job embedding refresh failed", error);
+  }
+
   return NextResponse.json({ ok: true });
 }
 

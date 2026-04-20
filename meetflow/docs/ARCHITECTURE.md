@@ -46,13 +46,21 @@ processing paths.
 | Subscriptions, invoices            | Stripe           |
 | Calendar availability, events      | Google Calendar  |
 
-## Background jobs (Phase 3+)
+## Background jobs
 
-- **Weekly matching batch**: Vercel Cron (`0 14 * * 0` UTC → Sun 23:00 JST).
-  Generates embeddings for new candidates and job postings, scores the top-20
-  neighbors with Claude, and writes `Match` rows.
+- **Weekly matching batch**: Vercel Cron (`0 14 * * 0` UTC → Sun 23:00 JST;
+  configured in `vercel.json`) calls `POST /api/cron/generate-matches` with
+  `Authorization: Bearer $CRON_SECRET`.
+  - Backfills missing embeddings for candidates and active jobs via
+    OpenAI `text-embedding-3-small`.
+  - For each candidate, pulls the top-20 jobs by cosine similarity
+    (`pgvector` HNSW), evaluates each pair with Claude (`claude-sonnet-4-6`)
+    using a structured output schema.
+  - Persists matches with `fitScore >= 70` and `recommendation = "APPROVE"`;
+    existing rows are upserted so re-scoring never duplicates a match.
+  - Writes a `MATCH_BATCH_COMPLETED` (or `…_FAILED`) row to `AuditLog`.
 - **Nightly reminders**: Cron triggers `/api/cron/remind-meetings` to send
-  next-day reminders via Resend.
+  next-day reminders via Resend (Phase 4).
 
 ## Compliance layer
 

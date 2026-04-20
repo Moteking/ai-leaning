@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { buildCandidateEmbeddingText, setCandidateEmbedding } from "@/lib/embeddings/store";
 
 const bodySchema = z.object({
   displayName: z.string().min(1).max(100),
@@ -73,6 +74,23 @@ export async function POST(request: Request) {
       metadata: { skills: data.skills.length, desiredRoles: data.desiredRoles.length },
     },
   });
+
+  // Best-effort embedding refresh. OpenAI outages shouldn't block onboarding —
+  // the weekly cron backfills missing embeddings.
+  try {
+    const text = buildCandidateEmbeddingText({
+      displayName: data.displayName,
+      currentPosition: data.currentPosition ?? null,
+      yearsOfExperience: data.yearsOfExperience ?? null,
+      skills: data.skills,
+      desiredRoles: data.desiredRoles,
+      workStyle: data.workStyle,
+      resumeText: data.resumeText,
+    });
+    await setCandidateEmbedding(profile.id, text);
+  } catch (error) {
+    console.warn("candidate embedding refresh failed", error);
+  }
 
   return NextResponse.json({ ok: true });
 }
