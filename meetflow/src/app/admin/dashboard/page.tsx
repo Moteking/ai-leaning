@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app/app-shell";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { requireRole } from "@/lib/roles";
+import { prisma } from "@/lib/prisma";
 
 const NAV = [
   { label: "統計", href: "/admin/dashboard" },
@@ -8,10 +9,20 @@ const NAV = [
   { label: "コンプライアンス", href: "/admin/compliance" },
   { label: "監査ログ", href: "/admin/audit-logs" },
   { label: "ユーザー", href: "/admin/users" },
+  { label: "企業", href: "/admin/companies" },
 ];
 
 export default async function AdminDashboard() {
   await requireRole("PLATFORM_ADMIN");
+  const [candidates, companies, pendingMatches, scheduledMeetings] = await Promise.all([
+    prisma.candidateProfile.count(),
+    prisma.company.count(),
+    prisma.match.count({ where: { status: "PENDING" } }),
+    prisma.meeting.count({
+      where: { status: "SCHEDULED", scheduledAt: { gte: startOfToday() } },
+    }),
+  ]);
+
   return (
     <AppShell title="職業紹介責任者" nav={NAV}>
       <header>
@@ -22,35 +33,29 @@ export default async function AdminDashboard() {
         </p>
       </header>
       <section className="mt-10 grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="py-6">
-            <CardTitle className="text-base">登録候補者</CardTitle>
-            <p className="mt-4 font-serif text-4xl">0</p>
-            <CardDescription>同意済みの候補者のみ</CardDescription>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-6">
-            <CardTitle className="text-base">登録企業</CardTitle>
-            <p className="mt-4 font-serif text-4xl">0</p>
-            <CardDescription>有効プランのみ</CardDescription>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-6">
-            <CardTitle className="text-base">監査待ちマッチ</CardTitle>
-            <p className="mt-4 font-serif text-4xl">0</p>
-            <CardDescription>Phase 3 で事後監査を実装</CardDescription>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-6">
-            <CardTitle className="text-base">今週の面談</CardTitle>
-            <p className="mt-4 font-serif text-4xl">0</p>
-            <CardDescription>Phase 4 で自動確定を実装</CardDescription>
-          </CardContent>
-        </Card>
+        <Stat title="登録候補者" value={candidates} description="同意済みの候補者のみ" />
+        <Stat title="登録企業" value={companies} description="全ステータス" />
+        <Stat title="監査待ちマッチ" value={pendingMatches} description="Phase 3 で生成されるマッチ" />
+        <Stat title="今後の面談" value={scheduledMeetings} description="Phase 4 で自動確定" />
       </section>
     </AppShell>
   );
+}
+
+function Stat({ title, value, description }: { title: string; value: number; description: string }) {
+  return (
+    <Card>
+      <CardContent className="py-6">
+        <CardTitle className="text-base">{title}</CardTitle>
+        <p className="mt-4 font-serif text-4xl">{value}</p>
+        <CardDescription>{description}</CardDescription>
+      </CardContent>
+    </Card>
+  );
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
 }

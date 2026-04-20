@@ -13,15 +13,22 @@ in-handler `auth()` call.
 
 ## Authenticated
 
-| Method | Route              | Who            | Purpose                              |
-| ------ | ------------------ | -------------- | ------------------------------------ |
-| POST   | `/api/onboarding`  | Any signed-in  | Choose role + record consent         |
-| POST   | `/api/profile`     | Candidate      | Update profile / resume (Phase 2)    |
-| POST   | `/api/jobs`        | Company admin  | Create/update job posting (Phase 2)  |
-| GET    | `/api/matches`     | Candidate/Co.  | List matches (Phase 3)               |
-| POST   | `/api/matches/:id/accept` | Candidate | Accept match (Phase 3)            |
-| POST   | `/api/meetings/:id/feedback` | Both | Post-meeting feedback (Phase 6)    |
-| POST   | `/api/admin/matches/:id/audit` | Platform admin | Approve / reject match (Phase 3) |
+| Method | Route                                 | Who            | Purpose                                           |
+| ------ | ------------------------------------- | -------------- | ------------------------------------------------- |
+| POST   | `/api/onboarding`                     | Any signed-in  | Choose role + record consent                      |
+| POST   | `/api/onboarding/candidate/parse`     | Candidate      | AI-structure a pasted resume (Claude)             |
+| POST   | `/api/onboarding/candidate`           | Candidate      | Finalize candidate profile + culture answers      |
+| POST   | `/api/onboarding/company`             | Company admin  | Create the company and link the first admin      |
+| POST   | `/api/profile`                        | Candidate      | Update profile / resume                           |
+| POST   | `/api/jobs`                           | Company admin  | Create a job posting                              |
+| PATCH  | `/api/jobs/:id`                       | Company admin  | Update a job posting                              |
+| DELETE | `/api/jobs/:id`                       | Company admin  | Delete a job posting                              |
+| POST   | `/api/invites`                        | Company admin  | Issue a hiring-manager invite token               |
+| POST   | `/api/invites/accept`                 | Hiring manager | Redeem an invite and attach to the company        |
+| GET    | `/api/matches`                        | Candidate/Co.  | List matches (Phase 3)                            |
+| POST   | `/api/matches/:id/accept`             | Candidate      | Accept match (Phase 3)                            |
+| POST   | `/api/meetings/:id/feedback`          | Both           | Post-meeting feedback (Phase 6)                   |
+| POST   | `/api/admin/matches/:id/audit`        | Platform admin | Approve / reject match (Phase 3)                  |
 
 ## Conventions
 

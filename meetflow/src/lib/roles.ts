@@ -21,8 +21,21 @@ const ROLE_HOMES: Record<AppRole, string> = {
   PLATFORM_ADMIN: "/admin/dashboard",
 };
 
+// Where the user lands *right after* picking a role. They still need to finish
+// persona-specific onboarding before they can use the dashboard.
+const ONBOARDING_NEXT: Record<AppRole, string> = {
+  CANDIDATE: "/onboarding/candidate",
+  COMPANY_ADMIN: "/onboarding/company",
+  HIRING_MANAGER: "/onboarding/manager",
+  PLATFORM_ADMIN: "/admin/dashboard",
+};
+
 export function homeForRole(role: AppRole): string {
   return ROLE_HOMES[role];
+}
+
+export function onboardingNextForRole(role: AppRole): string {
+  return ONBOARDING_NEXT[role];
 }
 
 function parseRole(value: unknown): AppRole | null {

@@ -120,6 +120,7 @@ model Company {
   jobPostings    JobPosting[]
   subscription   Subscription?
   hiringManagers HiringManager[]
+  invites        Invite[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -164,6 +165,23 @@ model HiringManager {
   availabilitySlots       AvailabilitySlot[]
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
+}
+
+// Invite issued by a company admin for a hiring manager. The invitee
+// completes Clerk sign-up, then redeems the token to join the company.
+model Invite {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  companyId  String
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  email      String
+  role       Role
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([companyId])
+  @@index([email])
 }
 
 model AvailabilitySlot {

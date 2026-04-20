@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { homeForRole } from "@/lib/roles";
+import { onboardingNextForRole } from "@/lib/roles";
 
 const bodySchema = z.object({
   // PLATFORM_ADMIN cannot be self-assigned; it is promoted manually in Clerk.
@@ -55,5 +55,5 @@ export async function POST(request: Request) {
     },
   });
 
-  return NextResponse.json({ redirectTo: homeForRole(parsed.data.role) });
+  return NextResponse.json({ redirectTo: onboardingNextForRole(parsed.data.role) });
 }
