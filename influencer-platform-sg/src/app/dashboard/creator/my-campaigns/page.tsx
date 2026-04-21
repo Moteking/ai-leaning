@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { Calendar, DollarSign, MessageSquare, ExternalLink, Clock, CheckCircle2 } from "lucide-react";
+import { Calendar, DollarSign, MessageSquare, ExternalLink, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api-client";
 
 const myApplications = [
   {
@@ -50,7 +52,9 @@ const pastCampaigns = [
 ];
 
 export default function MyCampaignsPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<"active" | "past">("active");
+  const [sendingMsg, setSendingMsg] = useState<string | null>(null);
 
   const statusConfig = {
     pending: { label: "Awaiting response", color: "bg-yellow-100 text-yellow-700" },
@@ -126,15 +130,40 @@ export default function MyCampaignsPage() {
                 </div>
 
                 <div className="flex items-center gap-3 mt-4">
-                  <button className="flex items-center gap-1 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-surface">
-                    <MessageSquare size={14} /> Message brand
+                  <button
+                    onClick={async () => {
+                      setSendingMsg(app.id);
+                      try {
+                        await api.messages.send({
+                          recipientId: "brand-placeholder-id",
+                          content: `Hi, I have a question about the "${app.title}" campaign.`,
+                          campaignTitle: app.title,
+                        });
+                        router.push("/dashboard/creator/messages");
+                      } catch { alert("Failed to send message. Please try from the Messages page."); }
+                      finally { setSendingMsg(null); }
+                    }}
+                    disabled={sendingMsg === app.id}
+                    className="flex items-center gap-1 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-surface disabled:opacity-50"
+                  >
+                    {sendingMsg === app.id ? <Loader2 size={14} className="animate-spin" /> : <MessageSquare size={14} />}
+                    Message brand
                   </button>
                   {app.status === "accepted" && (
-                    <button className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90">
+                    <button
+                      onClick={() => {
+                        const url = prompt("Paste the URL of your published content:");
+                        if (url) alert(`Content submitted: ${url}\nThe brand will be notified for review.`);
+                      }}
+                      className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90"
+                    >
                       Submit content
                     </button>
                   )}
-                  <button className="flex items-center gap-1 px-4 py-2 text-sm text-gray-500 hover:text-gray-700">
+                  <button
+                    onClick={() => alert(`Campaign Brief: ${app.title}\n\nBrand: ${app.brand}\nPayment: S$${app.payment.toLocaleString()}\nDeadline: ${app.deadline}`)}
+                    className="flex items-center gap-1 px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+                  >
                     View brief <ExternalLink size={12} />
                   </button>
                 </div>

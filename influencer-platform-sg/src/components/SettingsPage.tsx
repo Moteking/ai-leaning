@@ -2,10 +2,19 @@
 
 import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { User, Bell, Shield, CreditCard, Save, Eye, EyeOff, Camera, Mail, Smartphone } from "lucide-react";
+import { User, Bell, Shield, CreditCard, Save, Eye, EyeOff, Camera, Mail, Smartphone, Loader2, CheckCircle2 } from "lucide-react";
+import { api } from "@/lib/api-client";
 
 export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
   const [activeTab, setActiveTab] = useState("profile");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const tabs = [
@@ -125,9 +134,24 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                  <button className="flex items-center gap-2 px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90">
-                    <Save size={16} /> Save changes
+                <div className="mt-6 pt-6 border-t border-border flex items-center justify-end gap-3">
+                  {saved && <span className="text-sm text-green-600 flex items-center gap-1"><CheckCircle2 size={14} /> Saved</span>}
+                  <button
+                    onClick={async () => {
+                      setSaving(true);
+                      setSaved(false);
+                      try {
+                        await api.users.updateProfile({ name: role === "brand" ? "Sarah Chen" : "Shermaine Tan" });
+                        setSaved(true);
+                        setTimeout(() => setSaved(false), 3000);
+                      } catch { alert("Failed to save"); }
+                      finally { setSaving(false); }
+                    }}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                    {saving ? "Saving..." : "Save changes"}
                   </button>
                 </div>
               </div>
@@ -165,10 +189,13 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
                 <div className="bg-white rounded-2xl border border-border p-6">
                   <h2 className="font-bold mb-6">Change password</h2>
                   <div className="space-y-4">
+                    {passwordError && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{passwordError}</div>}
+                    {passwordSuccess && <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 flex items-center gap-1"><CheckCircle2 size={14} /> Password updated successfully</div>}
                     <div>
                       <label className="block text-sm font-medium mb-1.5">Current password</label>
                       <div className="relative">
                         <input type={showPassword ? "text" : "password"} placeholder="Current password"
+                          value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)}
                           className="w-full px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-primary pr-12" />
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -178,15 +205,34 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
                     <div>
                       <label className="block text-sm font-medium mb-1.5">New password</label>
                       <input type="password" placeholder="At least 8 characters"
+                        value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-primary" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1.5">Confirm new password</label>
                       <input type="password" placeholder="Re-enter new password"
+                        value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-primary" />
                     </div>
-                    <button className="px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90">
-                      Update password
+                    <button
+                      disabled={passwordSaving}
+                      onClick={async () => {
+                        setPasswordError("");
+                        setPasswordSuccess(false);
+                        if (newPassword !== confirmPassword) { setPasswordError("Passwords don't match"); return; }
+                        if (newPassword.length < 8) { setPasswordError("Password must be at least 8 characters"); return; }
+                        setPasswordSaving(true);
+                        try {
+                          await api.users.changePassword({ currentPassword, newPassword });
+                          setPasswordSuccess(true);
+                          setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+                        } catch (err) { setPasswordError(err instanceof Error ? err.message : "Failed to update password"); }
+                        finally { setPasswordSaving(false); }
+                      }}
+                      className="px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {passwordSaving && <Loader2 size={16} className="animate-spin" />}
+                      {passwordSaving ? "Updating..." : "Update password"}
                     </button>
                   </div>
                 </div>

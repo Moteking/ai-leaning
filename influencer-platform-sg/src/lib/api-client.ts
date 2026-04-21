@@ -56,6 +56,12 @@ export const api = {
     send: (body: { recipientId: string; content: string; campaignTitle?: string }) =>
       apiFetch("/api/messages/send", { method: "POST", body: JSON.stringify(body) }),
   },
+  users: {
+    updateProfile: (body: Record<string, unknown>) =>
+      apiFetch("/api/users/profile", { method: "PATCH", body: JSON.stringify(body) }),
+    changePassword: (body: { currentPassword: string; newPassword: string }) =>
+      apiFetch("/api/users/password", { method: "PATCH", body: JSON.stringify(body) }),
+  },
   notifications: {
     list: () => apiFetch("/api/notifications"),
     markRead: (notificationId: string) =>

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { Search, Filter, Calendar, Tag, ArrowRight, Camera as Instagram, Film as Youtube } from "lucide-react";
+import { Search, Filter, Calendar, Tag, ArrowRight, Camera as Instagram, Film as Youtube, Loader2, CheckCircle2 } from "lucide-react";
 import { mockCampaigns } from "@/lib/mock-data";
 import { SocialPlatform } from "@/lib/types";
+import { api } from "@/lib/api-client";
 
 const categories = ["All", "Beauty", "F&B", "Fashion", "Fitness", "Tech", "Travel", "Lifestyle", "Parenting", "Home"];
 
@@ -18,6 +19,20 @@ function PlatformIcon({ platform }: { platform: SocialPlatform }) {
 export default function CreatorCampaignsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [applyingTo, setApplyingTo] = useState<string | null>(null);
+  const [appliedIds, setAppliedIds] = useState<string[]>([]);
+
+  const handleApply = async (campaignId: string) => {
+    setApplyingTo(campaignId);
+    try {
+      await api.campaigns.apply({ campaignId, message: "I'd love to work on this campaign!" });
+      setAppliedIds((prev) => [...prev, campaignId]);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to apply");
+    } finally {
+      setApplyingTo(null);
+    }
+  };
 
   const openCampaigns = mockCampaigns.filter((c) => c.status === "open");
   const filtered = openCampaigns.filter((c) => {
@@ -104,9 +119,20 @@ export default function CreatorCampaignsPage() {
                       <Calendar size={10} /> Apply by {campaign.applicationDeadline}
                     </div>
                   </div>
-                  <button className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90">
-                    Apply <ArrowRight size={14} />
-                  </button>
+                  {appliedIds.includes(campaign.id) ? (
+                    <span className="flex items-center gap-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                      <CheckCircle2 size={14} /> Applied
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleApply(campaign.id)}
+                      disabled={applyingTo === campaign.id}
+                      className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                    >
+                      {applyingTo === campaign.id ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
+                      {applyingTo === campaign.id ? "Applying..." : "Apply"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

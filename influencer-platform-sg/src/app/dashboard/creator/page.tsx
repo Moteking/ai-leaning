@@ -67,9 +67,9 @@ export default function CreatorDashboard() {
                     <div className="flex items-center gap-3 text-xs text-gray-500">
                       <span className="flex items-center gap-1"><Clock size={12} />Apply by {campaign.applicationDeadline}</span>
                     </div>
-                    <button className="flex items-center gap-1 text-sm text-primary hover:underline">
+                    <Link href="/dashboard/creator/campaigns" className="flex items-center gap-1 text-sm text-primary hover:underline">
                       View details <ArrowRight size={12} />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}

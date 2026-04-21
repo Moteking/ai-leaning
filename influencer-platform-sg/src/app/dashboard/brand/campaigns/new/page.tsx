@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { ArrowLeft, Upload, Save, Send, Plus, Minus, Info } from "lucide-react";
+import { ArrowLeft, Upload, Save, Send, Plus, Minus, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { SocialPlatform } from "@/lib/types";
+import { api } from "@/lib/api-client";
 
 const allCategories = ["Beauty", "F&B", "Fashion", "Fitness", "Tech", "Travel", "Lifestyle", "Parenting", "Home", "Gadgets", "Wellness"];
 
@@ -20,6 +22,9 @@ const deliverableOptions: { value: DeliverableType; label: string }[] = [
 ];
 
 export default function NewCampaignPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -65,6 +70,33 @@ export default function NewCampaignPage() {
     setDeliverables((prev) => prev.map((d, i) => (i === index ? { ...d, [field]: value } : d)));
   };
 
+  const handleSave = async (status: string) => {
+    setError("");
+    if (!formData.title || !formData.description) {
+      setError("Title and description are required");
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.campaigns.create({
+        ...formData,
+        status,
+        categories: selectedCategories,
+        platforms: selectedPlatforms,
+        budgetSGD: parseInt(formData.budgetSGD) || 0,
+        paymentPerCreatorSGD: parseInt(formData.paymentPerCreatorSGD) || 0,
+        minFollowers: parseInt(formData.minFollowers) || 0,
+        maxFollowers: parseInt(formData.maxFollowers) || 0,
+        deliverables,
+      });
+      router.push("/dashboard/brand/campaigns");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save campaign");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-surface">
       <DashboardSidebar role="brand" />
@@ -79,7 +111,11 @@ export default function NewCampaignPage() {
         </div>
 
         <div className="max-w-3xl">
-          <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+          {error && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>
+          )}
+
+          <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleSave("open"); }}>
             {/* Basic */}
             <div className="bg-white rounded-2xl border border-border p-6">
               <h2 className="font-bold text-lg mb-5">Campaign basics</h2>
@@ -268,13 +304,13 @@ export default function NewCampaignPage() {
             <div className="flex items-center justify-between pb-8">
               <Link href="/dashboard/brand/campaigns" className="px-5 py-2.5 text-sm text-gray-500 hover:text-gray-700">Cancel</Link>
               <div className="flex items-center gap-3">
-                <button type="button" className="flex items-center gap-2 px-6 py-2.5 border border-border rounded-xl text-sm font-medium hover:bg-surface">
+                <button type="button" disabled={loading} onClick={() => handleSave("draft")} className="flex items-center gap-2 px-6 py-2.5 border border-border rounded-xl text-sm font-medium hover:bg-surface disabled:opacity-50">
                   <Save size={16} />
                   Save draft
                 </button>
-                <button type="submit" className="flex items-center gap-2 px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90">
-                  <Send size={16} />
-                  Publish campaign
+                <button type="submit" disabled={loading} className="flex items-center gap-2 px-6 py-2.5 gradient-bg text-white rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50">
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {loading ? "Publishing..." : "Publish campaign"}
                 </button>
               </div>
             </div>

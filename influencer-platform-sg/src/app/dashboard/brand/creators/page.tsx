@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { Search, SlidersHorizontal, Star, CheckCircle2, Heart, Camera as Instagram, Film as Youtube, MapPin, Languages, MessageSquare } from "lucide-react";
+import { Search, SlidersHorizontal, Star, CheckCircle2, Heart, Camera as Instagram, Film as Youtube, MapPin, Languages, MessageSquare, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { mockCreators } from "@/lib/mock-data";
 import { SocialPlatform } from "@/lib/types";
+import { api } from "@/lib/api-client";
 
 const categories = ["All", "Beauty", "F&B", "Fashion", "Fitness", "Tech", "Travel", "Lifestyle", "Parenting", "Home", "Gadgets", "Wellness"];
 const platformFilters: { value: SocialPlatform | "all"; label: string }[] = [
@@ -27,6 +29,43 @@ export default function CreatorsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | "all">("all");
   const [savedCreators, setSavedCreators] = useState<string[]>([]);
+  const [messagingCreator, setMessagingCreator] = useState<string | null>(null);
+  const [messageSent, setMessageSent] = useState<string[]>([]);
+  const router = useRouter();
+
+  const handleMessage = async (creatorUserId: string, creatorName: string) => {
+    setMessagingCreator(creatorUserId);
+    try {
+      await api.messages.send({
+        recipientId: creatorUserId,
+        content: `Hi ${creatorName}! I'd like to discuss a potential campaign collaboration with you.`,
+      });
+      setMessageSent((prev) => [...prev, creatorUserId]);
+      router.push("/dashboard/brand/messages");
+    } catch {
+      alert("Failed to send message. Make sure you are logged in.");
+    } finally {
+      setMessagingCreator(null);
+    }
+  };
+
+  const handleInvite = async (creatorName: string, creatorUserId: string) => {
+    const campaignTitle = prompt(`Enter the campaign title to invite ${creatorName} to:`);
+    if (!campaignTitle) return;
+    setMessagingCreator(creatorUserId);
+    try {
+      await api.messages.send({
+        recipientId: creatorUserId,
+        content: `Hi ${creatorName}! We'd like to invite you to our campaign "${campaignTitle}". Are you interested?`,
+        campaignTitle,
+      });
+      alert(`Invitation sent to ${creatorName}!`);
+    } catch {
+      alert("Failed to send invitation. Make sure you are logged in.");
+    } finally {
+      setMessagingCreator(null);
+    }
+  };
 
   const filteredCreators = mockCreators.filter((creator) => {
     const matchesSearch =
@@ -184,10 +223,19 @@ export default function CreatorsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-1 py-2 border border-border rounded-lg text-sm font-medium hover:bg-surface">
-                    <MessageSquare size={14} /> Message
+                  <button
+                    onClick={() => handleMessage(creator.id, creator.displayName)}
+                    disabled={messagingCreator === creator.id}
+                    className="flex-1 flex items-center justify-center gap-1 py-2 border border-border rounded-lg text-sm font-medium hover:bg-surface disabled:opacity-50"
+                  >
+                    {messagingCreator === creator.id ? <Loader2 size={14} className="animate-spin" /> : <MessageSquare size={14} />}
+                    {messageSent.includes(creator.id) ? "Messaged" : "Message"}
                   </button>
-                  <button className="flex-1 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90">
+                  <button
+                    onClick={() => handleInvite(creator.displayName, creator.id)}
+                    disabled={messagingCreator === creator.id}
+                    className="flex-1 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  >
                     Invite to campaign
                   </button>
                 </div>

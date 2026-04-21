@@ -1,12 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Building2, Video } from "lucide-react";
+import { Eye, EyeOff, Building2, Video, Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"brand" | "creator">("brand");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,6 +23,28 @@ export default function RegisterPage() {
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role,
+        company: role === "brand" ? formData.company : undefined,
+        handle: role === "creator" ? formData.handle : undefined,
+      });
+      router.push(role === "brand" ? "/dashboard/brand" : "/dashboard/creator");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,6 +63,12 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-bold mb-2">Create your account</h1>
           <p className="text-gray-500 text-sm mb-6">Start free, no credit card required</p>
 
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button
               onClick={() => setRole("brand")}
@@ -45,7 +79,7 @@ export default function RegisterPage() {
               <Building2 size={24} className={role === "brand" ? "text-primary" : "text-gray-400"} />
               <div className="text-left">
                 <div className="font-medium text-sm">Brand</div>
-                <div className="text-xs text-gray-500">I want to run campaigns</div>
+                <div className="text-xs text-gray-500">Run campaigns</div>
               </div>
             </button>
             <button
@@ -57,15 +91,15 @@ export default function RegisterPage() {
               <Video size={24} className={role === "creator" ? "text-primary" : "text-gray-400"} />
               <div className="text-left">
                 <div className="font-medium text-sm">Creator</div>
-                <div className="text-xs text-gray-500">I want to get paid campaigns</div>
+                <div className="text-xs text-gray-500">Get paid campaigns</div>
               </div>
             </button>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium mb-2">{role === "brand" ? "Your name" : "Display name"}</label>
-              <input type="text" value={formData.name} onChange={(e) => updateField("name", e.target.value)}
+              <input type="text" value={formData.name} onChange={(e) => updateField("name", e.target.value)} required
                 className="w-full px-4 py-3 rounded-xl border border-border outline-none focus:border-primary text-sm"
                 placeholder={role === "brand" ? "John Tan" : "Your name"} />
             </div>
@@ -80,16 +114,15 @@ export default function RegisterPage() {
             ) : (
               <div>
                 <label className="block text-sm font-medium mb-2">Primary social handle</label>
-                <input type="text" value={formData.handle} onChange={(e) => updateField("handle", e.target.value)}
+                <input type="text" value={formData.handle} onChange={(e) => updateField("handle", e.target.value)} required
                   className="w-full px-4 py-3 rounded-xl border border-border outline-none focus:border-primary text-sm"
                   placeholder="@yourhandle" />
-                <p className="text-xs text-gray-500 mt-1">You can add more platforms after signup</p>
               </div>
             )}
 
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
-              <input type="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)}
+              <input type="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)} required
                 className="w-full px-4 py-3 rounded-xl border border-border outline-none focus:border-primary text-sm"
                 placeholder="you@example.com" />
             </div>
@@ -97,7 +130,7 @@ export default function RegisterPage() {
             <div>
               <label className="block text-sm font-medium mb-2">Password</label>
               <div className="relative">
-                <input type={showPassword ? "text" : "password"} value={formData.password} onChange={(e) => updateField("password", e.target.value)}
+                <input type={showPassword ? "text" : "password"} value={formData.password} onChange={(e) => updateField("password", e.target.value)} required minLength={8}
                   className="w-full px-4 py-3 rounded-xl border border-border outline-none focus:border-primary text-sm pr-12"
                   placeholder="At least 8 characters" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -106,18 +139,14 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-2">
-              <input type="checkbox" className="rounded border-border mt-1" />
-              <span className="text-xs text-gray-500">
-                I agree to the <a href="/terms" className="text-primary hover:underline">Terms</a> and{" "}
-                <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>
-              </span>
-            </div>
-
-            <Link href={role === "brand" ? "/dashboard/brand" : "/dashboard/creator"}
-              className="block w-full gradient-bg text-white py-3 rounded-xl font-medium text-center hover:opacity-90">
-              Create account
-            </Link>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full gradient-bg text-white py-3 rounded-xl font-medium text-center hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 size={18} className="animate-spin" />}
+              {loading ? "Creating account..." : "Create account"}
+            </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
@@ -130,7 +159,7 @@ export default function RegisterPage() {
       <div className="hidden lg:flex flex-1 gradient-bg items-center justify-center p-12">
         <div className="text-white text-center max-w-md">
           <h2 className="text-3xl font-bold mb-4">
-            {role === "brand" ? "Find the right creators for your brand" : "Get paid for your content"}
+            {role === "brand" ? "Find the right creators" : "Get paid for your content"}
           </h2>
           <p className="text-white/80 leading-relaxed">
             {role === "brand"
