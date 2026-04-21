@@ -15,7 +15,7 @@ import {
   Film as Youtube,
 } from "lucide-react";
 import Link from "next/link";
-import { pricingPlans } from "@/lib/mock-data";
+import { pricingPlans } from "@/lib/pricing";
 
 function HeroSection() {
   return (

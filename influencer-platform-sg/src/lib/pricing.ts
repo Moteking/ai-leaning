@@ -1,0 +1,65 @@
+import { PricingPlan } from "./types";
+
+export const pricingPlans: PricingPlan[] = [
+  {
+    id: "plan-free",
+    name: "Starter",
+    priceSGD: 0,
+    period: "month",
+    description: "Perfect for trying out the platform",
+    features: [
+      "Browse up to 20 creator profiles/month",
+      "1 active campaign",
+      "Basic messaging",
+      "Email support",
+    ],
+  },
+  {
+    id: "plan-growth",
+    name: "Growth",
+    priceSGD: 299,
+    period: "month",
+    description: "For small brands scaling their influencer marketing",
+    features: [
+      "Unlimited creator browsing",
+      "5 active campaigns",
+      "Advanced filters",
+      "Campaign templates",
+      "Priority messaging",
+      "Chat support",
+    ],
+  },
+  {
+    id: "plan-pro",
+    name: "Pro",
+    priceSGD: 799,
+    period: "month",
+    description: "For established brands with ongoing campaigns",
+    features: [
+      "Unlimited creator browsing",
+      "Unlimited campaigns",
+      "Saved creator lists",
+      "Team collaboration (up to 5 users)",
+      "Custom campaign briefs",
+      "Dedicated account manager",
+      "Contract templates",
+    ],
+    recommended: true,
+  },
+  {
+    id: "plan-enterprise",
+    name: "Enterprise",
+    priceSGD: -1,
+    period: "month",
+    description: "Custom solutions for agencies & large brands",
+    features: [
+      "Everything in Pro",
+      "Unlimited team members",
+      "White-label options",
+      "Custom integrations",
+      "SLA guarantee",
+      "Invoice billing",
+      "Quarterly strategy calls",
+    ],
+  },
+];

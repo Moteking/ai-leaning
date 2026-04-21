@@ -1,26 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import { Search, Filter, Calendar, Tag, ArrowRight, Camera as Instagram, Film as Youtube, Loader2, CheckCircle2 } from "lucide-react";
-import { mockCampaigns } from "@/lib/mock-data";
-import { SocialPlatform } from "@/lib/types";
+import { Search, Filter, Calendar, Tag, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { api } from "@/lib/api-client";
 
 const categories = ["All", "Beauty", "F&B", "Fashion", "Fitness", "Tech", "Travel", "Lifestyle", "Parenting", "Home"];
 
-function PlatformIcon({ platform }: { platform: SocialPlatform }) {
-  if (platform === "instagram") return <Instagram size={14} />;
-  if (platform === "youtube") return <Youtube size={14} />;
-  if (platform === "tiktok") return <span className="text-[10px] font-bold">TT</span>;
-  return <span className="text-[10px] font-bold">XHS</span>;
+interface Campaign {
+  id: string;
+  title: string;
+  description: string;
+  brand?: { name: string; company: string };
+  paymentPerCreatorSGD: number;
+  applicationDeadline: string;
+  categories: string;
+  platforms: string;
+  deliverables: { type: string; quantity: number }[];
 }
 
 export default function CreatorCampaignsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
   const [applyingTo, setApplyingTo] = useState<string | null>(null);
   const [appliedIds, setAppliedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const params: Record<string, string> = { status: "open" };
+    if (selectedCategory !== "All") params.category = selectedCategory;
+    setLoading(true);
+    api.campaigns.list(params)
+      .then((r) => {
+        let items = ((r as { data: Campaign[] }).data || []);
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          items = items.filter((c) => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q));
+        }
+        setCampaigns(items);
+      })
+      .finally(() => setLoading(false));
+  }, [selectedCategory, searchQuery]);
 
   const handleApply = async (campaignId: string) => {
     setApplyingTo(campaignId);
@@ -33,13 +54,6 @@ export default function CreatorCampaignsPage() {
       setApplyingTo(null);
     }
   };
-
-  const openCampaigns = mockCampaigns.filter((c) => c.status === "open");
-  const filtered = openCampaigns.filter((c) => {
-    const matchesSearch = searchQuery === "" || c.title.toLowerCase().includes(searchQuery.toLowerCase()) || c.brandName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || c.categories.includes(selectedCategory);
-    return matchesSearch && matchesCategory;
-  });
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -59,10 +73,6 @@ export default function CreatorCampaignsPage() {
                 placeholder="Search campaigns or brands..."
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-border outline-none focus:border-primary text-sm" />
             </div>
-            <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-border text-sm hover:bg-surface">
-              <Filter size={16} />
-              Filters
-            </button>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
@@ -74,70 +84,71 @@ export default function CreatorCampaignsPage() {
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mb-4">{filtered.length} open campaigns</div>
+        <div className="text-sm text-gray-500 mb-4">{campaigns.length} open campaigns</div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {filtered.map((campaign) => (
-            <div key={campaign.id} className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
-              <div className="h-32 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                <Tag size={36} className="text-primary/30" />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs text-gray-500">{campaign.brandName}</div>
-                  <div className="flex items-center gap-1">
-                    {campaign.platforms.map((p) => (
-                      <span key={p} className="w-6 h-6 bg-surface rounded flex items-center justify-center">
-                        <PlatformIcon platform={p} />
-                      </span>
+        {loading ? (
+          <div className="flex justify-center py-20"><Loader2 size={32} className="animate-spin text-primary" /></div>
+        ) : campaigns.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">No open campaigns found. Check back later!</div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {campaigns.map((campaign) => (
+              <div key={campaign.id} className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+                <div className="h-32 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                  <Tag size={36} className="text-primary/30" />
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-500">{campaign.brand?.company || campaign.brand?.name}</div>
+                  </div>
+
+                  <h3 className="font-bold text-lg mb-2">{campaign.title}</h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{campaign.description}</p>
+
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {campaign.categories.split(",").filter(Boolean).map((cat) => (
+                      <span key={cat} className="text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">{cat}</span>
                     ))}
                   </div>
-                </div>
 
-                <h3 className="font-bold text-lg mb-2">{campaign.title}</h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{campaign.description}</p>
-
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {campaign.categories.map((cat) => (
-                    <span key={cat} className="text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">{cat}</span>
-                  ))}
-                </div>
-
-                <div className="space-y-2 mb-4 text-sm">
-                  {campaign.deliverables.map((d, i) => (
-                    <div key={i} className="flex items-center gap-2 text-gray-600">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <span>{d.quantity}× {d.type.replace(/_/g, " ")}</span>
+                  {campaign.deliverables?.length > 0 && (
+                    <div className="space-y-2 mb-4 text-sm">
+                      {campaign.deliverables.map((d, i) => (
+                        <div key={i} className="flex items-center gap-2 text-gray-600">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                          <span>{d.quantity}× {d.type.replace(/_/g, " ")}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div>
-                    <div className="font-bold text-lg text-primary">S${campaign.paymentPerCreatorSGD.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500 flex items-center gap-1">
-                      <Calendar size={10} /> Apply by {campaign.applicationDeadline}
-                    </div>
-                  </div>
-                  {appliedIds.includes(campaign.id) ? (
-                    <span className="flex items-center gap-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
-                      <CheckCircle2 size={14} /> Applied
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleApply(campaign.id)}
-                      disabled={applyingTo === campaign.id}
-                      className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
-                    >
-                      {applyingTo === campaign.id ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
-                      {applyingTo === campaign.id ? "Applying..." : "Apply"}
-                    </button>
                   )}
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <div>
+                      <div className="font-bold text-lg text-primary">S${campaign.paymentPerCreatorSGD?.toLocaleString()}</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                        <Calendar size={10} /> Apply by {campaign.applicationDeadline || "TBD"}
+                      </div>
+                    </div>
+                    {appliedIds.includes(campaign.id) ? (
+                      <span className="flex items-center gap-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                        <CheckCircle2 size={14} /> Applied
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleApply(campaign.id)}
+                        disabled={applyingTo === campaign.id}
+                        className="flex items-center gap-1 px-4 py-2 gradient-bg text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                      >
+                        {applyingTo === campaign.id ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
+                        {applyingTo === campaign.id ? "Applying..." : "Apply"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

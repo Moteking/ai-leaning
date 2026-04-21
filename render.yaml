@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: castsg
+    runtime: node
+    region: singapore
+    rootDir: influencer-platform-sg
+    plan: free
+    buildCommand: npm install && npx prisma generate && node scripts/init-db.js && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        value: file:./prisma/dev.db
