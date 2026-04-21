@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     "Connect brands with top influencers across Instagram, TikTok, and YouTube in Singapore. Manage campaigns, track deliverables, and grow your brand.",
 };
 
+import { AuthProvider } from "@/lib/auth-context";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -14,7 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

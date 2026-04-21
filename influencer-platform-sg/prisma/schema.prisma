@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  name           String
+  role           String    // "brand" | "creator"
+  company        String?
+  avatarUrl      String?
+  phone          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  creatorProfile CreatorProfile?
+  campaigns      Campaign[]
+  applications   Application[]
+  sentMessages   Message[]       @relation("sender")
+  conversations1 Conversation[]  @relation("participant1")
+  conversations2 Conversation[]  @relation("participant2")
+  notifications  Notification[]
+}
+
+model CreatorProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id])
+  handle             String   @unique
+  displayName        String
+  bio                String   @default("")
+  city               String   @default("Singapore")
+  languages          String   @default("English")      // comma separated
+  categories         String   @default("")              // comma separated
+  verified           Boolean  @default(false)
+  completedCampaigns Int      @default(0)
+  averageRating      Float    @default(0)
+
+  platforms          CreatorPlatform[]
+  rateCard           RateCard?
+}
+
+model CreatorPlatform {
+  id              String         @id @default(cuid())
+  creatorId       String
+  creator         CreatorProfile @relation(fields: [creatorId], references: [id])
+  platform        String         // "instagram" | "tiktok" | "youtube" | "xiaohongshu"
+  handle          String
+  followers       Int            @default(0)
+  url             String         @default("")
+}
+
+model RateCard {
+  id               String         @id @default(cuid())
+  creatorId        String         @unique
+  creator          CreatorProfile @relation(fields: [creatorId], references: [id])
+  instagramPost    Int?
+  instagramReel    Int?
+  instagramStory   Int?
+  tiktokVideo      Int?
+  youtubeVideo     Int?
+  youtubeShort     Int?
+}
+
+model Campaign {
+  id                   String        @id @default(cuid())
+  brandId              String
+  brand                User          @relation(fields: [brandId], references: [id])
+  title                String
+  description          String
+  briefMarkdown        String        @default("")
+  productName          String        @default("")
+  budgetSGD            Int           @default(0)
+  paymentPerCreatorSGD Int           @default(0)
+  status               String        @default("draft")  // draft|open|in_progress|completed|cancelled
+  categories           String        @default("")        // comma separated
+  platforms            String        @default("")        // comma separated
+  targetCity           String        @default("Singapore")
+  minFollowers         Int           @default(0)
+  maxFollowers         Int           @default(0)
+  applicationDeadline  String        @default("")
+  contentDeadline      String        @default("")
+  startDate            String        @default("")
+  endDate              String        @default("")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  deliverables         Deliverable[]
+  applications         Application[]
+}
+
+model Deliverable {
+  id           String   @id @default(cuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  type         String   // instagram_post|instagram_reel|instagram_story|tiktok_video|youtube_video|youtube_short
+  quantity     Int      @default(1)
+  requirements String   @default("")
+}
+
+model Application {
+  id           String   @id @default(cuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  creatorId    String
+  creator      User     @relation(fields: [creatorId], references: [id])
+  message      String   @default("")
+  proposedRate Int?
+  status       String   @default("pending")  // pending|shortlisted|accepted|rejected|withdrawn
+  appliedAt    DateTime @default(now())
+}
+
+model Conversation {
+  id             String    @id @default(cuid())
+  participant1Id String
+  participant1   User      @relation("participant1", fields: [participant1Id], references: [id])
+  participant2Id String
+  participant2   User      @relation("participant2", fields: [participant2Id], references: [id])
+  campaignTitle  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  messages       Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation("sender", fields: [senderId], references: [id])
+  content        String
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // message|campaign|application|payment|system
+  title     String
+  body      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
