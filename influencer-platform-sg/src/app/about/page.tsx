@@ -52,10 +52,10 @@ export default function AboutPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
               {[
-                { icon: <Heart className="text-primary" size={24} />, title: "Transparent", desc: "No hidden fees. All rates, deliverables, and payments are clear." },
+                { icon: <Heart className="text-primary" size={24} />, title: "Transparent", desc: "Clear deliverables, honest communication, and verified creators." },
                 { icon: <Users className="text-primary" size={24} />, title: "Verified", desc: "Every creator is manually vetted. No fake followers." },
                 { icon: <Target className="text-primary" size={24} />, title: "Effective", desc: "Tools that actually save brands and creators time." },
-                { icon: <Rocket className="text-primary" size={24} />, title: "Local-first", desc: "Built for SG culture, languages, and payment norms." },
+                { icon: <Rocket className="text-primary" size={24} />, title: "Local-first", desc: "Built for SG culture, languages, and local creators." },
               ].map((v) => (
                 <div key={v.title} className="bg-white border border-border rounded-2xl p-6">
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">{v.icon}</div>

@@ -21,7 +21,6 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
     { value: "profile", label: "Profile", icon: <User size={16} /> },
     { value: "notifications", label: "Notifications", icon: <Bell size={16} /> },
     { value: "security", label: "Security", icon: <Shield size={16} /> },
-    { value: "billing", label: role === "brand" ? "Billing" : "Payouts", icon: <CreditCard size={16} /> },
   ];
 
   return (
@@ -165,7 +164,6 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
                     { label: "New campaign opportunities", desc: "When new campaigns match your categories", def: true },
                     { label: "Application updates", desc: "When your application status changes", def: true },
                     { label: "New messages", desc: "When you receive a new message", def: true },
-                    { label: "Payment notifications", desc: "When a payment is released", def: true },
                     { label: "Weekly digest", desc: "Summary of your activity every Monday", def: true },
                     { label: "Marketing emails", desc: "Product updates and tips", def: false },
                   ].map((item) => (
@@ -247,67 +245,6 @@ export default function SettingsPage({ role }: { role: "brand" | "creator" }) {
               </div>
             )}
 
-            {activeTab === "billing" && role === "brand" && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-2xl border border-border p-6">
-                  <h2 className="font-bold mb-4">Current plan</h2>
-                  <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/20">
-                    <div>
-                      <div className="font-bold text-lg">Growth plan</div>
-                      <div className="text-sm text-gray-600">S$299 / month</div>
-                    </div>
-                    <button className="px-5 py-2.5 border border-border rounded-xl text-sm font-medium hover:bg-surface">
-                      Upgrade
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-white rounded-2xl border border-border p-6">
-                  <h2 className="font-bold mb-4">Payment method</h2>
-                  <div className="flex items-center justify-between p-4 rounded-xl border border-border">
-                    <div className="flex items-center gap-3">
-                      <CreditCard size={20} className="text-gray-400" />
-                      <div>
-                        <div className="font-medium text-sm">Visa •••• 4242</div>
-                        <div className="text-xs text-gray-500">Expires 12/28</div>
-                      </div>
-                    </div>
-                    <button className="text-sm text-primary hover:underline">Change</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "billing" && role === "creator" && (
-              <div className="bg-white rounded-2xl border border-border p-6">
-                <h2 className="font-bold mb-4">Payout method</h2>
-                <p className="text-sm text-gray-600 mb-4">
-                  Payments from brands are sent to your bank account. PayNow is supported for instant transfers.
-                </p>
-                <div className="space-y-3">
-                  <div className="p-4 border border-border rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-sm">PayNow (Phone)</div>
-                        <div className="text-xs text-gray-500">+65 •••• 4567</div>
-                      </div>
-                      <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">Primary</span>
-                    </div>
-                  </div>
-                  <div className="p-4 border border-border rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-sm">Bank transfer</div>
-                        <div className="text-xs text-gray-500">DBS •••• 1234</div>
-                      </div>
-                      <button className="text-xs text-primary hover:underline">Edit</button>
-                    </div>
-                  </div>
-                </div>
-                <button className="mt-4 w-full py-2.5 border border-dashed border-border rounded-xl text-sm font-medium text-gray-500 hover:border-primary hover:text-primary">
-                  + Add payout method
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </main>

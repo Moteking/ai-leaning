@@ -224,37 +224,6 @@ export default function NewCampaignPage() {
               </div>
             </div>
 
-            {/* Budget */}
-            <div className="bg-white rounded-2xl border border-border p-6">
-              <h2 className="font-bold text-lg mb-5">Budget & payment</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1.5">Payment per creator (SGD) <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">S$</span>
-                    <input type="number" value={formData.paymentPerCreatorSGD} onChange={(e) => updateField("paymentPerCreatorSGD", e.target.value)}
-                      placeholder="1500"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border outline-none focus:border-primary text-sm" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1.5">Total campaign budget (SGD) <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">S$</span>
-                    <input type="number" value={formData.budgetSGD} onChange={(e) => updateField("budgetSGD", e.target.value)}
-                      placeholder="15000"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border outline-none focus:border-primary text-sm" />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 bg-blue-50 rounded-xl p-3 flex items-start gap-2">
-                <Info size={16} className="text-blue-500 flex-shrink-0 mt-0.5" />
-                <div className="text-xs text-blue-700">
-                  A 5% service fee applies to each completed campaign payment. Payments are released to creators only after you approve the content.
-                </div>
-              </div>
-            </div>
-
             {/* Creator requirements */}
             <div className="bg-white rounded-2xl border border-border p-6">
               <h2 className="font-bold text-lg mb-5">Creator requirements</h2>

@@ -25,8 +25,7 @@ export default function PrivacyPage() {
                 <li><strong>Account data</strong>: name, email, password (hashed), company (for brands), phone number.</li>
                 <li><strong>Profile data</strong>: bio, categories, languages, city, social media handles, profile picture.</li>
                 <li><strong>Platform data</strong>: follower counts and public metrics you choose to share.</li>
-                <li><strong>Campaign data</strong>: briefs, messages, deliverables, ratings, and payment records.</li>
-                <li><strong>Payment data</strong>: payment method details (processed by Stripe — we do not store full card numbers), PayNow ID, and bank account for payouts.</li>
+                <li><strong>Campaign data</strong>: briefs, messages, deliverables, and ratings.</li>
                 <li><strong>Usage data</strong>: IP address, device information, access logs, and cookies.</li>
               </ul>
             </section>
@@ -37,7 +36,6 @@ export default function PrivacyPage() {
                 <li>To provide, operate, and improve the Platform.</li>
                 <li>To verify identity and prevent fraud.</li>
                 <li>To match Brands with relevant Creators.</li>
-                <li>To process payments and issue invoices.</li>
                 <li>To communicate campaign updates, messages, and notifications.</li>
                 <li>To respond to inquiries and provide customer support.</li>
                 <li>To comply with legal obligations.</li>
@@ -50,7 +48,7 @@ export default function PrivacyPage() {
               <p>We may disclose your personal data to:</p>
               <ul className="list-disc pl-5 space-y-2 mt-2">
                 <li>Other users on the Platform (e.g. Brand/Creator profile information relevant to matching).</li>
-                <li>Service providers (payment processors, email delivery, cloud hosting).</li>
+                <li>Service providers (email delivery, cloud hosting).</li>
                 <li>Law enforcement or regulators when required by law.</li>
                 <li>Successors in interest in the event of a business transaction.</li>
               </ul>
@@ -61,7 +59,6 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-bold text-gray-900 mb-3">4. Third-party services</h2>
               <p>We integrate with the following third-party services:</p>
               <ul className="list-disc pl-5 space-y-2 mt-2">
-                <li><strong>Stripe</strong> — payment processing.</li>
                 <li><strong>Google Analytics</strong> — usage analytics.</li>
                 <li><strong>SendGrid</strong> — transactional email.</li>
               </ul>

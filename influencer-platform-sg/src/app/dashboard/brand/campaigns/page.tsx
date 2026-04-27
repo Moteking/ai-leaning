@@ -96,21 +96,7 @@ export default function CampaignsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm">
-                    <DollarSign size={16} className="text-gray-400" />
-                    <div>
-                      <div className="font-medium">S${campaign.paymentPerCreatorSGD?.toLocaleString()}/creator</div>
-                      <div className="text-xs text-gray-500">Payment</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <DollarSign size={16} className="text-gray-400" />
-                    <div>
-                      <div className="font-medium">S${campaign.budgetSGD?.toLocaleString()}</div>
-                      <div className="text-xs text-gray-500">Total budget</div>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-border">
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar size={16} className="text-gray-400" />
                     <div>

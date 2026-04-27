@@ -42,18 +42,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-3">4. Platform services</h2>
-              <p>CastSG provides tools for Brand-Creator matching, campaign management, communication, deliverable tracking, and payment processing. We do not employ Creators; they are independent contractors.</p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">5. Fees and payments</h2>
-              <ol className="list-decimal pl-5 space-y-2">
-                <li>Brands pay a monthly subscription fee based on their chosen plan.</li>
-                <li>A 5% service fee applies to each completed campaign payment between Brand and Creator.</li>
-                <li>Payments to Creators are processed through the Platform (acting as payment facilitator) and sent via PayNow or bank transfer.</li>
-                <li>All prices are in Singapore Dollars (SGD) and inclusive of applicable GST.</li>
-                <li>Subscriptions auto-renew monthly. You may cancel anytime; access continues until the end of the paid period.</li>
-              </ol>
+              <p>CastSG provides tools for Brand-Creator matching, campaign management, communication, and deliverable tracking. We do not employ Creators; they are independent contractors.</p>
             </section>
 
             <section>

@@ -133,26 +133,6 @@ export default function CreatorProfilePage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-border p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold">Rate card (SGD)</h3>
-              <Link href="/dashboard/creator/settings" className="flex items-center gap-1 text-sm text-primary hover:underline">
-                <Edit3 size={14} /> Edit
-              </Link>
-            </div>
-            {!cp?.rateCard ? (
-              <p className="text-sm text-gray-500 py-4">No rate card set up yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {Object.entries(cp.rateCard).filter(([k, v]) => v && k !== "id" && k !== "creatorId").map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-3 bg-surface rounded-xl">
-                    <span className="text-sm capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-                    <span className="font-bold">S${value?.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </main>
     </div>

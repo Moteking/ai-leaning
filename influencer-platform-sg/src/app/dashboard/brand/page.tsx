@@ -103,7 +103,6 @@ export default function BrandDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm mb-1">{campaign.title}</div>
                       <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span>S${campaign.paymentPerCreatorSGD?.toLocaleString()}/creator</span>
                         <span>{campaign.applications?.length || 0} applicants</span>
                       </div>
                     </div>

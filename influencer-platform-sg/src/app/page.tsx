@@ -15,7 +15,6 @@ import {
   Film as Youtube,
 } from "lucide-react";
 import Link from "next/link";
-import { pricingPlans } from "@/lib/pricing";
 
 function HeroSection() {
   return (
@@ -41,7 +40,7 @@ function HeroSection() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
             Connect with top creators across Instagram, TikTok, and YouTube.
             Manage your entire influencer campaign workflow in one place —
-            from discovery to payment.
+            from discovery to delivery.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -77,7 +76,7 @@ function HeroSection() {
           {[
             { value: "2,500+", label: "Verified Creators" },
             { value: "450+", label: "Active Brands" },
-            { value: "S$3.8M", label: "Campaigns Run" },
+            { value: "5,000+", label: "Campaigns Run" },
             { value: "96%", label: "Satisfaction Rate" },
           ].map((stat) => (
             <div key={stat.label} className="text-center p-6 bg-white rounded-2xl shadow-sm border border-border">
@@ -138,7 +137,7 @@ function FeaturesSection() {
       icon: <Shield className="text-primary" size={28} />,
       title: "Verified Profiles",
       description:
-        "Every creator is manually verified. See real rate cards, past campaigns, and genuine audience data.",
+        "Every creator is manually verified. See past campaigns, audience data, and genuine reviews.",
     },
   ];
 
@@ -186,7 +185,7 @@ function HowItWorksSection() {
       step: "02",
       title: "Post or discover campaigns",
       description: "Brands post campaign briefs. Creators browse and apply to opportunities that fit.",
-      forBrand: "Post campaign brief with budget & deliverables",
+      forBrand: "Post campaign brief with deliverables",
       forCreator: "Browse and apply to relevant campaigns",
     },
     {
@@ -198,10 +197,10 @@ function HowItWorksSection() {
     },
     {
       step: "04",
-      title: "Pay & complete",
-      description: "Pay securely through the platform once content goes live.",
-      forBrand: "Approve and release payment",
-      forCreator: "Receive payment directly to your bank",
+      title: "Complete & review",
+      description: "Approve the delivered content and leave a review for the creator.",
+      forBrand: "Approve content and complete campaign",
+      forCreator: "Content goes live, receive brand review",
     },
   ];
 
@@ -248,101 +247,19 @@ function HowItWorksSection() {
   );
 }
 
-function PricingSection() {
-  return (
-    <section id="pricing" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-primary font-semibold text-sm tracking-wider uppercase">Pricing</span>
-          <h2 className="text-3xl sm:text-4xl font-bold mt-3 mb-4">Plans that scale with you</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Start free. Upgrade as you grow. Creators always use the platform for free.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pricingPlans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-2xl p-8 border-2 transition-all ${
-                plan.recommended
-                  ? "border-primary bg-primary/5 shadow-xl scale-105"
-                  : "border-border bg-white hover:border-primary/30"
-              }`}
-            >
-              {plan.recommended && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 gradient-bg text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1">
-                  <Star size={12} />
-                  Most popular
-                </div>
-              )}
-
-              <h3 className="font-bold text-lg mb-1">{plan.name}</h3>
-              <p className="text-sm text-gray-500 mb-4">{plan.description}</p>
-
-              <div className="mb-6">
-                {plan.priceSGD === -1 ? (
-                  <div className="text-3xl font-bold">Custom</div>
-                ) : plan.priceSGD === 0 ? (
-                  <div className="text-3xl font-bold">
-                    Free<span className="text-base font-normal text-gray-500"> forever</span>
-                  </div>
-                ) : (
-                  <div className="text-3xl font-bold">
-                    S${plan.priceSGD}
-                    <span className="text-base font-normal text-gray-500">/{plan.period}</span>
-                  </div>
-                )}
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm">
-                    <CheckCircle2 size={16} className="text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/auth/register"
-                className={`block text-center py-3 rounded-full font-medium text-sm transition-colors ${
-                  plan.recommended
-                    ? "gradient-bg text-white hover:opacity-90"
-                    : "border-2 border-primary text-primary hover:bg-primary hover:text-white"
-                }`}
-              >
-                {plan.priceSGD === -1 ? "Contact sales" : plan.priceSGD === 0 ? "Start free" : "Start trial"}
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-center text-sm text-gray-500 mt-8">
-          Creators use CastSG for free — forever. Brands pay a monthly subscription plus a small service fee per completed campaign.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 function FAQSection() {
   const faqs = [
     {
       q: "What is CastSG?",
-      a: "CastSG is Singapore's dedicated influencer campaign management platform. Brands post campaigns, creators apply, and the platform handles the workflow from brief to payment.",
+      a: "CastSG is Singapore's dedicated influencer campaign management platform. Brands post campaigns, creators apply, and the platform handles the entire workflow from brief to content delivery.",
     },
     {
       q: "Which platforms are supported?",
       a: "Instagram, TikTok, YouTube, and Xiaohongshu (小红书). You can run multi-platform campaigns where creators deliver content across multiple channels.",
     },
     {
-      q: "How do creators get paid?",
-      a: "Payment goes through CastSG once content is approved by the brand. We release funds to creators via local bank transfer (PayNow or direct deposit).",
-    },
-    {
       q: "Is CastSG only for big brands?",
-      a: "Not at all. Many of our brands are SMEs and D2C startups in Singapore. We have a free tier to help small brands get started.",
+      a: "Not at all. Many of our brands are SMEs and D2C startups in Singapore. Anyone can sign up and start posting campaigns.",
     },
     {
       q: "How are creators verified?",
@@ -463,7 +380,6 @@ export default function Home() {
         <FeaturesSection />
         <HowItWorksSection />
         <TestimonialsSection />
-        <PricingSection />
         <FAQSection />
         <CTASection />
       </main>

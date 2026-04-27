@@ -241,26 +241,6 @@ export default function CreatorsPage() {
                     ))}
                   </div>
 
-                  {creator.rateCard && (
-                    <div className="bg-surface rounded-xl p-3 mb-4">
-                      <div className="text-xs text-gray-500 mb-2">Rate card (starting from)</div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                        {creator.rateCard.instagramPost && (
-                          <span>IG post: <strong>S${creator.rateCard.instagramPost}</strong></span>
-                        )}
-                        {creator.rateCard.instagramReel && (
-                          <span>IG reel: <strong>S${creator.rateCard.instagramReel}</strong></span>
-                        )}
-                        {creator.rateCard.tiktokVideo && (
-                          <span>TikTok: <strong>S${creator.rateCard.tiktokVideo}</strong></span>
-                        )}
-                        {creator.rateCard.youtubeVideo && (
-                          <span>YT video: <strong>S${creator.rateCard.youtubeVideo}</strong></span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleMessage(userId, creator.displayName)}

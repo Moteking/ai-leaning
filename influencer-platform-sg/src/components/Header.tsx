@@ -27,9 +27,6 @@ export default function Header() {
             <a href="#how-it-works" className="text-sm text-gray-600 hover:text-primary transition-colors">
               How it works
             </a>
-            <a href="#pricing" className="text-sm text-gray-600 hover:text-primary transition-colors">
-              Pricing
-            </a>
             <a href="#faq" className="text-sm text-gray-600 hover:text-primary transition-colors">
               FAQ
             </a>
@@ -64,7 +61,6 @@ export default function Header() {
           <div className="px-4 py-4 space-y-3">
             <a href="#features" className="block text-sm text-gray-600 py-2" onClick={() => setIsMenuOpen(false)}>Features</a>
             <a href="#how-it-works" className="block text-sm text-gray-600 py-2" onClick={() => setIsMenuOpen(false)}>How it works</a>
-            <a href="#pricing" className="block text-sm text-gray-600 py-2" onClick={() => setIsMenuOpen(false)}>Pricing</a>
             <a href="#faq" className="block text-sm text-gray-600 py-2" onClick={() => setIsMenuOpen(false)}>FAQ</a>
             <div className="pt-3 border-t border-border space-y-2">
               <Link href="/auth/login" className="block text-sm text-center text-gray-700 py-2">Sign in</Link>
