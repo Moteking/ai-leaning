@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { jobInputSchema } from "@/lib/validations/job";
-import { buildJobEmbeddingText, setJobEmbedding } from "@/lib/embeddings/store";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -18,16 +17,16 @@ export async function POST(request: Request) {
 
   const admin = await prisma.companyAdmin.findFirst({
     where: { user: { clerkId: userId } },
-    include: { user: true, company: true },
   });
   if (!admin) return NextResponse.json({ error: "企業管理者のみ実行できます。" }, { status: 403 });
 
-  const job = await prisma.jobPosting.create({
+  const job = await prisma.jobOpening.create({
     data: {
       companyId: admin.companyId,
       title: parsed.data.title,
       description: parsed.data.description,
       requiredSkills: parsed.data.requiredSkills,
+      niceToHaveSkills: parsed.data.niceToHaveSkills ?? [],
       salaryMin: parsed.data.salaryMin,
       salaryMax: parsed.data.salaryMax,
       workStyle: parsed.data.workStyle,
@@ -38,29 +37,12 @@ export async function POST(request: Request) {
   await prisma.auditLog.create({
     data: {
       actorId: userId,
-      action: "JOB_CREATED",
-      targetType: "JobPosting",
+      action: "JOB_OPENING_CREATED",
+      targetType: "JobOpening",
       targetId: job.id,
       metadata: { title: job.title },
     },
   });
-
-  try {
-    const text = buildJobEmbeddingText({
-      title: job.title,
-      description: job.description,
-      requiredSkills: job.requiredSkills,
-      salaryMin: job.salaryMin,
-      salaryMax: job.salaryMax,
-      workStyle: job.workStyle,
-      companyName: admin.company.name,
-      companyIndustry: admin.company.industry,
-      companyDescription: admin.company.description,
-    });
-    await setJobEmbedding(job.id, text);
-  } catch (error) {
-    console.warn("job embedding refresh failed", error);
-  }
 
   return NextResponse.json({ ok: true, jobId: job.id });
 }

@@ -1,56 +1,48 @@
-# Compliance Checklist
+# Privacy & Fairness Checklist
 
-MeetFlow is designed to operate under a Japanese paid job-placement license
-(有料職業紹介事業). Every obligation from the spec's section 7 is mapped to an
-implementation hook below. Search the codebase for `[COMPLIANCE]` to find all
-touchpoints.
+Post-pivot MeetFlow is a B2B SaaS for hiring companies, not a placement
+service. The hiring company is the data controller for applicant
+information; we are the processor. The list below tracks the obligations
+we still want to honor.
 
-## 1. Consent for personal-data use
+## 1. Applicant transparency
 
-- UI: `/onboarding` shows an explicit checkbox.
-- Server: `/api/onboarding` refuses to persist a role without `consented: true`
-  and writes `consentedAt` on the `CandidateProfile`.
-- Audit: same handler writes `ONBOARDING_COMPLETED` to `AuditLog`.
+- The diagnostic page (`/apply/:token`) tells the applicant what data is
+  collected, what it is used for, and which company is the controller —
+  before they answer any question. (Phase D)
+- The AI evaluation system prompt is published in
+  `lib/ai/score-applicant.ts` (Phase E) so a curious applicant can be told
+  on request what was considered.
 
-## 2. Prevention of discriminatory screening
+## 2. No protected-attribute screening
 
-- `lib/ai/match.ts` (Phase 3) will inject a prompt preamble forbidding
-  age/gender/nationality-based scoring.
-- Admin review in `/admin/matches` allows the placement officer to reject
-  matches post-hoc.
+- The scorer's system prompt forbids reasoning over age, gender,
+  nationality, race, religion, marital status, health, disability.
+- Resume parsing strips fields that exist purely to convey those
+  attributes (date of birth, gender pronouns when listed as a header
+  field).
 
-## 3. Transparent pricing
+## 3. Tenant isolation
 
-- Public `/` landing page shows the three subscription tiers and the 10%
-  success fee.
-- `/compliance` repeats the pricing and references the service agreement.
+- Every `Applicant`, `JobOpening`, `DiagnosticTemplate` and `Application`
+  carries a `companyId`. Server queries always include it as a filter.
+- The audit log records the actor who ran each query so a misbehaving
+  admin can be traced.
 
-## 4. Placement officer oversight
+## 4. Audit trail
 
-- Role `PLATFORM_ADMIN` has access to `/admin/*`.
-- `Match.auditedBy` / `auditedAt` capture the decision.
-- MVP mode: matches are auto-approved; officer performs post-hoc audit.
+- `AuditLog` is append-only.
+- Every privileged mutation (job CRUD, applicant create, scoring,
+  status change) writes a row.
 
-## 5. Audit log
+## 5. Retention and deletion
 
-- `AuditLog` is append-only and indexed by actor and target.
-- Retention: 5 years.
+- Deletion of an `Applicant` cascades to `Application`, `DiagnosticResponse`.
+- Companies should be able to bulk-delete applicants past their retention
+  policy from `/company/applicants` (Phase C+).
 
-## 6. Accurate job posting information
+## Open items
 
-- `JobPosting` requires salary range, work style, and description (non-null).
-- Admin review (Phase 2) lets the company admin flag problem postings.
-
-## 7. Candidate information protection
-
-- Candidate details are exposed to a company only after `Match.status` becomes
-  `APPROVED`. Earlier stages show only an anonymised profile summary.
-- Phase 2 will add a "hide from current employer" toggle that filters matches
-  against the candidate's current company.
-
-## Open items (to track before go-live)
-
-- [ ] License number + placement officer name on `/compliance`.
-- [ ] Data retention and deletion policy (formal doc).
-- [ ] DPA with Clerk, Anthropic, OpenAI, Google, Stripe, Resend.
+- [ ] Per-tenant data export (right of access support).
+- [ ] DPA template with Anthropic / OpenAI.
 - [ ] Breach response runbook.

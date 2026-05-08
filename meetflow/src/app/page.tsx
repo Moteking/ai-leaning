@@ -7,55 +7,55 @@ import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/c
 const STEPS = [
   {
     index: "01",
-    title: "登録 (5分)",
-    body: "職務経歴書を貼り付けるだけ。AIが構造化し、5つのカルチャー診断に答えて完了です。",
+    title: "求人と性格診断を設定",
+    body: "自社のカルチャー、求人要件、性格診断の質問を登録します。プリセットテンプレートをそのまま使うか、自由にカスタマイズできます。",
   },
   {
     index: "02",
-    title: "マッチを受け取る",
-    body: "毎週日曜夜、AIがあなたに合う求人を厳選。スカウトメールの山に埋もれません。",
+    title: "応募者をアップロード",
+    body: "応募者の氏名・メール・履歴書テキストを登録すると、診断回答用の専用リンクが発行されます。リンクを応募者に共有してください。",
   },
   {
     index: "03",
-    title: "面談が自動で確定",
-    body: "承諾した瞬間、双方のカレンダーから最適な時間が選ばれ、面談リンクが発行されます。",
+    title: "AI が即時スコアリング",
+    body: "応募者が診断を提出すると、Claude が履歴書 × 求人要件 × 自社カルチャーを照合し、適合度スコアと評価コメントを返します。",
   },
 ];
 
 const PRICING = [
   {
     name: "Starter",
-    price: "¥150,000",
-    unit: "月額 / 5面談まで",
-    highlights: ["採用ファネルの試験運用に", "求人2件まで掲載", "AI推薦レポート"],
+    price: "¥30,000",
+    unit: "月額 / 応募者 30名まで",
+    highlights: ["求人 3件まで", "標準テンプレート利用可", "AI スコアリング無制限"],
   },
   {
     name: "Growth",
-    price: "¥300,000",
-    unit: "月額 / 15面談まで",
-    highlights: ["成長フェーズの標準プラン", "求人5件まで掲載", "面接官3名までの招待"],
+    price: "¥80,000",
+    unit: "月額 / 応募者 150名まで",
+    highlights: ["求人 10件まで", "カスタムテンプレート無制限", "面接官 5名まで招待"],
     featured: true,
   },
   {
     name: "Scale",
-    price: "¥600,000",
-    unit: "月額 / 40面談まで",
-    highlights: ["複数職種を並行採用", "求人無制限", "採用データAPI / 専任担当"],
+    price: "¥200,000",
+    unit: "月額 / 応募者無制限",
+    highlights: ["求人無制限", "API 連携 / SSO", "専任カスタマーサクセス"],
   },
 ];
 
 const VALUES = [
   {
-    title: "スカウトしない、される側に回らない",
-    body: "候補者は受け身、企業も送り手に回らない。AIが仲介者として単独で両者を見立てます。",
+    title: "自社カルチャーを軸に評価",
+    body: "「うちで活躍する人」を文章で定義し、AI がそれに沿って一貫した基準で応募者を評価します。",
   },
   {
-    title: "日程調整の往復をゼロに",
-    body: "空き時間の交差から最適解を1件だけ提示。双方のカレンダーに自動で入ります。",
+    title: "履歴書だけでは見えない適合性",
+    body: "性格診断と履歴書を組み合わせて、面接前にカルチャーフィットの仮説を立てられます。",
   },
   {
-    title: "年収10%の成功報酬",
-    body: "業界標準30-35%より大幅に低く、採用コストを構造的に引き下げます。",
+    title: "面接官の負担を減らす",
+    body: "事前にスコアと AI コメントを渡すことで、限られた面接時間を本質的な確認に使えます。",
   },
 ];
 
@@ -67,22 +67,23 @@ export default function HomePage() {
         <section className="border-b border-[var(--border)]">
           <div className="mx-auto max-w-6xl px-6 py-24">
             <p className="text-sm tracking-[0.2em] text-[var(--muted-foreground)]">
-              AI-FIRST RECRUITMENT MATCHING
+              AI APPLICANT SCORING FOR HIRING TEAMS
             </p>
             <h1 className="mt-6 font-serif text-5xl leading-[1.2] tracking-tight md:text-6xl">
-              スカウトもメッセージも<br />日程調整もない、<br />面談だけが残る転職。
+              履歴書と性格診断で、<br />「自社に合うか」を<br />数字で見立てる。
             </h1>
             <p className="mt-8 max-w-2xl text-lg text-[var(--muted-foreground)]">
-              MeetFlowは、候補者と企業をAIが厳選し、面談日時まで自動で確定する中途採用サービスです。
-              書類選考やメッセージ交換の往復を全廃し、本当に会うべき30分だけを残します。
+              MeetFlow は、応募者の履歴書と独自の性格診断を組み合わせ、自社カルチャーへの
+              適合度を AI がスコアリングする中途採用支援ツールです。
+              履歴書だけでは見えない「合う/合わない」を、面接前に可視化します。
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link href="/sign-up">
-                <Button size="lg">候補者として登録</Button>
+                <Button size="lg">企業として始める</Button>
               </Link>
-              <Link href="/sign-up">
+              <Link href="/#how-it-works">
                 <Button variant="outline" size="lg">
-                  企業の方はこちら
+                  仕組みを見る
                 </Button>
               </Link>
             </div>
@@ -108,7 +109,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-6xl px-6 py-20">
             <h2 className="font-serif text-3xl tracking-tight">仕組み</h2>
             <p className="mt-3 text-[var(--muted-foreground)]">
-              従来の「スカウト→メッセージ→選考→日程調整→面談」という5工程を、3工程に圧縮しました。
+              アップロードからスコア算出まで、最短数分。応募者にはアカウント登録不要のリンクを送るだけです。
             </p>
             <div className="mt-12 grid gap-8 md:grid-cols-3">
               {STEPS.map((step) => (
@@ -124,9 +125,9 @@ export default function HomePage() {
 
         <section id="pricing" className="border-b border-[var(--border)]">
           <div className="mx-auto max-w-6xl px-6 py-20">
-            <h2 className="font-serif text-3xl tracking-tight">料金 (企業向け)</h2>
+            <h2 className="font-serif text-3xl tracking-tight">料金</h2>
             <p className="mt-3 text-[var(--muted-foreground)]">
-              候補者は基本無料。企業は月額サブスクリプション + 採用成立時に年収の10%。
+              シンプルな月額制。応募者数に応じて 3 プランからお選びください。年間契約で 15% オフ。
             </p>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {PRICING.map((plan) => (
@@ -147,7 +148,7 @@ export default function HomePage() {
                       ))}
                     </ul>
                     <CardDescription className="mt-6">
-                      すべてのプランで、採用成立時の成功報酬は年収の10%です。
+                      初期費用なし、いつでも解約可能。
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -158,15 +159,15 @@ export default function HomePage() {
 
         <section id="compliance">
           <div className="mx-auto max-w-6xl px-6 py-20">
-            <h2 className="font-serif text-3xl tracking-tight">法令遵守への取り組み</h2>
+            <h2 className="font-serif text-3xl tracking-tight">プライバシーと公正性</h2>
             <p className="mt-3 max-w-3xl text-[var(--muted-foreground)]">
-              MeetFlowは有料職業紹介事業の許可取得を前提に設計されています。
-              個人情報の取り扱い、差別的選別の防止、職業紹介責任者による監査、料金の明示など、
-              厚生労働省のガイドラインに沿って運営します。
+              応募者情報は契約企業ごとに分離され、AI 評価のプロンプトには年齢・性別・国籍などの
+              属性で判断しないよう明示的なガードレールを組み込んでいます。
+              個人情報は契約企業が管理者となり、MeetFlow は処理者として運用します。
             </p>
             <div className="mt-8">
               <Link href="/compliance">
-                <Button variant="outline">法令遵守の詳細を見る</Button>
+                <Button variant="outline">プライバシーと公正性の詳細</Button>
               </Link>
             </div>
           </div>

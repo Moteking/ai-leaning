@@ -7,30 +7,29 @@ export default function CompliancePage() {
       <SiteHeader />
       <main className="flex-1">
         <article className="mx-auto max-w-3xl px-6 py-20">
-          <h1 className="font-serif text-4xl tracking-tight">法令遵守について</h1>
+          <h1 className="font-serif text-4xl tracking-tight">プライバシーと公正性</h1>
           <p className="mt-6 text-[var(--muted-foreground)]">
-            MeetFlowは職業安定法に基づく有料職業紹介事業の許可取得を前提に設計されています。
-            本ページは許可取得までの暫定版で、許可取得後に許可番号・職業紹介責任者名を掲載します。
+            MeetFlow は、契約企業の採用活動を支援する SaaS ツールです。応募者の個人情報は契約企業が
+            管理者(コントローラ)、MeetFlow が処理者(プロセッサ)として、必要な範囲でのみ取り扱います。
           </p>
 
           <section className="mt-10 space-y-4">
             <h2 className="font-serif text-2xl">取り組み</h2>
             <ul className="list-disc space-y-2 pl-6 text-sm text-[var(--muted-foreground)]">
-              <li>個人情報利用について、登録時に明示的な同意を取得します。</li>
-              <li>AIによるマッチング判断から年齢・性別・国籍等の差別的要素を除外しています。</li>
-              <li>職業紹介責任者が全マッチを事後監査し、問題のあるマッチを無効化できます。</li>
-              <li>料金は本サイトに明示し、成功報酬は契約書に計算式を記載します。</li>
-              <li>求人情報の適正表示(給与・勤務地・雇用形態の必須化)を強制します。</li>
-              <li>監査ログを5年間保管し、厚労省の調査に対応できる形式で保持します。</li>
+              <li>応募者は性格診断回答前に、利用目的と評価方法の説明を確認できます。</li>
+              <li>AI 評価のプロンプトに年齢・性別・国籍・人種・宗教・婚姻状況・健康状態などを
+                判断材料にしないよう明示的なガードレールを組み込んでいます。</li>
+              <li>応募者データはテナントごとに分離され、他企業から参照できません。</li>
+              <li>採用終了後の応募者データは、契約企業の保管ポリシーに従って削除可能です。</li>
+              <li>すべての操作は監査ログに記録されます。</li>
             </ul>
           </section>
 
           <section className="mt-10 space-y-4">
-            <h2 className="font-serif text-2xl">料金の明示</h2>
+            <h2 className="font-serif text-2xl">評価モデルについて</h2>
             <p className="text-sm text-[var(--muted-foreground)]">
-              候補者は基本無料です。企業は月額サブスクリプション(¥150,000 / ¥300,000 / ¥600,000)に加え、
-              採用成立時に採用者の初年度年収の10%を成功報酬としてお支払いいただきます。
-              詳細は個別の業務委託契約書に記載します。
+              AI による適合度スコアは「補助情報」です。最終的な採用判断は契約企業の採用責任者が行います。
+              スコアの根拠は AI コメントとして提示し、必要に応じて応募者に開示できる形式で保管されます。
             </p>
           </section>
         </article>

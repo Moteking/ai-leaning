@@ -8,7 +8,8 @@ import { JobForm } from "../job-form";
 const NAV = [
   { label: "ホーム", href: "/company/dashboard" },
   { label: "求人", href: "/company/jobs" },
-  { label: "面談", href: "/company/meetings" },
+  { label: "応募者", href: "/company/applicants" },
+  { label: "性格診断", href: "/company/templates" },
   { label: "面接官", href: "/company/managers" },
   { label: "料金プラン", href: "/company/billing" },
 ];
@@ -17,7 +18,7 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
   const { userId } = await requireRole("COMPANY_ADMIN");
   const { companyId } = await requireCompanyForAdmin(userId);
   const { id } = await params;
-  const job = await prisma.jobPosting.findFirst({ where: { id, companyId } });
+  const job = await prisma.jobOpening.findFirst({ where: { id, companyId } });
   if (!job) notFound();
 
   return (
@@ -34,6 +35,7 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
             title: job.title,
             description: job.description,
             requiredSkills: job.requiredSkills,
+            niceToHaveSkills: job.niceToHaveSkills,
             salaryMin: job.salaryMin,
             salaryMax: job.salaryMax,
             workStyle: job.workStyle,

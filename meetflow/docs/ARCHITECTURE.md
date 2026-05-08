@@ -1,69 +1,58 @@
 # Architecture
 
-MeetFlow is a Next.js 15 (App Router) application deployed on Vercel, with
-PostgreSQL (Neon + pgvector) as the system of record and Clerk as the identity
-provider. This document describes the runtime topology and the major
-processing paths.
+MeetFlow (post-pivot) is a B2B SaaS that helps hiring companies score
+applicants on culture and skill fit. Stack: Next.js 15 App Router on
+Vercel, Postgres on Neon, Clerk for auth, Claude for evaluation.
 
 ## Runtime topology
 
 ```
 ┌────────┐     ┌──────────────────────────┐     ┌─────────────────┐
 │Browser │ ──► │ Next.js on Vercel        │ ──► │ Neon PostgreSQL │
-└────────┘     │   Edge middleware        │     │  + pgvector     │
-               │   RSC + Route handlers   │     └─────────────────┘
-               │   Vercel Cron            │
+└────────┘     │   Edge middleware        │     └─────────────────┘
+               │   RSC + Route handlers   │
                └──────────┬───────────────┘
                           │
-          ┌───────────────┼──────────────────────────┐
-          ▼               ▼                          ▼
-    ┌───────────┐   ┌─────────────┐          ┌────────────────┐
-    │  Clerk    │   │ Anthropic   │          │ Google / Stripe│
-    │  (authn)  │   │ Claude API  │          │ Resend / PostHog│
-    └───────────┘   └─────────────┘          └────────────────┘
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+    ┌──────────┐    ┌────────────┐  ┌────────────────┐
+    │  Clerk   │    │ Anthropic  │  │ Stripe / Resend │
+    │ (authn)  │    │ Claude API │  │  (later phases) │
+    └──────────┘    └────────────┘  └────────────────┘
 ```
 
 ## Request flow for a protected page
 
-1. Browser requests `/company/jobs`.
-2. Edge middleware (`src/middleware.ts`) runs `clerkMiddleware`, which reads
-   the session cookie.
-3. Unauthenticated users are redirected to `/sign-in`.
-4. Authenticated users with no `publicMetadata.role` are redirected to
-   `/onboarding`.
-5. If the role does not match the route's required role, the middleware
-   redirects to the user's role-specific home.
-6. The RSC fetches data via `lib/prisma.ts`, renders, and streams HTML.
+1. Browser requests `/company/applicants`.
+2. Edge middleware (`src/middleware.ts`) runs `clerkMiddleware`, reads the
+   session cookie, and looks at `publicMetadata.role`.
+3. Unauthenticated → `/sign-in`. Missing role → `/onboarding`. Wrong role
+   → role-specific home.
+4. The page resolves `companyId` via `requireCompanyForAdmin`, queries
+   Prisma scoped to that company, and renders.
 
-## Data ownership
+## Public applicant flow (Phase D)
 
-| Concern                           | System of record |
-| --------------------------------- | ---------------- |
-| Identity, email, password          | Clerk            |
-| Role, consent timestamp, profile   | Neon (Prisma)    |
-| Embeddings for semantic match      | Neon (pgvector)  |
-| Matches, meetings, feedback, audit | Neon (Prisma)    |
-| Subscriptions, invoices            | Stripe           |
-| Calendar availability, events      | Google Calendar  |
+`/apply/:token` is the only publicly accessible app route. The token is
+matched against `Applicant.diagnosticToken` and verified against
+`diagnosticTokenExpiresAt`. No Clerk session is ever attached.
 
 ## Background jobs
 
-- **Weekly matching batch**: Vercel Cron (`0 14 * * 0` UTC → Sun 23:00 JST;
-  configured in `vercel.json`) calls `POST /api/cron/generate-matches` with
-  `Authorization: Bearer $CRON_SECRET`.
-  - Backfills missing embeddings for candidates and active jobs via
-    OpenAI `text-embedding-3-small`.
-  - For each candidate, pulls the top-20 jobs by cosine similarity
-    (`pgvector` HNSW), evaluates each pair with Claude (`claude-sonnet-4-6`)
-    using a structured output schema.
-  - Persists matches with `fitScore >= 70` and `recommendation = "APPROVE"`;
-    existing rows are upserted so re-scoring never duplicates a match.
-  - Writes a `MATCH_BATCH_COMPLETED` (or `…_FAILED`) row to `AuditLog`.
-- **Nightly reminders**: Cron triggers `/api/cron/remind-meetings` to send
-  next-day reminders via Resend (Phase 4).
+None for the MVP. Scoring is triggered by `POST /api/apply/:token` at
+submission time. We can later add a fallback Cron to retry failed scoring
+runs.
+
+## Data ownership
+
+| Concern                                  | System of record |
+| ---------------------------------------- | ---------------- |
+| Identity, password (company-side users)  | Clerk            |
+| Role / consent timestamps                | Neon (Prisma)    |
+| Applicants, applications, responses      | Neon (Prisma)    |
+| AI evaluation outputs                    | Neon (Prisma)    |
+| Subscriptions                            | Stripe (later)   |
 
 ## Compliance layer
 
-`AuditLog` is written from every action that touches candidate data. The
-`/admin` section exposes these records to the job-placement officer. See
-`COMPLIANCE.md` for the checklist.
+`AuditLog` is written from every privileged action. See `COMPLIANCE.md`.

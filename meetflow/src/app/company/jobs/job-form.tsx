@@ -31,6 +31,7 @@ type Props =
         title: string;
         description: string;
         requiredSkills: string[];
+        niceToHaveSkills: string[];
         salaryMin: number;
         salaryMax: number;
         workStyle: WorkStyle;
@@ -45,6 +46,7 @@ export function JobForm(props: Props) {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [requiredSkills, setRequiredSkills] = useState(initial?.requiredSkills.join(", ") ?? "");
+  const [niceToHaveSkills, setNiceToHaveSkills] = useState(initial?.niceToHaveSkills.join(", ") ?? "");
   const [salaryMin, setSalaryMin] = useState(initial?.salaryMin.toString() ?? "");
   const [salaryMax, setSalaryMax] = useState(initial?.salaryMax.toString() ?? "");
   const [workStyle, setWorkStyle] = useState<WorkStyle>(initial?.workStyle ?? "FLEXIBLE");
@@ -74,6 +76,7 @@ export function JobForm(props: Props) {
           title,
           description,
           requiredSkills: splitList(requiredSkills),
+          niceToHaveSkills: splitList(niceToHaveSkills),
           salaryMin: min,
           salaryMax: max,
           workStyle,
@@ -165,6 +168,14 @@ export function JobForm(props: Props) {
               id="requiredSkills"
               value={requiredSkills}
               onChange={(e) => setRequiredSkills(e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="niceToHaveSkills">あると望ましいスキル (カンマ区切り)</Label>
+            <Input
+              id="niceToHaveSkills"
+              value={niceToHaveSkills}
+              onChange={(e) => setNiceToHaveSkills(e.target.value)}
             />
           </div>
           <div className="md:col-span-2">

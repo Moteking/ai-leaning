@@ -1,30 +1,23 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export type AppRole =
-  | "CANDIDATE"
-  | "COMPANY_ADMIN"
-  | "HIRING_MANAGER"
-  | "PLATFORM_ADMIN";
+export type AppRole = "COMPANY_ADMIN" | "HIRING_MANAGER" | "PLATFORM_ADMIN";
 
 export const ROLE_LABELS: Record<AppRole, string> = {
-  CANDIDATE: "候補者",
   COMPANY_ADMIN: "企業管理者",
   HIRING_MANAGER: "面接官",
-  PLATFORM_ADMIN: "職業紹介責任者",
+  PLATFORM_ADMIN: "プラットフォーム管理者",
 };
 
 const ROLE_HOMES: Record<AppRole, string> = {
-  CANDIDATE: "/dashboard",
   COMPANY_ADMIN: "/company/dashboard",
   HIRING_MANAGER: "/manager/dashboard",
   PLATFORM_ADMIN: "/admin/dashboard",
 };
 
-// Where the user lands *right after* picking a role. They still need to finish
+// Where the user lands right after picking a role. They still need to finish
 // persona-specific onboarding before they can use the dashboard.
 const ONBOARDING_NEXT: Record<AppRole, string> = {
-  CANDIDATE: "/onboarding/candidate",
   COMPANY_ADMIN: "/onboarding/company",
   HIRING_MANAGER: "/onboarding/manager",
   PLATFORM_ADMIN: "/admin/dashboard",
@@ -39,9 +32,7 @@ export function onboardingNextForRole(role: AppRole): string {
 }
 
 function parseRole(value: unknown): AppRole | null {
-  if (typeof value !== "string") return null;
   if (
-    value === "CANDIDATE" ||
     value === "COMPANY_ADMIN" ||
     value === "HIRING_MANAGER" ||
     value === "PLATFORM_ADMIN"

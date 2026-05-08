@@ -1,64 +1,61 @@
 # Data Model
 
-Source of truth: `prisma/schema.prisma`. This document summarises each table
-and lists the key relationships.
+Source of truth: `prisma/schema.prisma`. Updated for the post-pivot domain
+(B2B applicant scoring SaaS).
 
 ## Entity overview
 
 ```
-User ─┬─ CandidateProfile ─┬─ AvailabilitySlot
-      │                    └─ Match ── Meeting ── Feedback
-      ├─ HiringManager ────── AvailabilitySlot
-      └─ CompanyAdmin ── Company ─┬─ JobPosting ── Match
-                                  ├─ HiringManager
-                                  └─ Subscription
+User ─┬─ HiringManager ── Company
+      └─ CompanyAdmin ── Company ─┬─ JobOpening ─┬─ Applicant ── Application ── DiagnosticResponse
+                                  │              └─ DiagnosticTemplate ── DiagnosticQuestion
+                                  ├─ Invite (HiringManager invitation)
+                                  └─ Templates / Applicants
 ```
 
 ## Tables
 
 ### `User`
-Thin shadow of the Clerk user; stores `role`, `clerkId`, `email`. Everything
-else hangs off role-specific profile tables.
+Mirror of the Clerk user with a single `role`
+(`COMPANY_ADMIN | HIRING_MANAGER | PLATFORM_ADMIN`).
 
-### `CandidateProfile`
-Skills, desired roles, salary band, work style, culture diagnostic answers,
-resume text, and the 1536-dim OpenAI embedding used for semantic retrieval.
-`consentedAt` is written during onboarding and is required by the
-Employment Security Act — see `COMPLIANCE.md`.
+### `Company`
+Hiring company. Holds the `cultureProfile` free-text field which the AI
+scorer uses to anchor culture-fit judgement.
 
-### `Company`, `CompanyAdmin`, `HiringManager`
-A company has N admins and N hiring managers. Admins configure the company,
-invite managers, and manage billing. Managers have their own availability.
+### `CompanyAdmin`, `HiringManager`
+Two ways a Clerk user can belong to a company. Admins configure jobs,
+templates and billing. Managers review applicants.
 
-### `JobPosting`
-Required skills, salary range, work style, status, and an embedding.
+### `Invite`
+Token-based invitation used to onboard a hiring manager into a company.
 
-### `AvailabilitySlot`
-Discrete intervals owned by either a candidate or a hiring manager. Used by
-the scheduling engine (Phase 4) to find intersections.
+### `JobOpening`
+Title, required/nice-to-have skills, salary range, work style. Optionally
+references a `DiagnosticTemplate` whose questions every applicant answers.
 
-### `Match`
-Unique per `(candidate, job)` pair. Stores `fitScore`, a structured
-`fitReasonJson` from Claude (kept 5 years for audit), plus the audit decision.
+### `DiagnosticTemplate`
+Per-company. `origin` is `STANDARD` (forked from a preset) or `CUSTOM`
+(built from scratch). `rubric` JSON encodes the company's preferred
+answer per question for scoring.
 
-### `Meeting` + `Feedback`
-`Meeting` is created only when a match is approved and a time was selected.
-`Feedback` is collected after the meeting (one row per participant).
+### `DiagnosticQuestion`
+Belongs to a template. Type is `SINGLE_CHOICE | LIKERT | FREE_TEXT`.
+`options` JSON holds choices for the first two types.
 
-### `Subscription`
-Mirrors the Stripe subscription so quota checks do not require a Stripe
-round-trip.
+### `Applicant`
+Person who applied. Not a Clerk user. Holds the uploaded résumé text,
+contact info, and a single-use `diagnosticToken` used by the public
+`/apply/:token` flow.
+
+### `Application`
+One per applicant. Tracks status through the funnel
+(`AWAITING_DIAGNOSTIC → SUBMITTED → REVIEWED → HIRED|REJECTED`) and stores
+the AI score (`fitScore` plus `fitReasonJson`).
+
+### `DiagnosticResponse`
+Applicant's answer to a single question, scoped to an application. Unique
+per `(applicationId, questionId)`.
 
 ### `AuditLog`
-Append-only record of every sensitive action. Indexed by actor and by target.
-Retention: 5 years.
-
-## pgvector notes
-
-Prisma has no first-class vector type, so `embedding` is declared as
-`Unsupported("vector(1536)")`. Indexes are created via the raw SQL in
-`prisma/vector_indexes.sql` after the first migration:
-
-```
-CREATE INDEX ... USING hnsw (embedding vector_cosine_ops);
-```
+Append-only operational log. Indexed by actor and target.

@@ -5,8 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const NAV = [
   { label: "統計", href: "/admin/dashboard" },
-  { label: "マッチ監査", href: "/admin/matches" },
-  { label: "コンプライアンス", href: "/admin/compliance" },
   { label: "監査ログ", href: "/admin/audit-logs" },
   { label: "ユーザー", href: "/admin/users" },
   { label: "企業", href: "/admin/companies" },
@@ -24,13 +22,13 @@ export default async function AdminCompaniesPage() {
   const companies = await prisma.company.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      _count: { select: { jobPostings: true, hiringManagers: true } },
+      _count: { select: { jobOpenings: true, hiringManagers: true, applicants: true } },
     },
     take: 100,
   });
 
   return (
-    <AppShell title="職業紹介責任者" nav={NAV}>
+    <AppShell title="プラットフォーム管理者" nav={NAV}>
       <header>
         <p className="text-sm tracking-[0.2em] text-[var(--muted-foreground)]">COMPANIES</p>
         <h1 className="mt-2 font-serif text-3xl tracking-tight">企業一覧 (最新100件)</h1>
@@ -55,7 +53,8 @@ export default async function AdminCompaniesPage() {
                   )}
                 </div>
                 <div className="text-right text-xs text-[var(--muted-foreground)]">
-                  <p>求人 {c._count.jobPostings}件</p>
+                  <p>求人 {c._count.jobOpenings}件</p>
+                  <p>応募者 {c._count.applicants}名</p>
                   <p>面接官 {c._count.hiringManagers}名</p>
                   <p className="mt-1">{new Date(c.createdAt).toLocaleDateString("ja-JP")}</p>
                 </div>

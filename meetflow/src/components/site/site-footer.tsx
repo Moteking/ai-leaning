@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div className="flex flex-col justify-between gap-6 md:flex-row">
           <div>
             <p className="font-serif text-base text-[var(--foreground)]">MeetFlow</p>
-            <p className="mt-1">AI面談マッチング (中途採用)</p>
+            <p className="mt-1">応募者の AI スコアリング (中途採用)</p>
           </div>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
             <div>
@@ -18,9 +18,9 @@ export function SiteFooter() {
               </ul>
             </div>
             <div>
-              <p className="mb-2 text-[var(--foreground)]">法令遵守</p>
+              <p className="mb-2 text-[var(--foreground)]">プライバシー</p>
               <ul className="space-y-1">
-                <li><Link href="/compliance">職業紹介事業について</Link></li>
+                <li><Link href="/compliance">プライバシーと公正性</Link></li>
                 <li><Link href="/privacy">プライバシーポリシー</Link></li>
                 <li><Link href="/terms">利用規約</Link></li>
               </ul>
@@ -34,7 +34,7 @@ export function SiteFooter() {
           </div>
         </div>
         <p className="mt-10 text-xs">
-          (C) {new Date().getFullYear()} MeetFlow. 本サービスは有料職業紹介事業の許可取得を前提に設計されています。
+          (C) {new Date().getFullYear()} MeetFlow.
         </p>
       </div>
     </footer>

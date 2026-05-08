@@ -1,21 +1,19 @@
-// MeetFlow Prisma schema
-// pgvector extension required on Neon/Supabase.
+// MeetFlow Prisma schema (B2B HR-Tech, post-pivot).
+// The hiring company uploads applicants' résumés, attaches a personality
+// diagnostic, and lets AI score how well each applicant fits the company.
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  extensions = [pgvector(map: "vector")]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ===== Enums =====
 
 enum Role {
-  CANDIDATE
   COMPANY_ADMIN
   HIRING_MANAGER
   PLATFORM_ADMIN
@@ -41,88 +39,57 @@ enum JobStatus {
   CLOSED
 }
 
-enum MatchStatus {
-  PENDING
-  APPROVED
-  REJECTED_BY_AUDIT
-  SCHEDULED
-  EXPIRED
+enum TemplateOrigin {
+  STANDARD
+  CUSTOM
 }
 
-enum MeetingStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELLED
-  NO_SHOW
+enum QuestionType {
+  SINGLE_CHOICE
+  LIKERT
+  FREE_TEXT
 }
 
-enum Plan {
-  STARTER
-  GROWTH
-  SCALE
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  PAST_DUE
-  CANCELLED
+enum ApplicationStatus {
+  AWAITING_DIAGNOSTIC
+  SUBMITTED
+  REVIEWED
+  HIRED
+  REJECTED
 }
 
 // ===== Models =====
 
 model User {
-  id               String            @id @default(cuid())
-  email            String            @unique
-  role             Role
-  clerkId          String            @unique
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  candidateProfile CandidateProfile?
-  hiringManager    HiringManager?
-  companyAdmins    CompanyAdmin[]
-}
-
-model CandidateProfile {
-  id                String             @id @default(cuid())
-  userId            String             @unique
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName       String
-  currentPosition   String?
-  yearsOfExperience Int?
-  skills            String[]
-  desiredRoles      String[]
-  desiredSalaryMin  Int?
-  desiredSalaryMax  Int?
-  workStyle         WorkStyle          @default(FLEXIBLE)
-  cultureAnswers    Json?
-  resumeText        String?
-  // Embedding column managed via raw SQL migration (pgvector). Prisma does not
-  // have first-class vector support, so we expose it as Unsupported.
-  embedding         Unsupported("vector(1536)")?
-  // [COMPLIANCE] Consent timestamp for personal data usage. Required by the
-  // Employment Security Act and the Personal Information Protection Act.
-  consentedAt       DateTime
-  availabilitySlots AvailabilitySlot[]
-  matches           Match[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id            String         @id @default(cuid())
+  email         String         @unique
+  role          Role
+  clerkId       String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  hiringManager HiringManager?
+  companyAdmins CompanyAdmin[]
 }
 
 model Company {
-  id             String          @id @default(cuid())
+  id             String               @id @default(cuid())
   name           String
   description    String
   industry       String
   size           CompanySize
   websiteUrl     String?
   logoUrl        String?
+  // Free-form description of who thrives at this company. Fed to the AI scorer
+  // to anchor culture fit. Editable from the company settings screen.
+  cultureProfile String?
   admins         CompanyAdmin[]
-  jobPostings    JobPosting[]
-  subscription   Subscription?
+  jobOpenings    JobOpening[]
   hiringManagers HiringManager[]
   invites        Invite[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  templates      DiagnosticTemplate[]
+  applicants     Applicant[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 }
 
 model CompanyAdmin {
@@ -136,39 +103,19 @@ model CompanyAdmin {
   @@unique([userId, companyId])
 }
 
-model JobPosting {
-  id             String                       @id @default(cuid())
-  companyId      String
-  company        Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  title          String
-  description    String
-  requiredSkills String[]
-  salaryMin      Int
-  salaryMax      Int
-  workStyle      WorkStyle
-  status         JobStatus                    @default(ACTIVE)
-  embedding      Unsupported("vector(1536)")?
-  matches        Match[]
-  createdAt      DateTime                     @default(now())
-  updatedAt      DateTime                     @updatedAt
-}
-
 model HiringManager {
-  id                      String             @id @default(cuid())
-  userId                  String             @unique
-  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyId               String
-  company                 Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  displayName             String
-  position                String
-  googleCalendarConnected Boolean            @default(false)
-  availabilitySlots       AvailabilitySlot[]
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  displayName String
+  position    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-// Invite issued by a company admin for a hiring manager. The invitee
-// completes Clerk sign-up, then redeems the token to join the company.
+// Invitation token used to onboard hiring managers into a company.
 model Invite {
   id         String    @id @default(cuid())
   token      String    @unique
@@ -184,81 +131,116 @@ model Invite {
   @@index([email])
 }
 
-model AvailabilitySlot {
-  id                 String            @id @default(cuid())
-  startsAt           DateTime
-  endsAt             DateTime
-  candidateProfileId String?
-  candidateProfile   CandidateProfile? @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
-  hiringManagerId    String?
-  hiringManager      HiringManager?    @relation(fields: [hiringManagerId], references: [id], onDelete: Cascade)
-  createdAt          DateTime          @default(now())
-
-  @@index([startsAt, endsAt])
+model JobOpening {
+  id               String              @id @default(cuid())
+  companyId        String
+  company          Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  requiredSkills   String[]
+  niceToHaveSkills String[]
+  salaryMin        Int
+  salaryMax        Int
+  workStyle        WorkStyle
+  status           JobStatus           @default(ACTIVE)
+  // Optional template attached to the job. If null, scorer falls back to the
+  // company's default (most-recent CUSTOM, or none).
+  templateId       String?
+  template         DiagnosticTemplate? @relation(fields: [templateId], references: [id])
+  applicants       Applicant[]
+  applications     Application[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
-model Match {
-  id                 String           @id @default(cuid())
-  candidateProfileId String
-  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
-  jobPostingId       String
-  jobPosting         JobPosting       @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
-  fitScore           Float
-  // [COMPLIANCE] Reasoning retained for audit by the job-placement officer.
-  // Must be kept for at least 5 years.
-  fitReasonJson      Json
-  status             MatchStatus      @default(PENDING)
-  auditedBy          String?
-  auditedAt          DateTime?
-  meeting            Meeting?
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-
-  @@unique([candidateProfileId, jobPostingId])
+model DiagnosticTemplate {
+  id          String               @id @default(cuid())
+  companyId   String
+  company     Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  origin      TemplateOrigin
+  // Optional per-question rubric in the shape:
+  //   { questionId: { idealValue?, weight?, rationale? } }
+  // The scorer uses this to know which answers the company prefers.
+  rubric      Json?
+  questions   DiagnosticQuestion[]
+  jobOpenings JobOpening[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 }
 
-model Meeting {
-  id                    String        @id @default(cuid())
-  matchId               String        @unique
-  match                 Match         @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  scheduledAt           DateTime
-  duration              Int
-  meetingUrl            String
-  briefingForCandidate  String
-  briefingForCompany    String
-  status                MeetingStatus @default(SCHEDULED)
-  feedbacks             Feedback[]
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
+model DiagnosticQuestion {
+  id         String               @id @default(cuid())
+  templateId String
+  template   DiagnosticTemplate   @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  order      Int
+  prompt     String
+  type       QuestionType
+  // Shape: [{ value: string, label: string }] for SINGLE_CHOICE; [{ value: 1..5, label: string }]
+  // for LIKERT; null for FREE_TEXT.
+  options    Json?
+  responses  DiagnosticResponse[]
+
+  @@index([templateId, order])
 }
 
-model Feedback {
-  id           String   @id @default(cuid())
-  meetingId    String
-  meeting      Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  fromUserId   String
-  rating       Int
-  comment      String?
-  wantNextStep Boolean
-  createdAt    DateTime @default(now())
+// Person who applied to a specific opening. Not a Clerk user — they access
+// the diagnostic via a single-use link backed by `diagnosticToken`.
+model Applicant {
+  id                       String       @id @default(cuid())
+  companyId                String
+  company                  Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  jobOpeningId             String
+  jobOpening               JobOpening   @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+  fullName                 String
+  email                    String
+  // Plain-text résumé. PDF parsing comes in a later phase.
+  resumeText               String
+  diagnosticToken          String       @unique
+  diagnosticTokenExpiresAt DateTime
+  application              Application?
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
+
+  @@index([companyId, createdAt])
+  @@index([email])
 }
 
-model Subscription {
-  id                    String             @id @default(cuid())
-  companyId             String             @unique
-  company               Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  plan                  Plan
-  stripeSubscriptionId  String             @unique
-  monthlyMeetingQuota   Int
-  meetingsUsedThisMonth Int                @default(0)
-  status                SubscriptionStatus @default(ACTIVE)
-  currentPeriodEnd      DateTime
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
+model Application {
+  id                    String               @id @default(cuid())
+  applicantId           String               @unique
+  applicant             Applicant            @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  jobOpeningId          String
+  jobOpening            JobOpening           @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+  status                ApplicationStatus    @default(AWAITING_DIAGNOSTIC)
+  diagnosticSubmittedAt DateTime?
+  // AI scoring output. Populated by the scorer after diagnostic submission.
+  fitScore              Float?
+  fitReasonJson         Json?
+  evaluatedAt           DateTime?
+  responses             DiagnosticResponse[]
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([jobOpeningId, status])
+  @@index([fitScore])
 }
 
-// [COMPLIANCE] Immutable audit log. Records every sensitive action so the
-// job-placement officer can answer regulator inquiries.
+model DiagnosticResponse {
+  id            String             @id @default(cuid())
+  applicationId String
+  application   Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      DiagnosticQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  // For SINGLE_CHOICE: option value. LIKERT: "1"-"5". FREE_TEXT: free string.
+  value         String
+
+  @@unique([applicationId, questionId])
+}
+
+// Append-only audit log. Useful for ops, not legally required (we are no
+// longer operating as a placement service post-pivot).
 model AuditLog {
   id         String   @id @default(cuid())
   actorId    String

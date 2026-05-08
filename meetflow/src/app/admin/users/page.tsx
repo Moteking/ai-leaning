@@ -5,8 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const NAV = [
   { label: "統計", href: "/admin/dashboard" },
-  { label: "マッチ監査", href: "/admin/matches" },
-  { label: "コンプライアンス", href: "/admin/compliance" },
   { label: "監査ログ", href: "/admin/audit-logs" },
   { label: "ユーザー", href: "/admin/users" },
   { label: "企業", href: "/admin/companies" },
@@ -17,7 +15,6 @@ export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      candidateProfile: { select: { displayName: true } },
       hiringManager: { select: { displayName: true, company: { select: { name: true } } } },
       companyAdmins: { include: { company: { select: { name: true } } } },
     },
@@ -25,7 +22,7 @@ export default async function AdminUsersPage() {
   });
 
   return (
-    <AppShell title="職業紹介責任者" nav={NAV}>
+    <AppShell title="プラットフォーム管理者" nav={NAV}>
       <header>
         <p className="text-sm tracking-[0.2em] text-[var(--muted-foreground)]">USERS</p>
         <h1 className="mt-2 font-serif text-3xl tracking-tight">ユーザー一覧 (最新100件)</h1>
@@ -36,11 +33,7 @@ export default async function AdminUsersPage() {
             <CardContent className="py-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="font-medium">
-                    {u.candidateProfile?.displayName ??
-                      u.hiringManager?.displayName ??
-                      u.email}
-                  </p>
+                  <p className="font-medium">{u.hiringManager?.displayName ?? u.email}</p>
                   <p className="text-sm text-[var(--muted-foreground)]">{u.email}</p>
                   {u.companyAdmins.length > 0 && (
                     <p className="text-xs text-[var(--muted-foreground)]">

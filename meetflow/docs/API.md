@@ -2,37 +2,32 @@
 
 All routes live under `/app/api/`. Every handler validates input with `zod`
 and returns JSON. Authentication is enforced by Clerk middleware plus an
-in-handler `auth()` call.
+in-handler `auth()` call (or a token check for public applicant routes).
 
 ## Public
 
-| Method | Route                 | Purpose                                    |
-| ------ | --------------------- | ------------------------------------------ |
-| POST   | `/api/webhooks/clerk` | Clerk user lifecycle (Phase 2)             |
-| POST   | `/api/webhooks/stripe`| Stripe subscription events (Phase 5)       |
+| Method | Route                  | Purpose                                 |
+| ------ | ---------------------- | --------------------------------------- |
+| POST   | `/api/webhooks/clerk`  | Clerk user lifecycle (later phase)      |
+| POST   | `/api/apply/:token`    | Applicant submits diagnostic (Phase D)  |
 
 ## Authenticated
 
-| Method | Route                                 | Who            | Purpose                                           |
-| ------ | ------------------------------------- | -------------- | ------------------------------------------------- |
-| POST   | `/api/onboarding`                     | Any signed-in  | Choose role + record consent                      |
-| POST   | `/api/onboarding/candidate/parse`     | Candidate      | AI-structure a pasted resume (Claude)             |
-| POST   | `/api/onboarding/candidate`           | Candidate      | Finalize candidate profile + culture answers      |
-| POST   | `/api/onboarding/company`             | Company admin  | Create the company and link the first admin      |
-| POST   | `/api/profile`                        | Candidate      | Update profile / resume                           |
-| POST   | `/api/jobs`                           | Company admin  | Create a job posting                              |
-| PATCH  | `/api/jobs/:id`                       | Company admin  | Update a job posting                              |
-| DELETE | `/api/jobs/:id`                       | Company admin  | Delete a job posting                              |
-| POST   | `/api/invites`                        | Company admin  | Issue a hiring-manager invite token               |
-| POST   | `/api/invites/accept`                 | Hiring manager | Redeem an invite and attach to the company        |
-| POST   | `/api/matches/:id/respond`            | Candidate      | Accept / decline an approved match                |
-| POST   | `/api/admin/matches/:id/audit`        | Platform admin | Approve or invalidate (REJECTED_BY_AUDIT) a match  |
-| POST   | `/api/cron/generate-matches`          | Cron / Admin   | Weekly matching batch (Bearer CRON_SECRET or Admin) |
-| POST   | `/api/meetings/:id/feedback`          | Both           | Post-meeting feedback (Phase 6)                   |
+| Method | Route                                | Who            | Purpose                                           |
+| ------ | ------------------------------------ | -------------- | ------------------------------------------------- |
+| POST   | `/api/onboarding`                    | Any signed-in  | Choose role (COMPANY_ADMIN / HIRING_MANAGER)      |
+| POST   | `/api/onboarding/company`            | Company admin  | Create the company and link the first admin      |
+| POST   | `/api/jobs`                          | Company admin  | Create a job opening                              |
+| PATCH  | `/api/jobs/:id`                      | Company admin  | Update a job opening                              |
+| DELETE | `/api/jobs/:id`                      | Company admin  | Delete a job opening                              |
+| POST   | `/api/invites`                       | Company admin  | Issue a hiring-manager invite token               |
+| POST   | `/api/invites/accept`                | Hiring manager | Redeem an invite and attach to the company        |
+| POST   | `/api/templates`                     | Company admin  | Create a diagnostic template (Phase B)            |
+| POST   | `/api/applicants`                    | Company admin  | Upload an applicant + résumé, mint link (Phase C) |
+| POST   | `/api/applications/:id/score`        | Internal       | Trigger AI scoring on submission (Phase E)        |
 
 ## Conventions
 
 - Body validation: `zod`. 400 responses have `{ error: string }`.
 - Errors surface a Japanese-language `error` suitable for end users.
-- Every write that touches candidate data writes to `AuditLog` in the same
-  transaction.
+- Every privileged write also writes to `AuditLog`.

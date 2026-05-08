@@ -6,7 +6,8 @@ import { JobForm } from "../job-form";
 const NAV = [
   { label: "ホーム", href: "/company/dashboard" },
   { label: "求人", href: "/company/jobs" },
-  { label: "面談", href: "/company/meetings" },
+  { label: "応募者", href: "/company/applicants" },
+  { label: "性格診断", href: "/company/templates" },
   { label: "面接官", href: "/company/managers" },
   { label: "料金プラン", href: "/company/billing" },
 ];

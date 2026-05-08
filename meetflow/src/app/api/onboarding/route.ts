@@ -5,9 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { onboardingNextForRole } from "@/lib/roles";
 
 const bodySchema = z.object({
-  // PLATFORM_ADMIN cannot be self-assigned; it is promoted manually in Clerk.
-  role: z.enum(["CANDIDATE", "COMPANY_ADMIN", "HIRING_MANAGER"]),
-  consented: z.literal(true),
+  // PLATFORM_ADMIN cannot be self-assigned; promoted manually in Clerk.
+  role: z.enum(["COMPANY_ADMIN", "HIRING_MANAGER"]),
 });
 
 export async function POST(request: Request) {
@@ -31,27 +30,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "メールアドレスを取得できませんでした。" }, { status: 400 });
   }
 
-  // Upsert the local User record keyed by Clerk id.
   await prisma.user.upsert({
     where: { clerkId: userId },
     update: { email: primaryEmail, role: parsed.data.role },
     create: { clerkId: userId, email: primaryEmail, role: parsed.data.role },
   });
 
-  // Mirror the role into Clerk public metadata so the middleware can read it
-  // directly from the session claims without a DB roundtrip.
   await client.users.updateUser(userId, {
     publicMetadata: { ...clerkUser.publicMetadata, role: parsed.data.role },
   });
 
-  // [COMPLIANCE] Record the consent moment in the audit log.
   await prisma.auditLog.create({
     data: {
       actorId: userId,
       action: "ONBOARDING_COMPLETED",
       targetType: "User",
       targetId: userId,
-      metadata: { role: parsed.data.role, consented: true, consentedAt: new Date().toISOString() },
+      metadata: { role: parsed.data.role },
     },
   });
 

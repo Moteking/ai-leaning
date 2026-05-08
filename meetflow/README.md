@@ -1,18 +1,24 @@
 # MeetFlow
 
-> スカウト・メッセージ・日程調整を全廃した、中途採用マッチングサービス。
-> AIが候補者と企業をマッチし、面談日時まで自動確定します。
+> 採用企業が応募者の履歴書と性格診断を AI で評価する B2B SaaS。
+> 自社カルチャーへの適合度をスコアで可視化します。
 
-本リポジトリは MVP 開発指示書(リポジトリルート直下を参照)に基づく実装です。
-Phase 1 では基盤(認証・スキーマ・LP・Role別ダッシュボード雛形)を構築します。
+本リポジトリは MVP 開発指示書の方針転換版に基づく実装です。
 
 ## 技術スタック
 
 - Next.js 15 (App Router) / TypeScript / Tailwind CSS v4
-- Prisma 6 + PostgreSQL (Neon, pgvector)
-- Clerk (authn / session claims で role 判定)
-- Anthropic Claude (Phase 2+) / OpenAI Embeddings (Phase 3+)
-- Google Calendar (Phase 4) / Stripe (Phase 5) / Resend (Phase 4) / PostHog
+- Prisma 6 + PostgreSQL (Neon)
+- Clerk(企業側ユーザーの認証)
+- Anthropic Claude (Sonnet 4.6) で履歴書・診断回答を評価
+- Stripe / Resend は後続フェーズ
+
+## ドメイン概要
+
+- **企業管理者** が会社、求人、性格診断テンプレートを設定
+- **応募者** はアカウント不要。企業から発行された専用リンクで履歴書 (現状はテキスト) を確認・診断に回答
+- **AI** が履歴書 × 求人 × 自社カルチャー × 診断回答を照合し、適合度スコア + 評価コメントを返す
+- **面接官** は AI 評価を確認して面接判断に利用
 
 ## ディレクトリ
 
@@ -21,44 +27,29 @@ src/
   app/
     (public)           # landing, compliance, privacy, terms, contact
     sign-in, sign-up   # Clerk
-    onboarding         # Role picker + consent
-    dashboard          # Candidate home
+    onboarding         # Role picker (COMPANY_ADMIN / HIRING_MANAGER)
     company/…          # Company admin
     manager/…          # Hiring manager
-    admin/…            # Platform admin (job-placement officer)
-    api/onboarding     # First write of role + consent
-  components/
-    ui/                # Button, Card (shadcn-style primitives)
-    site/              # Landing header/footer
-    app/               # Authenticated AppShell
-  lib/
-    prisma.ts, roles.ts, cn.ts
-  middleware.ts        # Clerk + role gating
-prisma/
-  schema.prisma        # All MVP tables
-  vector_indexes.sql   # HNSW indexes for pgvector
+    admin/…            # Platform admin
+    apply/[token]/…    # Public applicant flow (Phase D)
+    api/               # Route handlers
+prisma/schema.prisma   # Applicant, JobOpening, DiagnosticTemplate, Application, …
 docs/
   ARCHITECTURE.md, DATA_MODEL.md, API.md, COMPLIANCE.md, DEPLOYMENT.md
 ```
 
 ## はじめ方
 
-1. `cp .env.example .env.local` し、Clerk と Neon の値を埋める。
+1. `cp .env.example .env.local` し Clerk と Neon の値を埋める
 2. `npm install`
-3. `npx prisma migrate dev --name init` で DB スキーマを適用。
-4. `psql "$DATABASE_URL" -f prisma/vector_indexes.sql` で HNSW インデックス作成。
-5. `npm run dev` → http://localhost:3000
+3. `npx prisma migrate dev --name init` で DB スキーマを適用
+4. `npm run dev` → http://localhost:3000
 
-## 重要な方針
+## フェーズ
 
-- 法令遵守に関わるコード/ドキュメントには `[COMPLIANCE]` コメントを付けています。
-  `docs/COMPLIANCE.md` を参照してください。
-- `any` は使わず、境界では `unknown` → zod でバリデーションします。
-- コミットメッセージは「なぜ」を端的に。
-
-## Phase 1 完了判定
-
-- Candidate / Company admin / Hiring manager / Platform admin の 4 ロールを
-  Clerk でサインアップし、`/onboarding` で立場を選ぶと対応するダッシュボードに
-  遷移する(PLATFORM_ADMIN は Clerk の publicMetadata で手動昇格)。
-- 未認証ユーザーは `/sign-in` に、Role 外アクセスは自ロールのホームに戻される。
+- ✅ **A**: スキーマ刷新 + 旧マッチング機能の撤去 + 新ランディング/法令ページ
+- **B**: 性格診断テンプレート(プリセット + カスタム編集)
+- **C**: 応募者作成(履歴書テキスト)+ 招待リンク発行
+- **D**: 公開フロー `/apply/[token]`(診断回答 UI + 提出 API)
+- **E**: AI スコアリング(履歴書 × 求人 × カルチャー × 回答)
+- **F**: 企業向け応募者ダッシュボード(スコア順表示・詳細)
