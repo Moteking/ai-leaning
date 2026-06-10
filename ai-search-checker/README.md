@@ -14,12 +14,14 @@ EC事業者向けの無料Webサービス。ECサイトのURLを入力すると�
 
 | カテゴリ | 配点 | 内容 |
 | --- | --- | --- |
-| 構造化データ | 30 | JSON-LDの有無、Product / Offer / AggregateRating / Review / FAQPage / BreadcrumbList / Organization の有無と必須プロパティ |
-| AIクローラー対応 | 20 | robots.txt で GPTBot / ClaudeBot / PerplexityBot / Google-Extended がブロックされていないか |
-| llms.txt 対応 | 10 | `/llms.txt` の有無 |
-| 基本SEO | 20 | title / meta description / OGP / canonical の有無と品質 |
-| 多言語対応 | 10 | hreflang タグの有無(越境EC向け) |
-| ページ表示の基本 | 10 | HTTPS / モバイル viewport |
+| 構造化データ | 24 | JSON-LDの有無、Product / Offer / AggregateRating / Review / FAQPage / BreadcrumbList / Organization / WebSite+SearchAction / ItemList の有無と必須・推奨プロパティ(商品識別子・送料・返品など)。microdata/RDFaも参考検出 |
+| AI可読性 | 14 | JS非実行クローラー向けにHTMLへ本文があるか(SPA/CSR検出)、本文テキスト量、h1・見出し階層、画像alt、更新日時(鮮度) |
+| AIクローラー対応 | 16 | robots.txt で OAI-SearchBot / GPTBot / ChatGPT-User / ClaudeBot / PerplexityBot / Perplexity-User / Google-Extended / Applebot-Extended / Bingbot / CCBot がブロックされていないか(重要度で加重) |
+| インデックス基盤 | 10 | meta robots / X-Robots-Tag の noindex、sitemap.xml の有無、robots.txt の Sitemap 宣言 |
+| 基本SEO | 16 | title / meta description / OGP / canonical / Twitter Card / favicon の有無と品質 |
+| llms.txt 対応 | 4 | `/llms.txt` の有無(新興の任意標準) |
+| 多言語対応 | 8 | hreflang(越境EC向け)と `<html lang>` の有無 |
+| ページ表示の基本 | 8 | HTTPS / モバイル viewport / charset / 初回HTML応答速度 |
 
 ## 技術スタック
 
@@ -72,11 +74,13 @@ ai-search-checker/
 │   │   ├── index.ts            # オーケストレーション
 │   │   ├── fetchSite.ts        # URL/robots.txt/llms.txt 取得(SSRF対策込み)
 │   │   ├── structuredData.ts   # JSON-LD 解析
-│   │   ├── aiCrawler.ts        # robots.txt 解析
+│   │   ├── aiReadability.ts    # JS依存/本文量/見出し/alt/鮮度
+│   │   ├── aiCrawler.ts        # robots.txt のAIクローラー判定
+│   │   ├── crawlBasis.ts       # noindex / sitemap.xml
 │   │   ├── llmsTxt.ts
-│   │   ├── basicSeo.ts
-│   │   ├── hreflang.ts
-│   │   ├── pageBasics.ts
+│   │   ├── basicSeo.ts         # title/desc/OGP/canonical/Twitter/favicon
+│   │   ├── hreflang.ts         # hreflang / html lang
+│   │   ├── pageBasics.ts       # HTTPS/viewport/charset/応答速度
 │   │   ├── scoring.ts          # グレード・サマリー算出
 │   │   ├── llmReview.ts        # AI講評(差し替えポイント)
 │   │   └── types.ts

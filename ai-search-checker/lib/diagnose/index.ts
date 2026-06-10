@@ -2,6 +2,8 @@ import * as cheerio from "cheerio";
 import { fetchSiteData } from "./fetchSite";
 import { analyzeStructuredData } from "./structuredData";
 import { analyzeAiCrawler } from "./aiCrawler";
+import { analyzeCrawlBasis } from "./crawlBasis";
+import { analyzeAiReadability } from "./aiReadability";
 import { analyzeLlmsTxt } from "./llmsTxt";
 import { analyzeBasicSeo } from "./basicSeo";
 import { analyzeHreflang } from "./hreflang";
@@ -21,11 +23,13 @@ export async function runDiagnosis(inputUrl: string): Promise<DiagnosisResult> {
 
   const categories: CategoryResult[] = [
     analyzeStructuredData($),
+    analyzeAiReadability($, site.html),
     analyzeAiCrawler(site.robotsTxt),
-    analyzeLlmsTxt(site.llmsTxtFound),
+    analyzeCrawlBasis($, site.headers, site.sitemapFound, site.robotsSitemapDeclared),
     analyzeBasicSeo($),
+    analyzeLlmsTxt(site.llmsTxtFound),
     analyzeHreflang($),
-    analyzePageBasics($, site.isHttps),
+    analyzePageBasics($, site.isHttps, site.responseTimeMs, site.htmlBytes),
   ];
 
   const totalScore = Math.round(

@@ -1,10 +1,10 @@
 import type { CheerioAPI } from "cheerio";
 import type { CategoryResult, DiagnosisItem, ItemStatus } from "./types";
 
-const CATEGORY_MAX = 20;
+const CATEGORY_MAX = 16;
 
 /**
- * 基本SEO(title / meta description / OGP / canonical)の診断。満点20点。
+ * 基本SEO(title / meta description / OGP / canonical / Twitter Card / favicon)の診断。満点16点。
  */
 export function analyzeBasicSeo($: CheerioAPI): CategoryResult {
   const items: DiagnosisItem[] = [];
@@ -26,11 +26,11 @@ export function analyzeBasicSeo($: CheerioAPI): CategoryResult {
       detail = `title あり(${title.length}文字)。長さが推奨範囲(10〜60文字)外です。`;
       advice =
         "title は10〜60文字程度が理想です。短すぎ・長すぎは検索結果やAIの引用で省略・軽視されやすくなります。";
-      score += 3;
+      score += 2.5;
     } else {
       status = "ok";
       detail = `title あり(${title.length}文字)。`;
-      score += 6;
+      score += 5;
     }
     items.push({ id: "seo-title", label: "title タグ", status, detail, advice });
   }
@@ -50,11 +50,11 @@ export function analyzeBasicSeo($: CheerioAPI): CategoryResult {
       status = "warning";
       detail = `meta description あり(${desc.length}文字)。長さが推奨範囲(50〜160文字)外です。`;
       advice = "meta description は50〜160文字程度が目安です。要点を簡潔にまとめてください。";
-      score += 2.5;
+      score += 2;
     } else {
       status = "ok";
       detail = `meta description あり(${desc.length}文字)。`;
-      score += 5;
+      score += 4;
     }
     items.push({ id: "seo-description", label: "meta description", status, detail, advice });
   }
@@ -78,11 +78,11 @@ export function analyzeBasicSeo($: CheerioAPI): CategoryResult {
       status = "warning";
       detail = `OGPの一部のみ設定(${ogPresent}項目)。og:title または og:image が不足しています。`;
       advice = "少なくとも og:title と og:image は設定してください。";
-      score += 2.5;
+      score += 1.5;
     } else {
       status = "ok";
       detail = `OGP設定あり(${ogPresent}項目)。`;
-      score += 5;
+      score += 3;
     }
     items.push({ id: "seo-ogp", label: "OGP(og:*)", status, detail, advice });
   }
@@ -101,9 +101,57 @@ export function analyzeBasicSeo($: CheerioAPI): CategoryResult {
     } else {
       status = "ok";
       detail = "canonical タグあり。";
-      score += 4;
+      score += 2;
     }
     items.push({ id: "seo-canonical", label: "canonical", status, detail, advice });
+  }
+
+  // --- Twitter Card (1点) ---
+  {
+    const twCard = $('meta[name="twitter:card"]').attr("content");
+    if (twCard) {
+      score += 1;
+      items.push({
+        id: "seo-twitter",
+        label: "Twitter Card",
+        status: "ok",
+        detail: `Twitter Card 設定あり(${twCard})。`,
+      });
+    } else {
+      items.push({
+        id: "seo-twitter",
+        label: "Twitter Card",
+        status: "warning",
+        detail: "twitter:card がありません。",
+        advice:
+          "twitter:card(summary_large_image 等)を設定すると、X(旧Twitter)等での共有時の表示が最適化されます。",
+      });
+    }
+  }
+
+  // --- favicon (1点) ---
+  {
+    const favicon = $(
+      'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]'
+    ).length;
+    if (favicon > 0) {
+      score += 1;
+      items.push({
+        id: "seo-favicon",
+        label: "ファビコン",
+        status: "ok",
+        detail: "ファビコン(link rel=icon 等)が設定されています。",
+      });
+    } else {
+      items.push({
+        id: "seo-favicon",
+        label: "ファビコン",
+        status: "warning",
+        detail: "ファビコンの指定が見当たりません。",
+        advice:
+          "ファビコンを設定すると、検索結果やブラウザタブでのブランド認知・信頼感が高まります。",
+      });
+    }
   }
 
   const rounded = Math.round(Math.min(score, CATEGORY_MAX));

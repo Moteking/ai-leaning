@@ -76,39 +76,85 @@ function isBlocked(groups: RobotsGroup[], userAgent: string): boolean {
   return !decision.allow;
 }
 
-const BOTS: { id: string; name: string; label: string; note: string }[] = [
+// AIクローラーは重要度に応じて加重。weight の合計が CATEGORY_MAX になる。
+const BOTS: { id: string; name: string; label: string; note: string; weight: number }[] = [
   {
-    id: "gptbot",
-    name: "GPTBot",
-    label: "GPTBot(ChatGPT検索)",
-    note: "OpenAI / ChatGPT の検索・学習クローラー",
-  },
-  {
-    id: "claudebot",
-    name: "ClaudeBot",
-    label: "ClaudeBot(Claude)",
-    note: "Anthropic Claude のクローラー",
-  },
-  {
-    id: "perplexitybot",
-    name: "PerplexityBot",
-    label: "PerplexityBot(Perplexity)",
-    note: "Perplexity AI の検索クローラー",
+    id: "oai-searchbot",
+    name: "OAI-SearchBot",
+    label: "OAI-SearchBot(ChatGPT検索)",
+    note: "ChatGPTの検索結果に表示するための実クローラー(GPTBotは学習用で別物)",
+    weight: 3,
   },
   {
     id: "google-extended",
     name: "Google-Extended",
     label: "Google-Extended(Google AI)",
     note: "Google の生成AI(Gemini / AI Overview)向けトークン",
+    weight: 2,
+  },
+  {
+    id: "perplexitybot",
+    name: "PerplexityBot",
+    label: "PerplexityBot(Perplexity)",
+    note: "Perplexity AI の検索インデックス用クローラー",
+    weight: 2,
+  },
+  {
+    id: "claudebot",
+    name: "ClaudeBot",
+    label: "ClaudeBot(Claude)",
+    note: "Anthropic Claude のクローラー",
+    weight: 2,
+  },
+  {
+    id: "bingbot",
+    name: "Bingbot",
+    label: "Bingbot(Microsoft Copilot)",
+    note: "Bing / Copilot の基盤となる検索クローラー",
+    weight: 2,
+  },
+  {
+    id: "gptbot",
+    name: "GPTBot",
+    label: "GPTBot(OpenAI 学習)",
+    note: "OpenAI の学習用クローラー",
+    weight: 1,
+  },
+  {
+    id: "chatgpt-user",
+    name: "ChatGPT-User",
+    label: "ChatGPT-User(ChatGPT閲覧)",
+    note: "ユーザー操作でChatGPTがページを閲覧する際のエージェント",
+    weight: 1,
+  },
+  {
+    id: "perplexity-user",
+    name: "Perplexity-User",
+    label: "Perplexity-User(Perplexity閲覧)",
+    note: "ユーザー操作でPerplexityがページを閲覧する際のエージェント",
+    weight: 1,
+  },
+  {
+    id: "applebot-extended",
+    name: "Applebot-Extended",
+    label: "Applebot-Extended(Apple Intelligence)",
+    note: "Apple Intelligence / Siri 向けのトークン",
+    weight: 1,
+  },
+  {
+    id: "ccbot",
+    name: "CCBot",
+    label: "CCBot(Common Crawl)",
+    note: "多数のLLMの学習元となる公開クロールデータ",
+    weight: 1,
   },
 ];
 
-const CATEGORY_MAX = 20;
-const PER_BOT = CATEGORY_MAX / BOTS.length; // 5点ずつ
+const CATEGORY_MAX = BOTS.reduce((s, b) => s + b.weight, 0); // 合計16点
 
 /**
  * AIクローラー対応の診断。
- * robots.txt で主要なAIクローラーがブロックされていないかを確認(満点20点)。
+ * robots.txt で主要なAIクローラーがブロックされていないかを確認(満点16点)。
  */
 export function analyzeAiCrawler(robotsTxt: string | null): CategoryResult {
   const items: DiagnosisItem[] = [];
@@ -125,12 +171,12 @@ export function analyzeAiCrawler(robotsTxt: string | null): CategoryResult {
         "AIクローラーはブロックされていないため診断上は問題ありませんが、意図したクロール制御のために robots.txt の設置を検討してください。",
     });
     for (const bot of BOTS) {
-      score += PER_BOT;
+      score += bot.weight;
       items.push({
         id: `bot-${bot.id}`,
         label: bot.label,
         status: "ok",
-        detail: "ブロックされていません(robots.txt 不在のため許可)。",
+        detail: `ブロックされていません(robots.txt 不在のため許可)。${bot.note}`,
       });
     }
     return buildCategory(items, score);
@@ -155,12 +201,12 @@ export function analyzeAiCrawler(robotsTxt: string | null): CategoryResult {
         advice: `${bot.name} がトップページをクロールできません。AI検索に表示させたい場合は robots.txt の Disallow 設定を見直してください。`,
       });
     } else {
-      score += PER_BOT;
+      score += bot.weight;
       items.push({
         id: `bot-${bot.id}`,
         label: bot.label,
         status: "ok",
-        detail: "ブロックされていません(クロール可能)。",
+        detail: `ブロックされていません(クロール可能)。${bot.note}`,
       });
     }
   }
@@ -173,7 +219,7 @@ function buildCategory(items: DiagnosisItem[], score: number): CategoryResult {
   return {
     id: "aiCrawler",
     label: "AIクローラー対応",
-    description: "AI検索のクローラー(GPTBot等)がブロックされていないか",
+    description: "AI検索のクローラー(OAI-SearchBot等)がブロックされていないか",
     score: rounded,
     maxScore: CATEGORY_MAX,
     percent: Math.round((rounded / CATEGORY_MAX) * 100),

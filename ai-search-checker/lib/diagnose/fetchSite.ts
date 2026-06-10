@@ -90,14 +90,12 @@ export async function fetchSiteData(inputUrl: string): Promise<RawSiteData> {
   const normalized = normalizeUrl(inputUrl);
 
   let res: Response;
+  const startedAt = performance.now();
   try {
     res = await fetchWithTimeout(normalized);
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       throw new Error("対象サイトの応答がタイムアウトしました。時間をおいて再度お試しください。");
-    }
-    if (process.env.DIAG_DEBUG) {
-      console.error("[fetchSiteData] underlying error:", err);
     }
     throw new Error("対象サイトにアクセスできませんでした。URLをご確認ください。");
   }
@@ -109,24 +107,41 @@ export async function fetchSiteData(inputUrl: string): Promise<RawSiteData> {
   }
 
   const html = await res.text();
+  const responseTimeMs = Math.round(performance.now() - startedAt);
+  const htmlBytes = Buffer.byteLength(html, "utf8");
   const finalUrl = res.url || normalized;
   const finalParsed = new URL(finalUrl);
   const origin = finalParsed.origin;
 
-  // robots.txt と llms.txt は並行取得
-  const [robotsTxt, llmsTxtRaw] = await Promise.all([
+  // レスポンスヘッダーを小文字キーで収集(X-Robots-Tag 等の判定に使用)
+  const headers: Record<string, string> = {};
+  res.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value;
+  });
+
+  // robots.txt / llms.txt / sitemap.xml は並行取得
+  const [robotsTxt, llmsTxtRaw, sitemapRaw] = await Promise.all([
     fetchOriginFile(origin, "/robots.txt"),
     fetchOriginFile(origin, "/llms.txt"),
+    fetchOriginFile(origin, "/sitemap.xml"),
   ]);
 
   const llmsTxtFound = !!llmsTxtRaw && llmsTxtRaw.trim().length > 0;
+  const sitemapFound =
+    !!sitemapRaw && /<(urlset|sitemapindex)[\s>]/i.test(sitemapRaw);
+  const robotsSitemapDeclared = !!robotsTxt && /^\s*sitemap\s*:/im.test(robotsTxt);
 
   return {
     inputUrl: normalized,
     finalUrl,
     html,
     isHttps: finalParsed.protocol === "https:",
+    headers,
+    responseTimeMs,
+    htmlBytes,
     robotsTxt,
     llmsTxtFound,
+    sitemapFound,
+    robotsSitemapDeclared,
   };
 }

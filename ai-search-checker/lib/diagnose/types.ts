@@ -65,8 +65,18 @@ export interface RawSiteData {
   html: string;
   /** HTTPSか */
   isHttps: boolean;
+  /** レスポンスヘッダー(小文字キー) */
+  headers: Record<string, string>;
+  /** メインHTML取得にかかった時間(ms) */
+  responseTimeMs: number;
+  /** HTMLのバイトサイズ */
+  htmlBytes: number;
   /** robots.txt の本文(取得失敗時は null) */
   robotsTxt: string | null;
   /** llms.txt が存在し中身があるか */
   llmsTxtFound: boolean;
+  /** sitemap.xml が取得できたか(/sitemap.xml への直接アクセス) */
+  sitemapFound: boolean;
+  /** robots.txt 内に Sitemap: 行が宣言されているか */
+  robotsSitemapDeclared: boolean;
 }

@@ -72,16 +72,20 @@ function categoryAdvice(c: CategoryResult): string {
   switch (c.id) {
     case "structuredData":
       return `${c.label}: Product / Offer / AggregateRating など主要スキーマをJSON-LDで実装し、必須プロパティを揃えましょう。`;
+    case "aiReadability":
+      return `${c.label}: AIクローラーはJSを実行しません。SSR/静的化でHTMLに本文を含め、見出し・alt も整備しましょう。`;
     case "aiCrawler":
-      return `${c.label}: robots.txt でAIクローラー(GPTBot等)をブロックしていないか確認し、必要に応じて許可しましょう。`;
+      return `${c.label}: robots.txt でAIクローラー(OAI-SearchBot等)をブロックしていないか確認し、必要に応じて許可しましょう。`;
+    case "crawlBasis":
+      return `${c.label}: 誤った noindex がないか確認し、sitemap.xml を設置・robots.txtで宣言しましょう。`;
     case "llmsTxt":
       return `${c.label}: /llms.txt を設置し、サイト概要と主要ページをAIに伝えましょう。`;
     case "basicSeo":
       return `${c.label}: title・meta description・OGP・canonical を適切な長さ・内容で整備しましょう。`;
-    case "hreflang":
-      return `${c.label}: 越境ECなら hreflang と x-default で言語・地域を明示しましょう。`;
+    case "i18n":
+      return `${c.label}: html lang を設定し、越境ECなら hreflang と x-default で言語・地域を明示しましょう。`;
     case "pageBasics":
-      return `${c.label}: HTTPS化とモバイル viewport の設定を確認しましょう。`;
+      return `${c.label}: HTTPS化・モバイル viewport・charset・応答速度を確認しましょう。`;
     default:
       return `${c.label}: 改善の余地があります。`;
   }

@@ -8,9 +8,9 @@ import ResultView from "./ResultView";
 type Phase = "idle" | "loading" | "result";
 
 const FEATURES = [
-  { title: "構造化データ", desc: "Product・Offer・FAQなどJSON-LDの実装状況" },
-  { title: "AIクローラー対応", desc: "GPTBot・ClaudeBot等のブロック有無" },
-  { title: "llms.txt / SEO", desc: "AI向けファイルと基本SEOの品質" },
+  { title: "構造化データ / AI可読性", desc: "JSON-LDの実装状況と、JSなしで本文が読めるか(SPA検出)" },
+  { title: "AIクローラー対応", desc: "OAI-SearchBot・PerplexityBot等のブロック有無とnoindex" },
+  { title: "SEO / 多言語 / 表示基盤", desc: "基本SEO・hreflang・HTTPS・応答速度まで総合チェック" },
 ];
 
 /** トップページの中核。URL入力 → 進捗 → 結果表示までを管理する。 */

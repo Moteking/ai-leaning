@@ -52,12 +52,19 @@ function findByType(nodes: JsonLdNode[], type: string): JsonLdNode[] {
   return nodes.filter((n) => typeNames(n).includes(type));
 }
 
-/** 必須プロパティの充足数を数える */
+/** プロパティが存在するか(前方一致も許容: "gtin" は gtin13 等にマッチ) */
+function hasProp(node: JsonLdNode, prop: string): boolean {
+  for (const [key, v] of Object.entries(node)) {
+    if ((key === prop || key.startsWith(prop)) && v !== undefined && v !== null && v !== "") {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** 指定プロパティ群のうち存在するものを返す */
 function presentProps(node: JsonLdNode, props: string[]): string[] {
-  return props.filter((p) => {
-    const v = node[p];
-    return v !== undefined && v !== null && v !== "";
-  });
+  return props.filter((p) => hasProp(node, p));
 }
 
 interface SchemaSpec {
@@ -68,10 +75,14 @@ interface SchemaSpec {
   weight: number;
   /** 必須プロパティ(充足率でスコアを按分) */
   required: string[];
+  /** 推奨プロパティ(満たすとより高評価。weight の一部を按分) */
+  recommended?: string[];
   /** 未対応時のアドバイス */
   failAdvice: string;
   /** 必須不足時のアドバイス(不足プロパティ名を埋め込む) */
   warnAdvice: (missing: string[]) => string;
+  /** 推奨不足時のヒント(必須は満たすが推奨が欠ける場合) */
+  recommendAdvice?: (missing: string[]) => string;
 }
 
 const SCHEMA_SPECS: SchemaSpec[] = [
@@ -79,12 +90,15 @@ const SCHEMA_SPECS: SchemaSpec[] = [
     id: "product",
     type: "Product",
     label: "Product(商品)スキーマ",
-    weight: 8,
+    weight: 6,
     required: ["name", "image", "description"],
+    recommended: ["brand", "sku", "gtin", "mpn"],
     failAdvice:
       "商品ページに Product スキーマ(JSON-LD)を追加してください。AI検索が商品名・画像・説明を正確に理解できるようになります。",
     warnAdvice: (m) =>
       `Product スキーマに ${m.join(" / ")} が不足しています。これらを補うとAIが商品情報をより正確に引用できます。`,
+    recommendAdvice: (m) =>
+      `Product に商品識別子 ${m.join(" / ")} を追加すると、AIショッピングや商品マッチングでの精度が上がります。`,
   },
   {
     id: "offer",
@@ -92,16 +106,19 @@ const SCHEMA_SPECS: SchemaSpec[] = [
     label: "Offer(価格・在庫)スキーマ",
     weight: 5,
     required: ["price", "priceCurrency", "availability"],
+    recommended: ["shippingDetails", "hasMerchantReturnPolicy"],
     failAdvice:
       "価格・在庫を示す Offer スキーマを追加してください。AI検索やGoogleの商品表示で価格・在庫が反映されやすくなります。",
     warnAdvice: (m) =>
       `Offer スキーマに ${m.join(" / ")} が不足しています。price・priceCurrency・availability を揃えると効果的です。`,
+    recommendAdvice: (m) =>
+      `Offer に送料・返品情報(${m.join(" / ")})を追加すると、Googleの無料リスティングやAI購買での評価が高まります。`,
   },
   {
     id: "aggregateRating",
     type: "AggregateRating",
     label: "AggregateRating(評価集計)スキーマ",
-    weight: 4,
+    weight: 2,
     required: ["ratingValue", "reviewCount"],
     failAdvice:
       "レビュー評価の集計(AggregateRating)を追加すると、AI検索や検索結果で星評価が表示されやすくなります。",
@@ -112,7 +129,7 @@ const SCHEMA_SPECS: SchemaSpec[] = [
     id: "review",
     type: "Review",
     label: "Review(個別レビュー)スキーマ",
-    weight: 3,
+    weight: 2,
     required: ["reviewRating", "author"],
     failAdvice:
       "個別のレビュー(Review)を構造化すると、AIが「利用者の声」を引用しやすくなり信頼性が高まります。",
@@ -134,7 +151,7 @@ const SCHEMA_SPECS: SchemaSpec[] = [
     id: "breadcrumbList",
     type: "BreadcrumbList",
     label: "BreadcrumbList(パンくず)スキーマ",
-    weight: 3,
+    weight: 1,
     required: ["itemListElement"],
     failAdvice:
       "パンくずリストを BreadcrumbList で構造化すると、AI・検索エンジンがサイト階層を理解しやすくなります。",
@@ -145,20 +162,44 @@ const SCHEMA_SPECS: SchemaSpec[] = [
     id: "organization",
     type: "Organization",
     label: "Organization(事業者情報)スキーマ",
-    weight: 4,
+    weight: 3,
     required: ["name", "url", "logo"],
     failAdvice:
       "運営事業者を示す Organization スキーマを追加すると、AIが「どの会社のサイトか」を正しく認識し信頼性が高まります。",
     warnAdvice: (m) =>
       `Organization に ${m.join(" / ")} が不足しています。name・url・logo を揃えると効果的です。`,
   },
+  {
+    id: "website",
+    type: "WebSite",
+    label: "WebSite + SearchAction スキーマ",
+    weight: 1,
+    required: ["url"],
+    recommended: ["potentialAction"],
+    failAdvice:
+      "WebSite スキーマを追加すると、サイト名や検索ボックス(SearchAction)が認識されやすくなります。",
+    warnAdvice: (m) =>
+      `WebSite スキーマに ${m.join(" / ")} が不足しています。`,
+    recommendAdvice: () =>
+      "WebSite に SearchAction(potentialAction)を追加すると、サイト内検索ボックスが検索結果に表示される可能性があります。",
+  },
+  {
+    id: "itemList",
+    type: "ItemList",
+    label: "ItemList(一覧)スキーマ",
+    weight: 1,
+    required: ["itemListElement"],
+    failAdvice:
+      "カテゴリ・商品一覧ページに ItemList スキーマを追加すると、AIが一覧の構造を理解しやすくなります(主に一覧ページ向け)。",
+    warnAdvice: () => "ItemList に一覧項目(itemListElement)が含まれていません。",
+  },
 ];
 
-const CATEGORY_MAX = 30;
+const CATEGORY_MAX = SCHEMA_SPECS.reduce((s, spec) => s + spec.weight, 0); // 合計24点
 
 /**
  * 構造化データ(JSON-LD)の診断。
- * 満点 30点(各スキーマの加重合計)。
+ * 満点 24点(各スキーマの加重合計)。
  */
 export function analyzeStructuredData($: CheerioAPI): CategoryResult {
   const scriptCount = $('script[type="application/ld+json"]').length;
@@ -199,32 +240,66 @@ export function analyzeStructuredData($: CheerioAPI): CategoryResult {
       continue;
     }
 
-    // 最も充足度の高いノードで判定
-    let bestPresent: string[] = [];
+    // 最も充足度の高いノードで判定(必須・推奨それぞれ)
+    let bestRequired: string[] = [];
+    let bestRecommended: string[] = [];
     for (const node of matched) {
-      const present = presentProps(node, spec.required);
-      if (present.length > bestPresent.length) bestPresent = present;
+      const req = presentProps(node, spec.required);
+      if (req.length > bestRequired.length) bestRequired = req;
+      if (spec.recommended) {
+        const rec = presentProps(node, spec.recommended);
+        if (rec.length > bestRecommended.length) bestRecommended = rec;
+      }
     }
-    const missing = spec.required.filter((p) => !bestPresent.includes(p));
-    const ratio = spec.required.length === 0 ? 1 : bestPresent.length / spec.required.length;
-    const earned = Math.round(spec.weight * ratio);
+    const missing = spec.required.filter((p) => !bestRequired.includes(p));
+    const requiredRatio =
+      spec.required.length === 0 ? 1 : bestRequired.length / spec.required.length;
+
+    // 推奨プロパティがある場合、weight の20%を推奨の充足率に割り当てる
+    let earned: number;
+    let missingRec: string[] = [];
+    if (spec.recommended && spec.recommended.length > 0) {
+      missingRec = spec.recommended.filter((p) => !bestRecommended.includes(p));
+      const recRatio = bestRecommended.length / spec.recommended.length;
+      earned = spec.weight * (0.8 * requiredRatio + 0.2 * recRatio);
+    } else {
+      earned = spec.weight * requiredRatio;
+    }
     score += earned;
 
     let status: ItemStatus;
     let detail: string;
     let advice: string | undefined;
-    if (missing.length === 0) {
-      status = "ok";
-      detail = `検出済み・必須プロパティを充足しています(${matched.length}件)。`;
-    } else {
+    if (missing.length > 0) {
       status = "warning";
       detail = `検出済みですが必須プロパティが不足しています(不足: ${missing.join(", ")})。`;
       advice = spec.warnAdvice(missing);
+    } else if (missingRec.length > 0 && spec.recommendAdvice) {
+      // 必須は満たすが推奨が欠ける → OK扱いだが改善ヒントを添える
+      status = "ok";
+      detail = `検出済み・必須プロパティを充足(${matched.length}件)。推奨プロパティ ${missingRec.join(", ")} は未設定です。`;
+      advice = spec.recommendAdvice(missingRec);
+    } else {
+      status = "ok";
+      detail = `検出済み・必須プロパティを充足しています(${matched.length}件)。`;
     }
     items.push({ id: `schema-${spec.id}`, label: spec.label, status, detail, advice });
   }
 
-  score = Math.min(score, CATEGORY_MAX);
+  // JSON-LD以外の形式(microdata / RDFa)の参考検出
+  const microdataCount = $("[itemscope]").length;
+  if (scriptCount === 0 && microdataCount > 0) {
+    items.push({
+      id: "microdata-note",
+      label: "microdata / RDFa",
+      status: "warning",
+      detail: `JSON-LDは無いものの microdata(itemscope)を ${microdataCount} 件検出しました。`,
+      advice:
+        "本診断はJSON-LDを基準に評価しています。GoogleはJSON-LDを推奨しているため、microdataからJSON-LDへの移行・併用を検討してください。",
+    });
+  }
+
+  score = Math.min(Math.round(score), CATEGORY_MAX);
 
   return {
     id: "structuredData",

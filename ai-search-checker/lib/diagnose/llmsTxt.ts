@@ -1,10 +1,10 @@
 import type { CategoryResult, DiagnosisItem } from "./types";
 
-const CATEGORY_MAX = 10;
+const CATEGORY_MAX = 4;
 
 /**
- * llms.txt の有無を診断(満点10点)。
- * llms.txt は AI に対しサイトの要約・重要ページを伝える新しい慣習。
+ * llms.txt の有無を診断(満点4点)。
+ * llms.txt は AI に対しサイトの要約・重要ページを伝える新興の慣習(任意)。
  */
 export function analyzeLlmsTxt(llmsTxtFound: boolean): CategoryResult {
   const items: DiagnosisItem[] = [];
