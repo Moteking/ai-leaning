@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { PROVIDER_NAME, SERVICE_NAME } from "@/lib/config";
 
@@ -45,11 +46,22 @@ export default function RootLayout({
 
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-ink-500">
-            <p>
+            <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-slate-100 pb-4">
+              <Link href="/company" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                運営会社情報
+              </Link>
+              <Link href="/privacy" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                プライバシーポリシー
+              </Link>
+              <Link href="/tokushoho" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                特定商取引法に基づく表記
+              </Link>
+            </nav>
+            <p className="mt-4">
               © {new Date().getFullYear()} {PROVIDER_NAME}
             </p>
             <p className="mt-1 text-xs">
-              ※本診断はトップページのHTMLを自動解析した参考情報です。実際の検索結果・AI回答での表示を保証するものではありません。
+              ※本診断は指定ページのHTMLを自動解析した参考情報です。実際の検索結果・AI回答での表示を保証するものではありません。
             </p>
           </div>
         </footer>

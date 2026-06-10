@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface LeadFormProps {
   url: string;
@@ -117,8 +118,16 @@ export default function LeadForm({ url, score, grade, onUnlock }: LeadFormProps)
         >
           {submitting ? "送信中..." : "詳細レポートを見る"}
         </button>
-        <p className="text-center text-[11px] text-ink-500">
-          ※ご入力いただいた情報は安全に管理されます。
+        <p className="text-center text-[11px] leading-relaxed text-ink-500">
+          <Link
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-700 underline hover:text-brand-800"
+          >
+            プライバシーポリシー
+          </Link>
+          に同意の上送信してください。
         </p>
       </form>
     </div>
