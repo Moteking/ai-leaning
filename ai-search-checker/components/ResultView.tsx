@@ -1,0 +1,128 @@
+"use client";
+
+import { useState } from "react";
+import type { DiagnosisResult } from "@/lib/diagnose/types";
+import ScoreGauge from "./ScoreGauge";
+import RadarChart from "./RadarChart";
+import CategoryCard from "./CategoryCard";
+import LeadForm from "./LeadForm";
+import { CONSULT_CTA_URL } from "@/lib/config";
+
+interface ResultViewProps {
+  result: DiagnosisResult;
+  onReset: () => void;
+}
+
+/** 診断結果の表示。サマリー → リードフォーム → 詳細レポートの順に開示する。 */
+export default function ResultView({ result, onReset }: ResultViewProps) {
+  const [unlocked, setUnlocked] = useState(false);
+
+  const radarData = result.categories.map((c) => ({
+    label: c.label,
+    percent: c.percent,
+  }));
+
+  return (
+    <div className="space-y-6">
+      {/* 診断対象 */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-ink-500">
+          <span className="font-semibold text-ink-700">診断対象：</span>
+          <span className="break-all">{result.url}</span>
+        </div>
+        <button
+          onClick={onReset}
+          className="self-start rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-slate-50"
+        >
+          別のURLを診断する
+        </button>
+      </div>
+
+      {/* サマリー(リード獲得前に表示) */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+        <div className="grid items-center gap-6 sm:grid-cols-[auto,1fr]">
+          <div className="flex justify-center">
+            <ScoreGauge score={result.totalScore} grade={result.grade} />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">総合診断サマリー</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-700">{result.summary}</p>
+
+            <div className="mt-4">
+              <RadarChart data={radarData} />
+            </div>
+          </div>
+        </div>
+
+        {/* カテゴリ別ミニスコア */}
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {result.categories.map((c) => (
+            <div key={c.id} className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-center">
+              <div className="text-xs text-ink-500">{c.label}</div>
+              <div className="mt-1 text-lg font-bold tabular-nums">
+                {c.score}
+                <span className="text-xs font-medium text-ink-500">/{c.maxScore}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* リードフォーム or 詳細レポート */}
+      {!unlocked ? (
+        <LeadForm
+          url={result.url}
+          score={result.totalScore}
+          grade={result.grade}
+          onUnlock={() => setUnlocked(true)}
+        />
+      ) : (
+        <div className="space-y-6 fade-up">
+          {/* AI講評 */}
+          <div className="rounded-2xl border border-brand-200 bg-brand-50/50 p-6 shadow-card">
+            <h2 className="flex items-center gap-2 text-lg font-bold">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-brand-600 text-xs font-bold text-white">
+                AI
+              </span>
+              総合講評
+            </h2>
+            <div className="mt-3 space-y-1.5 text-sm leading-relaxed text-ink-700">
+              {result.review.split("\n").map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          </div>
+
+          {/* 項目別詳細 */}
+          <div>
+            <h2 className="mb-3 text-lg font-bold">項目別の詳細レポート</h2>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {result.categories.map((category) => (
+                <CategoryCard key={category.id} category={category} />
+              ))}
+            </div>
+          </div>
+
+          {/* 専門家相談CTA */}
+          <div className="rounded-2xl bg-gradient-to-br from-brand-700 to-brand-900 p-8 text-center text-white shadow-card">
+            <h2 className="text-xl font-bold sm:text-2xl">
+              診断結果をもとに、改善を一緒に進めませんか?
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-brand-100">
+              構造化データの実装やAIクローラー対応は、専門知識があると確実かつスピーディに進められます。
+              貴社サイトに合わせた具体的な改善方法を、専門家が無料でご相談に応じます。
+            </p>
+            <a
+              href={CONSULT_CTA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-block rounded-xl bg-white px-8 py-3.5 text-base font-bold text-brand-700 shadow-sm transition hover:bg-brand-50"
+            >
+              専門家による無料相談を申し込む
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
