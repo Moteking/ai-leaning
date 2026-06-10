@@ -9,15 +9,21 @@ import LeadForm from "./LeadForm";
 import { CONSULT_CTA_URL } from "@/lib/config";
 
 interface ResultViewProps {
-  result: DiagnosisResult;
+  results: DiagnosisResult[];
+  notices?: string[];
   onReset: () => void;
 }
 
-/** 診断結果の表示。サマリー → リードフォーム → 詳細レポートの順に開示する。 */
-export default function ResultView({ result, onReset }: ResultViewProps) {
+/** 診断結果の表示。複数ページはタブで切替。サマリー → リードフォーム → 詳細レポートの順に開示する。 */
+export default function ResultView({ results, notices = [], onReset }: ResultViewProps) {
   const [unlocked, setUnlocked] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const radarData = result.categories.map((c) => ({
+  const active = results[activeIndex] ?? results[0];
+  // リード保存はメイン(先頭=サイトトップ)の結果を使う
+  const primary = results[0];
+
+  const radarData = active.categories.map((c) => ({
     label: c.label,
     percent: c.percent,
   }));
@@ -28,7 +34,7 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-ink-500">
           <span className="font-semibold text-ink-700">診断対象：</span>
-          <span className="break-all">{result.url}</span>
+          <span className="break-all">{active.finalUrl}</span>
         </div>
         <button
           onClick={onReset}
@@ -38,15 +44,49 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
         </button>
       </div>
 
+      {/* 商品ページ診断失敗などの注意 */}
+      {notices.length > 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {notices.map((n, i) => (
+            <p key={i}>{n}</p>
+          ))}
+        </div>
+      )}
+
+      {/* ページ切替タブ(複数ページ時のみ) */}
+      {results.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {results.map((r, i) => (
+            <button
+              key={r.finalUrl + i}
+              onClick={() => setActiveIndex(i)}
+              className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                i === activeIndex
+                  ? "bg-brand-600 text-white shadow-sm"
+                  : "border border-slate-300 bg-white text-ink-700 hover:bg-slate-50"
+              }`}
+            >
+              {r.pageLabel}
+              <span className="ml-2 tabular-nums opacity-80">{r.totalScore}点</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* サマリー(リード獲得前に表示) */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+        {results.length > 1 && (
+          <div className="mb-3 inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
+            {active.pageLabel}の診断結果
+          </div>
+        )}
         <div className="grid items-center gap-6 sm:grid-cols-[auto,1fr]">
           <div className="flex justify-center">
-            <ScoreGauge score={result.totalScore} grade={result.grade} />
+            <ScoreGauge score={active.totalScore} grade={active.grade} />
           </div>
           <div>
             <h2 className="text-lg font-bold">総合診断サマリー</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink-700">{result.summary}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-700">{active.summary}</p>
 
             <div className="mt-4">
               <RadarChart data={radarData} />
@@ -55,8 +95,8 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
         </div>
 
         {/* カテゴリ別ミニスコア */}
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {result.categories.map((c) => (
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {active.categories.map((c) => (
             <div key={c.id} className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-center">
               <div className="text-xs text-ink-500">{c.label}</div>
               <div className="mt-1 text-lg font-bold tabular-nums">
@@ -71,9 +111,9 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
       {/* リードフォーム or 詳細レポート */}
       {!unlocked ? (
         <LeadForm
-          url={result.url}
-          score={result.totalScore}
-          grade={result.grade}
+          url={primary.url}
+          score={primary.totalScore}
+          grade={primary.grade}
           onUnlock={() => setUnlocked(true)}
         />
       ) : (
@@ -85,9 +125,12 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
                 AI
               </span>
               総合講評
+              {results.length > 1 && (
+                <span className="text-sm font-medium text-ink-500">（{active.pageLabel}）</span>
+              )}
             </h2>
             <div className="mt-3 space-y-1.5 text-sm leading-relaxed text-ink-700">
-              {result.review.split("\n").map((line, i) => (
+              {active.review.split("\n").map((line, i) => (
                 <p key={i}>{line}</p>
               ))}
             </div>
@@ -95,9 +138,14 @@ export default function ResultView({ result, onReset }: ResultViewProps) {
 
           {/* 項目別詳細 */}
           <div>
-            <h2 className="mb-3 text-lg font-bold">項目別の詳細レポート</h2>
+            <h2 className="mb-3 text-lg font-bold">
+              項目別の詳細レポート
+              {results.length > 1 && (
+                <span className="ml-2 text-sm font-medium text-ink-500">（{active.pageLabel}）</span>
+              )}
+            </h2>
             <div className="grid gap-4 lg:grid-cols-2">
-              {result.categories.map((category) => (
+              {active.categories.map((category) => (
                 <CategoryCard key={category.id} category={category} />
               ))}
             </div>

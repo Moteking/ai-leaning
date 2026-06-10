@@ -16,8 +16,13 @@ export type { DiagnosisResult, CategoryResult, DiagnosisItem, ItemStatus } from 
 
 /**
  * URLを受け取り、AI検索対応度を診断して結果を返すメイン関数。
+ * @param inputUrl 診断対象URL
+ * @param pageLabel ページ種別ラベル(例: サイトトップ / 商品ページ)
  */
-export async function runDiagnosis(inputUrl: string): Promise<DiagnosisResult> {
+export async function runDiagnosis(
+  inputUrl: string,
+  pageLabel = "サイトトップ"
+): Promise<DiagnosisResult> {
   const site = await fetchSiteData(inputUrl);
   const $ = cheerio.load(site.html);
 
@@ -40,6 +45,7 @@ export async function runDiagnosis(inputUrl: string): Promise<DiagnosisResult> {
 
   const partial: Omit<DiagnosisResult, "review"> = {
     url: site.inputUrl,
+    pageLabel,
     finalUrl: site.finalUrl,
     totalScore,
     grade,

@@ -39,6 +39,8 @@ export interface CategoryResult {
 export interface DiagnosisResult {
   /** 入力されたURL */
   url: string;
+  /** このページの種別ラベル(例: サイトトップ / 商品ページ) */
+  pageLabel: string;
   /** 実際に取得できた最終URL(リダイレクト後) */
   finalUrl: string;
   /** 総合スコア(0-100) */

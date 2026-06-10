@@ -17,8 +17,11 @@ const FEATURES = [
 export default function DiagnoseApp() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [url, setUrl] = useState("");
+  const [productUrl, setProductUrl] = useState("");
+  const [showProductInput, setShowProductInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<DiagnosisResult | null>(null);
+  const [results, setResults] = useState<DiagnosisResult[]>([]);
+  const [notices, setNotices] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,13 +35,17 @@ export default function DiagnoseApp() {
       const res = await fetch("/api/diagnose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({
+          url: url.trim(),
+          productUrl: showProductInput ? productUrl.trim() : "",
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "診断に失敗しました。");
       }
-      setResult(data.result as DiagnosisResult);
+      setResults((data.results ?? []) as DiagnosisResult[]);
+      setNotices((data.notices ?? []) as string[]);
       setPhase("result");
       // 結果表示位置へスクロール
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -49,7 +56,8 @@ export default function DiagnoseApp() {
   };
 
   const handleReset = () => {
-    setResult(null);
+    setResults([]);
+    setNotices([]);
     setPhase("idle");
     setError(null);
   };
@@ -99,11 +107,42 @@ export default function DiagnoseApp() {
                 無料診断
               </button>
             </div>
+            {/* 商品ページURL(任意) */}
+            <div className="mt-3">
+              {!showProductInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowProductInput(true)}
+                  className="text-xs font-semibold text-brand-700 hover:underline"
+                >
+                  ＋ 商品ページのURLも追加して精密に診断する(任意)
+                </button>
+              ) : (
+                <div>
+                  <label htmlFor="productUrl" className="block text-sm font-semibold">
+                    商品ページのURL(任意)
+                  </label>
+                  <input
+                    id="productUrl"
+                    type="text"
+                    inputMode="url"
+                    value={productUrl}
+                    onChange={(e) => setProductUrl(e.target.value)}
+                    placeholder="https://your-shop.example.com/products/sample"
+                    className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
+                  />
+                  <p className="mt-1 text-xs text-ink-500">
+                    Product・価格・レビューなどの構造化データは商品ページに実装されるため、商品ページを指定するとより正確に診断できます。
+                  </p>
+                </div>
+              )}
+            </div>
+
             {error && (
               <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
             )}
             <p className="mt-3 text-xs text-ink-500">
-              ※ 会員登録不要・無料。トップページのHTMLを解析します。
+              ※ 会員登録不要・無料。指定ページのHTMLを解析します。
             </p>
           </form>
 
@@ -121,8 +160,8 @@ export default function DiagnoseApp() {
 
       {phase === "loading" && <ProgressView />}
 
-      {phase === "result" && result && (
-        <ResultView result={result} onReset={handleReset} />
+      {phase === "result" && results.length > 0 && (
+        <ResultView results={results} notices={notices} onReset={handleReset} />
       )}
     </div>
   );
