@@ -5,9 +5,9 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 ).replace(/\/$/, "");
 
-/** 「専門家による無料相談」CTAのリンク先(後で差し替え可能) */
+/** 「専門家による無料相談」CTAのリンク先(環境変数で上書き可能) */
 export const CONSULT_CTA_URL =
-  process.env.NEXT_PUBLIC_CONSULT_CTA_URL || "https://kaaay.co.jp";
+  process.env.NEXT_PUBLIC_CONSULT_CTA_URL || "https://kaaay.co.jp/contact";
 
 /** Google Analytics 4 の測定ID(設定された場合のみ計測タグを読み込む) */
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "";

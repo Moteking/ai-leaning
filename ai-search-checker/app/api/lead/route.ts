@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeadStore } from "@/lib/db/leadStore";
+import { getClientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,12 +8,22 @@ export const dynamic = "force-dynamic";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
+  // 濫用防止のレートリミット(ベストエフォート)
+  const { allowed } = rateLimit(`lead:${getClientIp(request)}`, 30, 10 * 60 * 1000);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "送信が多すぎます。しばらく時間をおいて再度お試しください。" },
+      { status: 429 }
+    );
+  }
+
   let body: {
     company?: string;
     email?: string;
     url?: string;
     score?: number;
     grade?: string;
+    website?: string;
   };
   try {
     body = await request.json();
@@ -21,6 +32,12 @@ export async function POST(request: Request) {
       { error: "リクエストの形式が正しくありません。" },
       { status: 400 }
     );
+  }
+
+  // ハニーポット: 通常非表示のフィールドに入力があればボットとみなす。
+  // ボットに気づかせないため、成功を装って保存はしない。
+  if ((body.website ?? "").trim() !== "") {
+    return NextResponse.json({ ok: true, skipped: true });
   }
 
   const company = (body.company ?? "").trim();
