@@ -17,6 +17,8 @@ export default function LeadForm({ url, score, grade, onUnlock }: LeadFormProps)
   const [agree, setAgree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // ハニーポット(ボット検出用・人間には非表示)
+  const [website, setWebsite] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ export default function LeadForm({ url, score, grade, onUnlock }: LeadFormProps)
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company: company.trim(), email: email.trim(), url, score, grade }),
+        body: JSON.stringify({ company: company.trim(), email: email.trim(), url, score, grade, website }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -66,6 +68,17 @@ export default function LeadForm({ url, score, grade, onUnlock }: LeadFormProps)
       </div>
 
       <form onSubmit={handleSubmit} className="mx-auto mt-6 max-w-md space-y-4">
+        {/* ハニーポット: 人間には見えない。ボットが入力すると送信時に弾く */}
+        <input
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+        />
         <div>
           <label className="block text-sm font-semibold" htmlFor="company">
             会社名 <span className="text-red-500">*</span>
