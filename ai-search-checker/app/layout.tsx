@@ -1,19 +1,58 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { PROVIDER_NAME, SERVICE_NAME } from "@/lib/config";
+import { PROVIDER_NAME, SERVICE_NAME, SITE_URL } from "@/lib/config";
+import { COMPANY } from "@/lib/company";
+import Analytics from "@/components/Analytics";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: `${SERVICE_NAME} | ECサイトのAI検索対応度を無料診断`,
   description:
     "ECサイトのURLを入力するだけで、ChatGPT検索・Perplexity・Google AI Overview などのAI検索への対応度を無料診断。構造化データやAIクローラー対応をスコア化し、改善アドバイスをお届けします。",
   robots: { index: true, follow: true },
+  alternates: { canonical: "/" },
   openGraph: {
     title: `${SERVICE_NAME} | ECサイトのAI検索対応度を無料診断`,
     description:
       "URLを入力するだけでAI検索対応度を100点満点で診断。構造化データ・AIクローラー対応・SEOを総合チェック。",
     type: "website",
+    locale: "ja_JP",
+    siteName: SERVICE_NAME,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SERVICE_NAME} | ECサイトのAI検索対応度を無料診断`,
+    description:
+      "URLを入力するだけでAI検索対応度を100点満点で診断。",
+  },
+};
+
+/** サービス自身の構造化データ(自分の診断項目を満たす) */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: SERVICE_NAME,
+      url: SITE_URL,
+      inLanguage: "ja",
+    },
+    {
+      "@type": "Organization",
+      name: COMPANY.name,
+      url: COMPANY.corporateSite,
+    },
+    {
+      "@type": "WebApplication",
+      name: SERVICE_NAME,
+      url: SITE_URL,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
+      inLanguage: "ja",
+    },
+  ],
 };
 
 export const viewport: Viewport = {
@@ -30,6 +69,11 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="min-h-screen flex flex-col font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Analytics />
         <header className="bg-white border-b border-slate-200">
           <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">

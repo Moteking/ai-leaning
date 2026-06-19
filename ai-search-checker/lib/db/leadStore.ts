@@ -24,14 +24,24 @@ let cached: LeadStore | null = null;
 
 /**
  * 利用する LeadStore を返す。
- * 既定はローカル SQLite。ネイティブモジュールの読み込みに失敗した環境
- * (一部のサーバーレス環境など)では、起動を止めないようメモリ実装にフォールバックする。
+ * 選択順:
+ *   1. 環境変数 LEADS_WEBHOOK_URL があれば WebhookLeadStore(サーバーレスでも永続化可)
+ *   2. ローカルで better-sqlite3 が使えれば SqliteLeadStore
+ *   3. いずれも不可なら起動を止めないよう MemoryLeadStore にフォールバック
  *
  * 差し替え方法:
  *   ここの分岐に SpreadsheetLeadStore や PostgresLeadStore を追加するだけでよい。
  */
 export async function getLeadStore(): Promise<LeadStore> {
   if (cached) return cached;
+
+  const webhookUrl = process.env.LEADS_WEBHOOK_URL;
+  if (webhookUrl) {
+    const { WebhookLeadStore } = await import("./webhookLeadStore");
+    cached = new WebhookLeadStore(webhookUrl);
+    return cached;
+  }
+
   try {
     const { SqliteLeadStore } = await import("./sqliteLeadStore");
     cached = new SqliteLeadStore();

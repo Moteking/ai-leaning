@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { runDiagnosis } from "@/lib/diagnose";
 import type { DiagnosisResult } from "@/lib/diagnose/types";
+import { getClientIp, rateLimit } from "@/lib/rateLimit";
 
 // 外部URLを取得するため Node.js ランタイムで実行(Edge不可)
 export const runtime = "nodejs";
@@ -12,6 +13,15 @@ function isInputError(message: string): boolean {
 }
 
 export async function POST(request: Request) {
+  // 濫用防止のためのレートリミット(ベストエフォート)
+  const { allowed, retryAfterSec } = rateLimit(`diagnose:${getClientIp(request)}`);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "診断のリクエストが多すぎます。しばらく時間をおいて再度お試しください。" },
+      { status: 429, headers: { "Retry-After": String(retryAfterSec) } }
+    );
+  }
+
   let body: { url?: string; productUrl?: string };
   try {
     body = await request.json();

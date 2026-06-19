@@ -42,21 +42,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "診断スコアが不正です。" }, { status: 400 });
   }
 
+  const lead = {
+    company,
+    email,
+    url,
+    score: Math.round(score),
+    grade: grade || "-",
+  };
+
   try {
     const store = await getLeadStore();
-    const record = await store.save({
-      company,
-      email,
-      url,
-      score: Math.round(score),
-      grade: grade || "-",
-    });
+    const record = await store.save(lead);
     return NextResponse.json({ ok: true, id: record.id });
   } catch (err) {
-    console.error("[lead] 保存に失敗しました:", err);
-    return NextResponse.json(
-      { error: "リード情報の保存に失敗しました。時間をおいて再度お試しください。" },
-      { status: 500 }
+    // 保存に失敗してもユーザーのレポート閲覧は妨げない(機会損失を避ける)。
+    // ただし取りこぼし監視のため、リード内容をログに必ず残す(Vercel等のログで確認可能)。
+    console.error(
+      "[lead] 保存に失敗しました(ユーザーには成功扱いで返却)。lead=",
+      JSON.stringify(lead),
+      "error=",
+      err
     );
+    return NextResponse.json({ ok: true, persisted: false });
   }
 }
