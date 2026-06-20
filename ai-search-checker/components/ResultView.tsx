@@ -6,6 +6,7 @@ import ScoreGauge from "./ScoreGauge";
 import RadarChart from "./RadarChart";
 import CategoryCard from "./CategoryCard";
 import LeadForm from "./LeadForm";
+import ShareButtons from "./ShareButtons";
 import { CONSULT_CTA_URL } from "@/lib/config";
 
 interface ResultViewProps {
@@ -105,6 +106,11 @@ export default function ResultView({ results, notices = [], onReset }: ResultVie
               </div>
             </div>
           ))}
+        </div>
+
+        {/* SNSシェア(リード獲得前から可能=バイラルループ) */}
+        <div className="mt-6">
+          <ShareButtons score={active.totalScore} grade={active.grade} />
         </div>
       </div>
 

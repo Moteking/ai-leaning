@@ -93,6 +93,9 @@ export default function RootLayout({
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-ink-500">
             <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-slate-100 pb-4">
+              <Link href="/badge" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                AI検索対応バッジ
+              </Link>
               <Link href="/company" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
                 運営会社情報
               </Link>
