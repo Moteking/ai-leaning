@@ -1,0 +1,51 @@
+name: Generate AIO articles
+
+on:
+  schedule:
+    # 毎日 21:00 UTC (= 日本時間 06:00) に記事を生成
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "生成する記事数"
+        required: false
+        default: "2"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-search-checker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ai-search-checker/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Anthropic SDK
+        run: npm install @anthropic-ai/sdk@latest --no-save
+      - name: Generate articles
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ARTICLES_PER_RUN: ${{ github.event.inputs.count || '2' }}
+          NEXT_PUBLIC_SITE_URL: https://aio-diagnosis.com
+        run: node automation/content/generate-articles.mjs
+      - name: Commit & push new articles
+        working-directory: .
+        run: |
+          git config user.name "aio-content-bot"
+          git config user.email "aio-content-bot@users.noreply.github.com"
+          git add ai-search-checker/content/blog
+          if git diff --staged --quiet; then
+            echo "新しい記事はありません。"
+          else
+            git commit -m "content: AIOメディアの記事を自動追加"
+            git push
+          fi
