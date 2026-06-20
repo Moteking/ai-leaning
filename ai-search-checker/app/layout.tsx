@@ -78,13 +78,20 @@ export default function RootLayout({
         <VercelAnalytics />
         <header className="bg-white border-b border-slate-200">
           <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">
-              AI
-            </span>
-            <span className="font-bold text-lg tracking-tight">{SERVICE_NAME}</span>
-            <span className="ml-2 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
-              無料
-            </span>
+            <Link href="/" className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">
+                AI
+              </span>
+              <span className="font-bold text-lg tracking-tight">{SERVICE_NAME}</span>
+              <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
+                無料
+              </span>
+            </Link>
+            <nav className="ml-auto flex items-center gap-4 text-sm font-medium text-ink-700">
+              <Link href="/blog" className="hover:text-brand-700">
+                AIOメディア
+              </Link>
+            </nav>
           </div>
         </header>
 
@@ -93,6 +100,9 @@ export default function RootLayout({
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-ink-500">
             <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-slate-100 pb-4">
+              <Link href="/blog" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                AIOメディア
+              </Link>
               <Link href="/badge" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
                 AI検索対応バッジ
               </Link>
