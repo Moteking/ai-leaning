@@ -1,0 +1,33 @@
+name: ai-search-checker CI
+
+on:
+  push:
+    paths:
+      - "ai-search-checker/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "ai-search-checker/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-search-checker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ai-search-checker/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://aio-diagnosis.com
