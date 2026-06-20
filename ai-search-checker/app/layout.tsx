@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { PROVIDER_NAME, SERVICE_NAME, SITE_URL } from "@/lib/config";
 import { COMPANY } from "@/lib/company";
@@ -74,6 +75,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Analytics />
+        <VercelAnalytics />
         <header className="bg-white border-b border-slate-200">
           <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">
