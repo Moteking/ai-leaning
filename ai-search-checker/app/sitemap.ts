@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/config";
 /** サービスサイト自身の sitemap.xml */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const routes = ["", "/company", "/privacy", "/tokushoho"];
+  const routes = ["", "/badge", "/company", "/privacy", "/tokushoho"];
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: now,

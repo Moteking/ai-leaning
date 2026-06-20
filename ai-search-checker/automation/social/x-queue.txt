@@ -1,0 +1,175 @@
+ECサイトのSEOは頑張ってるのに、ChatGPTやGoogle AIに"無視"されてるかも。
+原因の多くは「構造化データ不足」と「AIクローラーのブロック」。
+あなたのECは何点? 30秒で無料診断👇
+https://aio-diagnosis.com
+#EC #AI検索 #AIO #ネットショップ
+---
+【AI検索に載るEC 5箇条】
+①Product構造化データ
+②robots.txtでGPTBot等を許可
+③JSなしでも本文が読めるHTML(SSR)
+④レビュー・FAQの構造化
+⑤llms.txt設置
+全部できてる? 無料診断→ https://aio-diagnosis.com
+#AIO #EC
+---
+「SEO」と「AIO(AI最適化)」は別物。
+SEO=検索順位、AIO=AIの回答に引用されること。
+AI検索時代のECは両方やる必要があります。
+まずは自社の対応度をチェック👇
+https://aio-diagnosis.com
+#AIO #SEO #EC
+---
+実は、GPTBot や OAI-SearchBot を robots.txt でブロックしているECは多い。
+"ChatGPT検索に出てこない"原因がこれかも。
+あなたのサイトは大丈夫?無料診断👇
+https://aio-diagnosis.com
+#ChatGPT #AI検索 #EC
+---
+AI検索（Perplexity / Google AI Overview）に商品を出すには、
+構造化データ(JSON-LD)が必須級。
+商品ページにProduct/Offer/レビューを構造化できてますか?
+30秒で診断→ https://aio-diagnosis.com
+#AIO #EC #構造化データ
+---
+越境ECの方へ。
+hreflang の設定、できていますか?
+AIや検索エンジンが「どの言語・地域向けか」を理解できず、機会損失しているかも。
+無料診断で確認👇
+https://aio-diagnosis.com
+#越境EC #EC #AIO
+---
+商品ページがJavaScript頼みで、
+AIクローラーには"空っぽ"に見えていませんか?
+多くのAIはJSを実行しません。SSR/静的化が重要です。
+あなたのサイトを診断→ https://aio-diagnosis.com
+#EC #AIO #フロントエンド
+---
+llms.txt、もう設置しましたか?
+AIにサイトの概要や主要ページを伝える新しい標準です。
+対応済みのECはまだ少数=今がチャンス。
+診断はこちら👇 https://aio-diagnosis.com
+#llmstxt #AIO #EC
+---
+「ChatGPTでおすすめのECを聞かれて出てくる店」になるには、
+AIに"理解される"サイト設計が必要です。
+構造化・クローラー許可・本文の可読性がカギ。
+無料診断→ https://aio-diagnosis.com
+#ChatGPT #EC #AIO
+---
+レビューを構造化(AggregateRating)していますか?
+AIや検索結果で★評価が表示され、"選ばれる"商品ページになります。
+できているか30秒でチェック👇
+https://aio-diagnosis.com
+#EC #レビュー #AIO
+---
+FAQをFAQPageスキーマで構造化すると、
+AI検索が「質問への回答」としてあなたのサイトを引用しやすくなります。
+対応できてる? 無料診断→ https://aio-diagnosis.com
+#FAQ #AIO #EC
+---
+noindex が意図せず付いていて、
+検索にもAIにも一切出ない――ECで時々ある事故です。
+今すぐ自社サイトを無料診断して確認しましょう👇
+https://aio-diagnosis.com
+#SEO #EC #AIO
+---
+sitemap.xml、robots.txtで宣言してますか?
+商品数の多いECほど、クロール効率が集客に直結します。
+基本ができているか診断→ https://aio-diagnosis.com
+#SEO #EC
+---
+AI検索対応は「早い者勝ち」の領域。
+大半のECがまだ未対応の今こそ、差をつけるチャンスです。
+まずは現在地を知るところから👇
+https://aio-diagnosis.com
+#AIO #EC #ネットショップ
+---
+Google AI Overview にEC商品を載せる条件:
+①構造化データ ②クローラー許可 ③信頼できる本文
+1つでも欠けると埋もれます。
+あなたのサイトは? 無料診断→ https://aio-diagnosis.com
+#AIO #SEO #EC
+---
+Shopifyでも、テーマ次第で構造化データが不十分なことがあります。
+"入れてるつもり"が一番危険。
+客観的にスコアで確認→ https://aio-diagnosis.com
+#Shopify #EC #AIO
+---
+AI検索対応度を100点満点でスコア化＋改善アドバイス付き。
+しかも無料・登録なしで今すぐ。
+EC運営者なら一度はチェックを👇
+https://aio-diagnosis.com
+#EC #AIO #無料ツール
+---
+"うちはSEO代理店に任せてるから大丈夫"
+…そのSEO、AIO(AI検索対応)まで見てますか?
+別物なので、念のため自社でも確認を👇
+https://aio-diagnosis.com
+#SEO #AIO #EC
+---
+AI検索時代に強いECの共通点:
+・構造化データが充実
+・AIクローラーを許可
+・JSなしでも本文が読める
+あなたのサイトはいくつ当てはまる? 診断→ https://aio-diagnosis.com
+#EC #AIO
+---
+商品識別子(GTIN/SKU/ブランド)を構造化していますか?
+AIショッピングや商品マッチングでの露出に効きます。
+対応状況を無料診断→ https://aio-diagnosis.com
+#EC #AIO #構造化データ
+---
+Organization(運営者情報)の構造化、できてますか?
+"どの会社のサイトか"をAIが正しく認識すると信頼性が上がります。
+チェックはこちら👇 https://aio-diagnosis.com
+#EC #AIO
+---
+パンくず(BreadcrumbList)を構造化すると、
+AI・検索エンジンがサイト階層を理解しやすくなります。
+細かいけど効く施策。診断で確認→ https://aio-diagnosis.com
+#SEO #EC #AIO
+---
+"AI検索対策、何から手をつければ?"
+→ まず無料診断で「弱点」を特定するのが最短です。
+項目別に改善アドバイス付き👇
+https://aio-diagnosis.com
+#AIO #EC
+---
+モバイル対応・HTTPS・表示速度。
+基本だけど、AIにも検索にも効く土台です。
+土台ができているか、まとめて無料診断→ https://aio-diagnosis.com
+#EC #SEO #AIO
+---
+Perplexityで自社や商品が引用される条件、ご存知ですか?
+構造化＋クロール許可＋良質な本文が基本。
+できているか30秒でチェック👇 https://aio-diagnosis.com
+#Perplexity #AIO #EC
+---
+"AI検索対応済み"バッジ、無料で配布中。
+自社サイトに貼って、取り組みをアピールできます。
+まずは診断から👇
+https://aio-diagnosis.com
+#EC #AIO
+---
+診断は「サイトトップ」だけでなく「商品ページURL」も追加できます。
+商品ページにこそ Product/価格/レビューの構造化が必要。
+両方診てみましょう👇 https://aio-diagnosis.com
+#EC #AIO
+---
+無料でできるECのAI検索対応、まず5ステップ:
+①構造化データ ②クローラー許可 ③SSR ④sitemap ⑤llms.txt
+詳しくは診断結果で→ https://aio-diagnosis.com
+#AIO #EC #ネットショップ
+---
+SEOの次は AIO/GEO。
+検索が「AIが要約して答える」形に変わる今、ECの集客も変わります。
+出遅れないために、まず現在地を診断👇
+https://aio-diagnosis.com
+#GEO #AIO #EC
+---
+あなたのECは、ChatGPTやGoogle AIに"見つけてもらえる"状態ですか?
+30秒・無料・登録なしで、AI検索対応度がわかります。
+今すぐチェック👇
+https://aio-diagnosis.com
+#AI検索 #AIO #EC

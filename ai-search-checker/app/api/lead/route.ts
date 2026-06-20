@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getLeadStore } from "@/lib/db/leadStore";
 import { getClientIp, rateLimit } from "@/lib/rateLimit";
+import { sendThankYouEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,19 +68,28 @@ export async function POST(request: Request) {
     grade: grade || "-",
   };
 
+  let persisted = true;
+  let id: number | undefined;
   try {
     const store = await getLeadStore();
     const record = await store.save(lead);
-    return NextResponse.json({ ok: true, id: record.id });
+    id = record.id;
   } catch (err) {
     // 保存に失敗してもユーザーのレポート閲覧は妨げない(機会損失を避ける)。
-    // ただし取りこぼし監視のため、リード内容をログに必ず残す(Vercel等のログで確認可能)。
+    // ただし取りこぼし監視のため、リード内容をログに必ず残す。
+    persisted = false;
     console.error(
       "[lead] 保存に失敗しました(ユーザーには成功扱いで返却)。lead=",
       JSON.stringify(lead),
       "error=",
       err
     );
-    return NextResponse.json({ ok: true, persisted: false });
   }
+
+  // 自動サンクスメール(BREVO_API_KEY 設定時のみ送信。失敗してもレスポンスは妨げない)
+  await sendThankYouEmail(lead).catch(() => {});
+
+  return persisted
+    ? NextResponse.json({ ok: true, id })
+    : NextResponse.json({ ok: true, persisted: false });
 }
