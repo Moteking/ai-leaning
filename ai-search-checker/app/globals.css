@@ -43,50 +43,67 @@ body {
   animation: fade-up 0.4s ease-out both;
 }
 
-/* ブログ記事の本文スタイル(Tailwind typographyプラグイン不使用の自前) */
+/* ブログ記事の本文スタイル(Tailwind typographyプラグイン不使用の自前)
+   参考: mieru-ca.com のAIO記事レイアウト(16px本文・目次・章見出し・黄色マーカー) */
 .prose-article {
-  @apply text-[15px] leading-relaxed text-ink-700;
+  font-size: 16px;
+  line-height: 1.9;
+  @apply text-ink-700;
+  letter-spacing: 0.01em;
 }
 .prose-article h2 {
-  @apply mt-10 mb-3 border-l-4 border-brand-600 pl-3 text-xl font-bold text-ink-900;
+  scroll-margin-top: 80px;
+  @apply mt-12 mb-5 rounded-md border-l-[6px] border-brand-600 bg-brand-50 px-4 py-3 text-[22px] font-bold leading-snug text-ink-900;
 }
 .prose-article h3 {
-  @apply mt-7 mb-2 text-lg font-bold text-ink-900;
+  scroll-margin-top: 80px;
+  @apply mt-9 mb-3 border-b-2 border-brand-200 pb-1.5 text-[18px] font-bold text-ink-900;
 }
 .prose-article p {
-  @apply my-4;
+  @apply my-5;
 }
 .prose-article ul {
-  @apply my-4 list-disc space-y-1 pl-6;
+  @apply my-5 list-disc space-y-2 pl-6 marker:text-brand-500;
 }
 .prose-article ol {
-  @apply my-4 list-decimal space-y-1 pl-6;
+  @apply my-5 list-decimal space-y-2 pl-6 marker:font-bold marker:text-brand-600;
+}
+.prose-article li {
+  @apply leading-relaxed;
 }
 .prose-article a {
-  @apply text-brand-700 underline hover:text-brand-800;
+  @apply font-medium text-brand-700 underline underline-offset-2 hover:text-brand-800;
 }
 .prose-article strong {
   @apply font-bold text-ink-900;
 }
+/* 黄色マーカー(==重要語== → <mark>) */
+.prose-article mark {
+  background: linear-gradient(transparent 60%, #fff176 60%);
+  @apply px-0.5 font-bold text-ink-900;
+}
 .prose-article blockquote {
-  @apply my-4 border-l-4 border-slate-200 pl-4 text-ink-500;
+  @apply my-5 rounded-r-md border-l-4 border-brand-300 bg-slate-50 px-4 py-2 text-ink-700;
 }
 .prose-article code {
-  @apply rounded bg-slate-100 px-1.5 py-0.5 text-sm text-ink-900;
+  @apply rounded bg-slate-100 px-1.5 py-0.5 text-[14px] text-ink-900;
 }
 .prose-article pre {
-  @apply my-4 overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100;
+  @apply my-5 overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100;
 }
 .prose-article pre code {
   @apply bg-transparent p-0 text-slate-100;
 }
 .prose-article table {
-  @apply my-4 w-full border-collapse text-sm;
+  @apply my-6 w-full border-collapse overflow-hidden rounded-lg text-[15px];
 }
 .prose-article th,
 .prose-article td {
-  @apply border border-slate-200 px-3 py-2 text-left;
+  @apply border border-slate-200 px-3 py-2.5 text-left;
 }
 .prose-article th {
-  @apply bg-slate-50 font-bold;
+  @apply bg-brand-50 font-bold text-ink-900;
+}
+.prose-article tr:nth-child(even) td {
+  @apply bg-slate-50/60;
 }

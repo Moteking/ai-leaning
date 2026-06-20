@@ -81,6 +81,21 @@ export default function BlogArticle({ params }: { params: { slug: string } }) {
         ))}
       </div>
 
+      {post.toc.length >= 2 && (
+        <nav className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <p className="text-sm font-bold text-ink-900">目次</p>
+          <ol className="mt-3 space-y-1.5 text-sm">
+            {post.toc.map((t) => (
+              <li key={t.id} className={t.depth === 3 ? "ml-4" : ""}>
+                <a href={`#${t.id}`} className="text-ink-700 hover:text-brand-700 hover:underline">
+                  {t.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
       <div
         className="prose-article mt-8"
         dangerouslySetInnerHTML={{ __html: post.html }}

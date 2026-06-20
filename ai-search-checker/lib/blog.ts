@@ -20,8 +20,15 @@ export interface BlogMeta {
   faq: FaqItem[];
 }
 
+export interface TocItem {
+  depth: number;
+  text: string;
+  id: string;
+}
+
 export interface BlogPost extends BlogMeta {
   html: string;
+  toc: TocItem[];
 }
 
 /** 生成HTMLの簡易サニタイズ(スクリプト等を除去) */
@@ -73,6 +80,25 @@ export function getPost(slug: string): BlogPost | null {
   if (!fs.existsSync(file)) return null;
   const raw = fs.readFileSync(file, "utf8");
   const { data, content } = matter(raw);
-  const html = sanitize(marked.parse(content, { async: false }) as string);
-  return { ...normalizeMeta(slug, data), html };
+
+  // ==重要語== を黄色マーカー(<mark>)に変換
+  const withMarks = content.replace(/==([^=\n]+)==/g, "<mark>$1</mark>");
+  let rendered = marked.parse(withMarks, { async: false }) as string;
+
+  // 見出し(h2/h3)に連番アンカーIDを付与し、目次(TOC)を生成
+  const toc: TocItem[] = [];
+  let n = 0;
+  rendered = rendered.replace(
+    /<h([23])>([\s\S]*?)<\/h\1>/g,
+    (_m, lvl: string, inner: string) => {
+      n += 1;
+      const id = `sec-${n}`;
+      const text = inner.replace(/<[^>]+>/g, "").trim();
+      toc.push({ depth: Number(lvl), text, id });
+      return `<h${lvl} id="${id}">${inner}</h${lvl}>`;
+    }
+  );
+
+  const html = sanitize(rendered);
+  return { ...normalizeMeta(slug, data), html, toc };
 }
