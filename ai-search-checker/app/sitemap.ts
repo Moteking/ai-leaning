@@ -5,7 +5,7 @@ import { getAllPostsMeta } from "@/lib/blog";
 /** サービスサイト自身の sitemap.xml(ブログ記事も含む) */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ["", "/blog", "/badge", "/company", "/privacy", "/tokushoho"];
+  const staticRoutes = ["", "/ai-mention", "/blog", "/badge", "/company", "/privacy", "/tokushoho"];
   const pages: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: now,
