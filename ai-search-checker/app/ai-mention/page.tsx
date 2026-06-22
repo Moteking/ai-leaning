@@ -3,13 +3,14 @@ import Link from "next/link";
 import AiMentionApp from "@/components/AiMentionApp";
 
 export const metadata: Metadata = {
-  title: "AI引用チェック | あなたのブランドはAIの回答に出てくる?",
+  title: "AI引用チェック | 競合シェア・AI可視性スコアを無料分析",
   description:
-    "ChatGPTのようにAIが質問に答えるとき、あなたのブランドが引用されるかを無料でチェック。AIに実際に質問し、Web検索を踏まえた回答で言及されるかを確認します。",
+    "ChatGPTのようにAIが答える時代に、あなたのブランドがAIの回答に引用されるかを無料分析。単なる確認で終わらず、そのクエリで“誰がAIに選ばれているか”の競合シェア、AI可視性スコア、参照元の内訳、優先度付きの改善アクションまで提示します。",
   alternates: { canonical: "/ai-mention" },
   openGraph: {
-    title: "AI引用チェック | あなたのブランドはAIの回答に出てくる?",
-    description: "AIに実際に質問し、あなたのブランドが引用されるかを無料でチェックします。",
+    title: "AI引用チェック | 競合シェア・AI可視性スコアを無料分析",
+    description:
+      "AIに実際に質問し、競合シェア・AI可視性スコア・改善アクションまで自動分析する無料ツール。",
     type: "website",
   },
 };
@@ -33,8 +34,9 @@ export default function AiMentionPage() {
           <span className="text-brand-700">AIの回答に出てきますか?</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ink-700">
-          ChatGPTやPerplexityのようにAIが質問に答える時代。ユーザーが「○○ おすすめ」と聞いたとき、
-          あなたのブランドが引用されるかを実際にAIに質問してチェックします。
+          ユーザーが「○○ おすすめ」と聞いたとき、AIの回答に出てくるのは誰か。
+          実際にAIへ質問し、<strong>そのクエリの競合シェア・AI可視性スコア・改善アクション</strong>まで自動分析します。
+          「自分でAIに聞く」だけでは見えない“勝ち負け”が分かります。
         </p>
       </div>
 
@@ -44,9 +46,9 @@ export default function AiMentionPage() {
 
       <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-3">
         {[
-          { t: "実際にAIへ質問", d: "Web検索を踏まえてAIが回答を生成します" },
-          { t: "引用の有無を判定", d: "回答にあなたのブランドが登場するか確認" },
-          { t: "競合の手がかり", d: "AIが参照した情報源（競合候補）も表示" },
+          { t: "競合シェアを可視化", d: "そのクエリで“誰がAIに選ばれているか”をランキング表示" },
+          { t: "AI可視性スコア", d: "あなたのAI検索での見つかりやすさを100点満点で数値化" },
+          { t: "改善アクション", d: "引用される側に回るための施策を優先度付きで提示" },
         ].map((f) => (
           <div key={f.t} className="rounded-xl border border-slate-200 bg-white p-4 shadow-card">
             <div className="text-sm font-bold text-brand-700">{f.t}</div>
