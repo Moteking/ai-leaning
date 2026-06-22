@@ -23,7 +23,7 @@ function normalize(s: string): string {
  * AIの回答にブランド/サイトが引用・言及されるかを判定する。
  *
  * ANTHROPIC_API_KEY が未設定なら available:false を返す（ツールは「準備中」表示）。
- * モデルは MENTION_MODEL（既定 claude-opus-4-8）。
+ * モデルは MENTION_MODEL（既定 claude-sonnet-4-6。Vercel無料枠の60秒に収めるため高速モデルを採用）。
  */
 export async function runMentionCheck(brand: string, query: string): Promise<MentionResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -37,8 +37,12 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
   };
   if (!apiKey) return base;
 
-  const client = new Anthropic({ apiKey });
-  const model = process.env.MENTION_MODEL || "claude-opus-4-8";
+  // Vercel Hobby の関数上限は60秒。SDK側を50秒で打ち切り、504(関数強制終了)に
+  // なる前にきれいなエラーで返す。timeout はミリ秒。リトライは時間を倍化させるため0。
+  const client = new Anthropic({ apiKey, timeout: 50_000, maxRetries: 0 });
+  // 既定は Sonnet 4.6(最新の web_search_20260209 が使える中で高速・低コスト)。
+  // 品質重視なら MENTION_MODEL=claude-opus-4-8 で上書き可(60秒に収まらない場合あり)。
+  const model = process.env.MENTION_MODEL || "claude-sonnet-4-6";
 
   const userMessage =
     `${query}について、おすすめを教えてください。` +
@@ -56,8 +60,9 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
   for (let i = 0; i < 4; i++) {
     const res = await client.messages.create({
       model,
-      max_tokens: 2500,
-      tools: [{ type: "web_search_20260209", name: "web_search" }],
+      max_tokens: 1600,
+      // 検索回数に上限を設け、時間切れ(60秒)を防ぐ
+      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 6 }],
       messages,
     });
 
