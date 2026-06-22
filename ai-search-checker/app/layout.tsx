@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { PROVIDER_NAME, SERVICE_NAME, SITE_URL } from "@/lib/config";
+import { PROVIDER_NAME, SERVICE_NAME, SITE_URL, GA_MEASUREMENT_ID } from "@/lib/config";
 import { COMPANY } from "@/lib/company";
 import Analytics from "@/components/Analytics";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -124,6 +125,7 @@ export default function RootLayout({
               <Link href="/tokushoho" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
                 特定商取引法に基づく表記
               </Link>
+              {GA_MEASUREMENT_ID && <CookieSettingsButton />}
             </nav>
             <p className="mt-4">
               © {new Date().getFullYear()} {PROVIDER_NAME}

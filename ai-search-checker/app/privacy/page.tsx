@@ -23,9 +23,12 @@ export default function PrivacyPage() {
           <li>診断結果(スコア・判定内容等)</li>
           <li>
             アクセス解析情報(Cookie、閲覧ログ等)。当社は本サービスの利用状況を把握するため、
-            Cookie を利用した Google Analytics(Google LLC 提供)を使用する場合があります。
+            Cookie を利用した Google Analytics(Google LLC 提供)を利用することがあります。
+            Google Analytics は、サイト初回訪問時に表示する同意バナーで利用者が
+            <strong>「同意する」を選択した場合にのみ</strong>有効になります(オプトイン方式)。
+            同意の有無は、フッターの「Cookie設定」からいつでも変更できます。
             これにより取得される情報は、同サービスのプライバシーポリシーに基づき管理されます。
-            なお、ブラウザの設定により Cookie の利用を無効化することができます。
+            なお、ブラウザの設定により Cookie の利用を無効化することもできます。
           </li>
         </ul>
       </LegalSection>
