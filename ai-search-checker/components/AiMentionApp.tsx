@@ -57,6 +57,65 @@ const PRIORITY_STYLE: Record<ActionItem["priority"], string> = {
   低: "bg-slate-100 text-slate-600",
 };
 
+interface Verdict {
+  wrap: string; // カード全体の border + bg(静的クラスでJIT検出可能にする)
+  titleClass: string;
+  badge: string;
+  badgeClass: string;
+  title: string;
+  message: string;
+}
+
+/** 掲載状況を全パターンに分けて、それぞれ専用の見出し・色・メッセージを返す */
+function getVerdict(r: MentionResult): Verdict {
+  // パターン1: 最有力(1番手)
+  if (r.mentioned && r.rank === 1) {
+    return {
+      wrap: "border-emerald-200 bg-emerald-50",
+      titleClass: "text-emerald-700",
+      badge: "最有力",
+      badgeClass: "bg-emerald-600",
+      title: "🏆 AIに“一番手”として推奨されています",
+      message:
+        "このクエリでは、AIが最初にあなたのブランドを挙げています。AI検索での勝者ポジションです。引用を取りこぼさないよう、構造化データやレビューを維持・強化しましょう。",
+    };
+  }
+  // パターン2: 上位で引用(2〜3番手)
+  if (r.mentioned && r.rank !== null && r.rank <= 3) {
+    return {
+      wrap: "border-green-200 bg-green-50",
+      titleClass: "text-green-700",
+      badge: `${r.rank}番手`,
+      badgeClass: "bg-green-600",
+      title: `✓ 上位でAIに引用されています（${r.rank}番手）`,
+      message:
+        "AIはあなたのブランドを上位で認識しています。あと一歩で一番手です。下の改善アクションで、より確実・上位での引用を狙えます。",
+    };
+  }
+  // パターン3: 下位で引用(4番手以下、または順位不明だが言及あり)
+  if (r.mentioned) {
+    return {
+      wrap: "border-amber-200 bg-amber-50",
+      titleClass: "text-amber-700",
+      badge: r.rank ? `${r.rank}番手` : "下位",
+      badgeClass: "bg-amber-500",
+      title: `△ AIに認識されていますが${r.rank ? `${r.rank}番手と` : ""}下位です`,
+      message:
+        "登場はしていますが、上位の競合に埋もれています。下の競合シェアと改善アクションで、上位へ押し上げる施策を進めましょう。",
+    };
+  }
+  // パターン4: 圏外(未掲載)
+  return {
+    wrap: "border-rose-200 bg-rose-50",
+    titleClass: "text-rose-700",
+    badge: "圏外",
+    badgeClass: "bg-rose-500",
+    title: "✗ まだAIの回答に登場していません（圏外）",
+    message:
+      "このクエリではAIにあなたのブランドが認識されていません。下の『AIに選ばれているブランド』が今の勢力図、『改善アクション』が割り込むための手順です。",
+  };
+}
+
 export default function AiMentionApp() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [brand, setBrand] = useState("");
@@ -132,36 +191,26 @@ export default function AiMentionApp() {
 
   if (phase === "result" && result) {
     const sc = scoreColor(result.visibilityScore);
+    const v = getVerdict(result);
     const maxMentions = Math.max(1, ...result.competitors.map((c) => c.mentions));
     const youInList = result.competitors.some((c) => c.isYou);
 
     return (
       <div className="space-y-6">
-        {/* ===== 判定 + 可視性スコア ===== */}
-        <div
-          className={`rounded-2xl border p-6 shadow-card ${
-            result.mentioned ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"
-          }`}
-        >
-          <div className="text-sm text-ink-500">
-            クエリ：「{result.query}」／ブランド：「{result.brand}」
+        {/* ===== 判定(全パターン別) + 可視性スコア ===== */}
+        <div className={`rounded-2xl border p-6 shadow-card ${v.wrap}`}>
+          <div className="flex items-center gap-2 text-sm text-ink-500">
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold text-white ${v.badgeClass}`}>
+              {v.badge}
+            </span>
+            <span className="truncate">
+              クエリ：「{result.query}」／ブランド：「{result.brand}」
+            </span>
           </div>
           <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-extrabold">
-                {result.mentioned ? (
-                  <span className="text-green-700">
-                    ✓ AIの回答に登場{result.rank ? `（${result.rank}番手）` : ""}
-                  </span>
-                ) : (
-                  <span className="text-amber-700">まだAIの回答に登場していません</span>
-                )}
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-700">
-                {result.mentioned
-                  ? "このクエリではAIがあなたのブランドを認識しています。さらに上位で確実に引用されるよう、下の改善アクションを進めましょう。"
-                  : "このクエリではAIの回答にあなたのブランドが登場していません。下の『AIに選ばれているブランド』『改善アクション』が、引用される側に回るための手がかりです。"}
-              </p>
+              <h2 className={`text-2xl font-extrabold ${v.titleClass}`}>{v.title}</h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-700">{v.message}</p>
             </div>
             <div
               className={`mx-auto flex h-28 w-28 flex-none flex-col items-center justify-center rounded-full bg-white ring-4 ${sc.ring}`}
