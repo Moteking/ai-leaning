@@ -23,7 +23,7 @@ function normalize(s: string): string {
  * AIの回答にブランド/サイトが引用・言及されるかを判定する。
  *
  * ANTHROPIC_API_KEY が未設定なら available:false を返す（ツールは「準備中」表示）。
- * モデルは MENTION_MODEL（既定 claude-sonnet-4-6。Vercel無料枠の60秒に収めるため高速モデルを採用）。
+ * モデルは MENTION_MODEL（既定 claude-haiku-4-5。Vercel無料枠の60秒に収めるため最速モデルを採用）。
  */
 export async function runMentionCheck(brand: string, query: string): Promise<MentionResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -40,9 +40,18 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
   // Vercel Hobby の関数上限は60秒。SDK側を50秒で打ち切り、504(関数強制終了)に
   // なる前にきれいなエラーで返す。timeout はミリ秒。リトライは時間を倍化させるため0。
   const client = new Anthropic({ apiKey, timeout: 50_000, maxRetries: 0 });
-  // 既定は Sonnet 4.6(最新の web_search_20260209 が使える中で高速・低コスト)。
-  // 品質重視なら MENTION_MODEL=claude-opus-4-8 で上書き可(60秒に収まらない場合あり)。
-  const model = process.env.MENTION_MODEL || "claude-sonnet-4-6";
+  // 既定は Haiku 4.5(最速。Vercel無料枠の60秒に確実に収める)。
+  // 品質重視なら MENTION_MODEL=claude-sonnet-4-6 / claude-opus-4-8 で上書き可
+  // (検索が長引くと60秒超で失敗する場合あり)。
+  const model = process.env.MENTION_MODEL || "claude-haiku-4-5";
+
+  // dynamic filtering 対応モデルのみ最新版 web 検索を使う。Haiku 等は基本版(軽量・高速)。
+  const supportsNewSearch = /claude-(opus-4-(6|7|8)|sonnet-4-6|fable-5)/.test(model);
+  const webSearchTool = (
+    supportsNewSearch
+      ? { type: "web_search_20260209", name: "web_search", max_uses: 3 }
+      : { type: "web_search_20250305", name: "web_search", max_uses: 3 }
+  ) as Anthropic.Messages.ToolUnion;
 
   const userMessage =
     `${query}について、おすすめを教えてください。` +
@@ -60,9 +69,9 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
   for (let i = 0; i < 4; i++) {
     const res = await client.messages.create({
       model,
-      max_tokens: 1600,
-      // 検索回数に上限を設け、時間切れ(60秒)を防ぐ
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 6 }],
+      max_tokens: 1200,
+      // 検索回数を3回に制限し、時間切れ(60秒)を防ぐ
+      tools: [webSearchTool],
       messages,
     });
 
