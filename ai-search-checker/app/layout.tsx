@@ -88,6 +88,9 @@ export default function RootLayout({
               </span>
             </Link>
             <nav className="ml-auto flex items-center gap-4 text-sm font-medium text-ink-700">
+              <Link href="/ai-mention" className="hidden hover:text-brand-700 sm:inline">
+                AI引用チェック
+              </Link>
               <Link href="/blog" className="hover:text-brand-700">
                 AIOメディア
               </Link>
@@ -100,6 +103,9 @@ export default function RootLayout({
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-ink-500">
             <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-slate-100 pb-4">
+              <Link href="/ai-mention" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
+                AI引用チェック
+              </Link>
               <Link href="/blog" className="font-medium text-ink-700 hover:text-brand-700 hover:underline">
                 AIOメディア
               </Link>
