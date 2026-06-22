@@ -5,22 +5,119 @@ export interface MentionSource {
   url: string;
 }
 
+/** AIの回答に登場したブランド/サービス(競合シェア) */
+export interface CompetitorRef {
+  name: string;
+  mentions: number;
+  isYou: boolean;
+}
+
+/** AIが参照した情報源の種別内訳 */
+export interface SourceCategory {
+  type: string;
+  count: number;
+}
+
+/** 優先度付きの改善アクション */
+export interface ActionItem {
+  title: string;
+  detail: string;
+  priority: "高" | "中" | "低";
+}
+
 export interface MentionResult {
   available: boolean; // ANTHROPIC_API_KEY が設定されているか
   query: string;
   brand: string;
   mentioned: boolean;
+  rank: number | null; // 競合の中での順位(1始まり)。未掲載は null
+  visibilityScore: number; // AI可視性スコア 0-100
   answer: string;
   sources: MentionSource[];
+  competitors: CompetitorRef[]; // AIに選ばれているブランドのランキング
+  sourceCategories: SourceCategory[]; // 参照元の種別内訳
+  reasons: string[]; // 引用されない(/されている)理由
+  actions: ActionItem[]; // 改善アクション
+  analyzed: boolean; // 競合解析(フェーズ2)が成功したか
 }
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "");
 }
 
+/** AIの回答テキストから ```json フェンス等を除いて最初のJSONオブジェクトを取り出す */
+function extractJson(text: string): unknown {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) throw new Error("no json");
+  return JSON.parse(text.slice(start, end + 1));
+}
+
+/** フェーズ2解析の出力スキーマ(構造化出力) */
+const ANALYSIS_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    mentioned: { type: "boolean" },
+    // 競合の中での順位。1始まり。未掲載なら 0
+    rank: { type: "integer" },
+    // AI可視性スコア 0-100
+    visibilityScore: { type: "integer" },
+    competitors: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          name: { type: "string" },
+          mentions: { type: "integer" },
+          isYou: { type: "boolean" },
+        },
+        required: ["name", "mentions", "isYou"],
+      },
+    },
+    sourceCategories: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          type: { type: "string" },
+          count: { type: "integer" },
+        },
+        required: ["type", "count"],
+      },
+    },
+    reasons: { type: "array", items: { type: "string" } },
+    actions: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          title: { type: "string" },
+          detail: { type: "string" },
+          priority: { type: "string", enum: ["高", "中", "低"] },
+        },
+        required: ["title", "detail", "priority"],
+      },
+    },
+  },
+  required: [
+    "mentioned",
+    "rank",
+    "visibilityScore",
+    "competitors",
+    "sourceCategories",
+    "reasons",
+    "actions",
+  ],
+} as const;
+
 /**
- * 指定の検索クエリを Claude(ウェブ検索ツール付き)に質問し、
- * AIの回答にブランド/サイトが引用・言及されるかを判定する。
+ * 指定の検索クエリを Claude(ウェブ検索ツール付き)に質問し、AIの回答を取得したうえで、
+ * 「競合シェア・AI可視性スコア・参照元の内訳・引用されない理由・改善アクション」まで解析して返す。
+ * 単に『自分でAIに聞く』だけでは得られない競合インテリジェンスを提供するのが狙い。
  *
  * ANTHROPIC_API_KEY が未設定なら available:false を返す（ツールは「準備中」表示）。
  * モデルは MENTION_MODEL（既定 claude-haiku-4-5。Vercel無料枠の60秒に収めるため最速モデルを採用）。
@@ -32,8 +129,15 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     query,
     brand,
     mentioned: false,
+    rank: null,
+    visibilityScore: 0,
     answer: "",
     sources: [],
+    competitors: [],
+    sourceCategories: [],
+    reasons: [],
+    actions: [],
+    analyzed: false,
   };
   if (!apiKey) return base;
 
@@ -53,19 +157,19 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
       : { type: "web_search_20250305", name: "web_search", max_uses: 3 }
   ) as Anthropic.Messages.ToolUnion;
 
+  // ===== フェーズ1: ウェブ検索付きでAIに「おすすめ」を回答させる =====
   const userMessage =
     `${query}について、おすすめを教えてください。` +
     `実在する具体的なサービス名・店舗名・ブランド名を複数挙げ、それぞれの特徴を簡潔に説明してください。` +
     `最新の情報を踏まえて回答してください。`;
 
-  // ウェブ検索ツール付きでAIに回答させる
   type Msg = Anthropic.MessageParam;
   const messages: Msg[] = [{ role: "user", content: userMessage }];
 
   let answer = "";
   const sources: MentionSource[] = [];
 
-  // server-tool ループ(pause_turn)に最大3回まで対応
+  // server-tool ループ(pause_turn)に対応
   for (let i = 0; i < 4; i++) {
     const res = await client.messages.create({
       model,
@@ -97,10 +201,7 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     break;
   }
 
-  // ブランド/サイトが回答・参照元に登場するか
-  const brandNorm = normalize(brand);
-  const hay = normalize(answer + " " + sources.map((s) => s.title + " " + s.url).join(" "));
-  const mentioned = brandNorm.length > 1 && hay.includes(brandNorm);
+  answer = answer.trim();
 
   // 参照元は重複URLを除去
   const seen = new Set<string>();
@@ -110,12 +211,115 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     return true;
   });
 
-  return {
+  // ブランド/サイトの単純な文字列一致(フェーズ2が失敗したときのフォールバック)
+  const brandNorm = normalize(brand);
+  const hay = normalize(answer + " " + uniqueSources.map((s) => s.title + " " + s.url).join(" "));
+  const fallbackMentioned = brandNorm.length > 1 && hay.includes(brandNorm);
+
+  const result: MentionResult = {
     available: true,
     query,
     brand,
-    mentioned,
-    answer: answer.trim(),
+    mentioned: fallbackMentioned,
+    rank: null,
+    visibilityScore: fallbackMentioned ? 50 : 10,
+    answer,
     sources: uniqueSources.slice(0, 10),
+    competitors: [],
+    sourceCategories: [],
+    reasons: [],
+    actions: [],
+    analyzed: false,
   };
+
+  // ===== フェーズ2: AIの回答を解析して競合インテリジェンスを生成(高速・ツールなし) =====
+  // 解析は別モデルにも切替可。失敗してもフェーズ1の結果は返す(機会損失を避ける)。
+  const analysisModel = process.env.MENTION_ANALYSIS_MODEL || "claude-haiku-4-5";
+  const sourceList = uniqueSources
+    .slice(0, 10)
+    .map((s, i) => `${i + 1}. ${s.title} (${s.url})`)
+    .join("\n");
+
+  const analysisPrompt =
+    `あなたはAIO(AI検索最適化)の専門アナリストです。以下は、検索クエリ「${query}」に対して` +
+    `AIが生成した「おすすめ回答」と、AIが根拠として参照した情報源の一覧です。` +
+    `ターゲットブランド「${brand}」が、このAI回答の中でどう扱われているかを分析してください。\n\n` +
+    `# AIの回答\n${answer.slice(0, 4000)}\n\n` +
+    `# AIが参照した情報源\n${sourceList || "(なし)"}\n\n` +
+    `# 分析タスク(必ず日本語で)\n` +
+    `1. mentioned: 「${brand}」がAI回答に実質的に登場・推奨されているか(表記ゆれも考慮)。\n` +
+    `2. rank: 回答で挙げられたブランドの中での「${brand}」の掲載順位(1始まり)。未掲載なら0。\n` +
+    `3. visibilityScore(0-100): AI検索での可視性。未掲載=5〜25、下位で言及=40〜60、上位で明確に推奨=70〜100。\n` +
+    `4. competitors: 回答で挙げられた実在ブランド/サービスを登場順に最大8件。各 name(ブランド名)、` +
+    `mentions(回答内での言及回数の目安1以上)、isYou(それが「${brand}」自身ならtrue)。\n` +
+    `5. sourceCategories: 参照元を「比較・ランキングメディア」「レビューサイト」「競合の公式サイト」` +
+    `「ニュース・メディア」「ECモール」「その他」等に分類し、種別ごとの件数。\n` +
+    `6. reasons: 「${brand}」がAIに引用される/されない要因を2〜4個(構造化データ、AIクローラー許可、` +
+    `第三者メディア掲載、レビューの有無、コンテンツ量など具体的に)。\n` +
+    `7. actions: 「${brand}」がAIに引用されるための改善アクションを優先度付きで3〜5個。` +
+    `各 title(短い見出し)、detail(具体的にどうするか1〜2文)、priority(高/中/低)。\n` +
+    `JSONのみを出力してください。`;
+
+  try {
+    const analysisParams: Record<string, unknown> = {
+      model: analysisModel,
+      max_tokens: 1500,
+      messages: [{ role: "user", content: analysisPrompt }],
+      output_config: { format: { type: "json_schema", schema: ANALYSIS_SCHEMA } },
+    };
+    const aRes = await client.messages.create(
+      analysisParams as unknown as Anthropic.Messages.MessageCreateParamsNonStreaming
+    );
+    let txt = "";
+    for (const b of aRes.content) {
+      if (b.type === "text") txt += b.text;
+    }
+    const parsed = extractJson(txt) as {
+      mentioned?: boolean;
+      rank?: number;
+      visibilityScore?: number;
+      competitors?: CompetitorRef[];
+      sourceCategories?: SourceCategory[];
+      reasons?: string[];
+      actions?: ActionItem[];
+    };
+
+    const rankNum = typeof parsed.rank === "number" ? parsed.rank : 0;
+    result.mentioned = Boolean(parsed.mentioned);
+    result.rank = rankNum > 0 ? rankNum : null;
+    result.visibilityScore = Math.max(
+      0,
+      Math.min(100, Math.round(parsed.visibilityScore ?? result.visibilityScore))
+    );
+    result.competitors = Array.isArray(parsed.competitors)
+      ? parsed.competitors.slice(0, 8).map((c) => ({
+          name: String(c.name ?? ""),
+          mentions: Math.max(1, Number(c.mentions) || 1),
+          isYou: Boolean(c.isYou),
+        }))
+      : [];
+    result.sourceCategories = Array.isArray(parsed.sourceCategories)
+      ? parsed.sourceCategories.slice(0, 8).map((s) => ({
+          type: String(s.type ?? ""),
+          count: Math.max(0, Number(s.count) || 0),
+        }))
+      : [];
+    result.reasons = Array.isArray(parsed.reasons)
+      ? parsed.reasons.map((r) => String(r)).slice(0, 5)
+      : [];
+    result.actions = Array.isArray(parsed.actions)
+      ? parsed.actions.slice(0, 5).map((a) => ({
+          title: String(a.title ?? ""),
+          detail: String(a.detail ?? ""),
+          priority: (["高", "中", "低"].includes(String(a.priority))
+            ? a.priority
+            : "中") as ActionItem["priority"],
+        }))
+      : [];
+    result.analyzed = true;
+  } catch (err) {
+    console.error("[ai-mention] 競合解析(フェーズ2)失敗:", err);
+  }
+
+  return result;
 }

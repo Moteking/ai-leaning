@@ -8,12 +8,33 @@ interface MentionSource {
   title: string;
   url: string;
 }
+interface CompetitorRef {
+  name: string;
+  mentions: number;
+  isYou: boolean;
+}
+interface SourceCategory {
+  type: string;
+  count: number;
+}
+interface ActionItem {
+  title: string;
+  detail: string;
+  priority: "高" | "中" | "低";
+}
 interface MentionResult {
   query: string;
   brand: string;
   mentioned: boolean;
+  rank: number | null;
+  visibilityScore: number;
   answer: string;
   sources: MentionSource[];
+  competitors: CompetitorRef[];
+  sourceCategories: SourceCategory[];
+  reasons: string[];
+  actions: ActionItem[];
+  analyzed: boolean;
 }
 
 type Phase = "idle" | "loading" | "result";
@@ -23,6 +44,18 @@ const EXAMPLES = [
   "オーガニックコスメ 通販 人気",
   "ペット用品 ネットショップ おすすめ",
 ];
+
+function scoreColor(score: number): { text: string; ring: string } {
+  if (score >= 70) return { text: "text-green-700", ring: "ring-green-200" };
+  if (score >= 40) return { text: "text-amber-700", ring: "ring-amber-200" };
+  return { text: "text-red-700", ring: "ring-red-200" };
+}
+
+const PRIORITY_STYLE: Record<ActionItem["priority"], string> = {
+  高: "bg-red-100 text-red-700",
+  中: "bg-amber-100 text-amber-700",
+  低: "bg-slate-100 text-slate-600",
+};
 
 export default function AiMentionApp() {
   const [phase, setPhase] = useState<Phase>("idle");
@@ -89,17 +122,22 @@ export default function AiMentionApp() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-50">
           <span className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
         </div>
-        <h2 className="mt-4 text-lg font-bold">AIに質問して引用状況を確認中…</h2>
+        <h2 className="mt-4 text-lg font-bold">AIに質問し、競合状況を解析中…</h2>
         <p className="mt-1 text-sm text-ink-500">
-          AIがWebを検索して回答を生成します。30秒〜1分ほどかかる場合があります。
+          AIがWebを検索して回答を生成し、競合シェア・引用要因を分析します。20〜40秒ほどかかります。
         </p>
       </div>
     );
   }
 
   if (phase === "result" && result) {
+    const sc = scoreColor(result.visibilityScore);
+    const maxMentions = Math.max(1, ...result.competitors.map((c) => c.mentions));
+    const youInList = result.competitors.some((c) => c.isYou);
+
     return (
       <div className="space-y-6">
+        {/* ===== 判定 + 可視性スコア ===== */}
         <div
           className={`rounded-2xl border p-6 shadow-card ${
             result.mentioned ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"
@@ -108,30 +146,147 @@ export default function AiMentionApp() {
           <div className="text-sm text-ink-500">
             クエリ：「{result.query}」／ブランド：「{result.brand}」
           </div>
-          <h2 className="mt-2 text-2xl font-extrabold">
-            {result.mentioned ? (
-              <span className="text-green-700">✓ AIの回答に登場しました</span>
-            ) : (
-              <span className="text-amber-700">まだAIの回答に登場していません</span>
-            )}
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink-700">
-            {result.mentioned
-              ? "このクエリでは、AIがあなたのブランドを認識・引用しています。さらに上位で確実に引用されるよう、構造化データやレビューを強化しましょう。"
-              : "このクエリでは、AIの回答にあなたのブランドが登場していません。AIに見つけられ・引用されるための対策（構造化データ、AIクローラー許可、コンテンツ拡充）が有効です。"}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
-          <h3 className="text-base font-bold">AIの回答（実際の生成結果）</h3>
-          <div className="mt-3 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm leading-relaxed text-ink-700">
-            {result.answer || "（回答を取得できませんでした）"}
+          <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-extrabold">
+                {result.mentioned ? (
+                  <span className="text-green-700">
+                    ✓ AIの回答に登場{result.rank ? `（${result.rank}番手）` : ""}
+                  </span>
+                ) : (
+                  <span className="text-amber-700">まだAIの回答に登場していません</span>
+                )}
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-700">
+                {result.mentioned
+                  ? "このクエリではAIがあなたのブランドを認識しています。さらに上位で確実に引用されるよう、下の改善アクションを進めましょう。"
+                  : "このクエリではAIの回答にあなたのブランドが登場していません。下の『AIに選ばれているブランド』『改善アクション』が、引用される側に回るための手がかりです。"}
+              </p>
+            </div>
+            <div
+              className={`mx-auto flex h-28 w-28 flex-none flex-col items-center justify-center rounded-full bg-white ring-4 ${sc.ring}`}
+            >
+              <span className={`text-3xl font-extrabold ${sc.text}`}>{result.visibilityScore}</span>
+              <span className="text-[11px] font-medium text-ink-500">AI可視性スコア</span>
+              <span className="text-[10px] text-ink-400">/100</span>
+            </div>
           </div>
         </div>
 
-        {result.sources.length > 0 && (
+        {/* ===== 競合シェア(誰がAIに選ばれているか) ===== */}
+        {result.competitors.length > 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
-            <h3 className="text-base font-bold">AIが参照した情報源（競合の手がかり）</h3>
+            <h3 className="text-base font-bold">このクエリで「AIに選ばれている」ブランド</h3>
+            <p className="mt-1 text-xs text-ink-500">
+              AIの回答に登場したブランドを掲載順に並べました。これがAI検索における“今の勢力図”です。
+            </p>
+            <ul className="mt-4 space-y-2.5">
+              {result.competitors.map((c, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <span className="w-6 flex-none text-right text-sm font-bold text-ink-400">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`truncate text-sm font-semibold ${
+                          c.isYou ? "text-brand-700" : "text-ink-700"
+                        }`}
+                      >
+                        {c.name}
+                      </span>
+                      {c.isYou && (
+                        <span className="flex-none rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                          あなた
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${c.isYou ? "bg-brand-600" : "bg-slate-400"}`}
+                        style={{ width: `${Math.round((c.mentions / maxMentions) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className="w-12 flex-none text-right text-xs text-ink-500">{c.mentions}回</span>
+                </li>
+              ))}
+            </ul>
+            {!youInList && (
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <span className="font-bold">あなた（{result.brand}）：圏外</span>
+                ー このクエリではAIに認識されていません。上位の競合に割り込むには下の対策が有効です。
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===== 改善アクション ===== */}
+        {result.actions.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <h3 className="text-base font-bold">AIに引用されるための改善アクション</h3>
+            <p className="mt-1 text-xs text-ink-500">優先度の高い順に着手するのがおすすめです。</p>
+            <ol className="mt-4 space-y-3">
+              {result.actions.map((a, i) => (
+                <li key={i} className="rounded-lg border border-slate-100 bg-slate-50 p-4">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`flex-none rounded-full px-2 py-0.5 text-[11px] font-bold ${PRIORITY_STYLE[a.priority]}`}
+                    >
+                      優先度{a.priority}
+                    </span>
+                    <span className="text-sm font-bold text-ink-700">{a.title}</span>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{a.detail}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* ===== 引用要因 + 参照元の内訳 ===== */}
+        {(result.reasons.length > 0 || result.sourceCategories.length > 0) && (
+          <div className="grid gap-6 sm:grid-cols-2">
+            {result.reasons.length > 0 && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+                <h3 className="text-base font-bold">引用される/されない要因</h3>
+                <ul className="mt-3 space-y-2 text-sm text-ink-600">
+                  {result.reasons.map((r, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 flex-none rounded-full bg-brand-400" />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {result.sourceCategories.length > 0 && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+                <h3 className="text-base font-bold">AIが参照した情報源の内訳</h3>
+                <p className="mt-1 text-xs text-ink-500">
+                  AIはこれらの“種類”のページを根拠にしています。ここに自社が載ることが引用への近道です。
+                </p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {result.sourceCategories.map((s, i) => (
+                    <li key={i} className="flex items-center justify-between">
+                      <span className="text-ink-700">{s.type}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-ink-500">
+                        {s.count}件
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===== 参照元の実URL ===== */}
+        {result.sources.length > 0 && (
+          <details className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <summary className="cursor-pointer text-base font-bold">
+              AIが参照した実際のページ（{result.sources.length}件）
+            </summary>
             <ul className="mt-3 space-y-2 text-sm">
               {result.sources.map((s, i) => (
                 <li key={i}>
@@ -146,20 +301,29 @@ export default function AiMentionApp() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-ink-500">
-              ※これらはAIが回答生成時に参照したページです。ここに自社が含まれていない場合、AIに見つけられていない可能性があります。
-            </p>
-          </div>
+          </details>
         )}
 
+        {/* ===== AIの生成回答(折りたたみ) ===== */}
+        <details className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+          <summary className="cursor-pointer text-base font-bold">
+            AIの回答（実際の生成結果）を全文表示
+          </summary>
+          <div className="mt-3 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm leading-relaxed text-ink-700">
+            {result.answer || "（回答を取得できませんでした）"}
+          </div>
+        </details>
+
+        {/* ===== CTA ===== */}
         <div className="rounded-2xl bg-gradient-to-br from-brand-700 to-brand-900 p-6 text-center text-white shadow-card">
           <h3 className="text-lg font-bold sm:text-xl">AIに引用されるサイトへ改善しませんか?</h3>
           <p className="mx-auto mt-2 max-w-xl text-sm text-brand-100">
-            まずは自社サイトのAI検索対応度を無料診断。引用されるための具体的な改善ポイントがわかります。
+            まずは自社サイトのAI検索対応度を無料診断。上の改善アクションを、サイトの構造化データや
+            AIクローラー対応の具体的な設定に落とし込めます。
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <Link href="/" className="rounded-xl bg-white px-6 py-3 text-sm font-bold text-brand-700 hover:bg-brand-50">
-              無料診断をはじめる
+              無料でサイトを診断する
             </Link>
             <a
               href={CONSULT_CTA_URL}
@@ -284,10 +448,10 @@ export default function AiMentionApp() {
           type="submit"
           className="w-full rounded-lg bg-brand-600 px-4 py-3 text-base font-bold text-white shadow-sm transition hover:bg-brand-700"
         >
-          AIに聞いて引用状況をチェック
+          AIに聞いて競合状況をチェック
         </button>
         <p className="text-center text-[11px] text-ink-500">
-          ※実際にAIへ質問し、Web検索を踏まえた回答であなたのブランドが引用されるかを確認します。
+          ※実際にAIへ質問し、Web検索を踏まえた回答から競合シェア・可視性スコア・改善策まで解析します。
         </p>
       </div>
     </form>
