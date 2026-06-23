@@ -1,0 +1,52 @@
+name: Track AI mentions (daily)
+
+# AI引用チェックの追跡対象(過去に診断された ブランド×クエリ)を毎日再診断し、
+# Supabase にスコアのスナップショットを蓄積して「推移グラフ」を作る。
+#
+# 必要な設定:
+#   - リポジトリ Secrets: TRACK_SECRET (本番の環境変数と同じ値)
+#   - 任意の Variables: SITE_URL (未設定なら https://aio-diagnosis.com)
+#   - 本番(Vercel)側に SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / TRACK_SECRET / ANTHROPIC_API_KEY
+# TRACK_SECRET が未設定なら何もせず正常終了する。
+
+on:
+  schedule:
+    - cron: "0 21 * * *" # 06:00 JST (UTC 21:00)
+  workflow_dispatch:
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-run tracked queries
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://aio-diagnosis.com' }}
+          TRACK_SECRET: ${{ secrets.TRACK_SECRET }}
+        run: |
+          set -u
+          if [ -z "${TRACK_SECRET:-}" ]; then
+            echo "TRACK_SECRET 未設定のためスキップします。"
+            exit 0
+          fi
+
+          echo "追跡対象を取得: $SITE_URL/api/track"
+          LIST=$(curl -s --max-time 20 -H "x-track-secret: $TRACK_SECRET" "$SITE_URL/api/track")
+          COUNT=$(echo "$LIST" | jq -r '.queries | length // 0' 2>/dev/null || echo 0)
+          echo "対象 $COUNT 件"
+          if [ "$COUNT" = "0" ]; then
+            echo "追跡対象がありません(まだ誰も診断していない or Supabase未設定)。"
+            exit 0
+          fi
+
+          echo "$LIST" | jq -c '.queries[]?' | while read -r row; do
+            B=$(echo "$row" | jq -r '.brand')
+            Q=$(echo "$row" | jq -r '.query')
+            echo "→ 再診断: $B / $Q"
+            curl -s --max-time 70 -X POST \
+              -H "x-track-secret: $TRACK_SECRET" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg b "$B" --arg q "$Q" '{brand:$b,query:$q}')" \
+              "$SITE_URL/api/track" | jq -c '.' || true
+            sleep 3
+          done
+          echo "完了"

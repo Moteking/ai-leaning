@@ -3,6 +3,7 @@ import { runMentionCheck } from "@/lib/aiMention";
 import { getLeadStore } from "@/lib/db/leadStore";
 import { sendThankYouEmail } from "@/lib/email";
 import { getClientIp, rateLimit } from "@/lib/rateLimit";
+import { recordSnapshot, getHistory } from "@/lib/db/snapshots";
 
 // 外部API(Claude)を呼ぶため Node.js ランタイム
 export const runtime = "nodejs";
@@ -73,7 +74,21 @@ export async function POST(request: Request) {
     }
     // サンクスメール(キー設定時のみ)
     await sendThankYouEmail({ company, email, url: `${brand} / ${query}`, score: 0, grade: "AI引用チェック" }).catch(() => {});
-    return NextResponse.json({ result });
+
+    // 経時追跡: スナップショットを記録し、過去履歴(今回分を含む)を返す
+    await recordSnapshot({
+      brand,
+      query,
+      visibilityScore: result.visibilityScore,
+      mentioned: result.mentioned,
+      rank: result.rank,
+      coverageMentioned: result.coverageMentioned,
+      coverageTotal: result.coverageTotal,
+      source: "user",
+    });
+    const history = await getHistory(brand, query);
+
+    return NextResponse.json({ result, history });
   } catch (err) {
     console.error("[ai-mention] チェック失敗:", err);
     return NextResponse.json(
