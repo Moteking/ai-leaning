@@ -32,12 +32,15 @@ export interface MentionResult {
   mentioned: boolean;
   rank: number | null; // 競合の中での順位(1始まり)。未掲載は null
   visibilityScore: number; // AI可視性スコア 0-100
+  summary: string; // 状況の一言要約(このケース固有)
   answer: string;
   sources: MentionSource[];
   competitors: CompetitorRef[]; // AIに選ばれているブランドのランキング
+  competitorStrength: string; // 上位競合がAIに選ばれている共通の勝因
   sourceCategories: SourceCategory[]; // 参照元の種別内訳
   reasons: string[]; // 引用されない(/されている)理由
   actions: ActionItem[]; // 改善アクション
+  relatedQueries: string[]; // 次に狙う/チェックすべき関連クエリ
   analyzed: boolean; // 競合解析(フェーズ2)が成功したか
 }
 
@@ -63,6 +66,9 @@ const ANALYSIS_SCHEMA = {
     rank: { type: "integer" },
     // AI可視性スコア 0-100
     visibilityScore: { type: "integer" },
+    summary: { type: "string" },
+    competitorStrength: { type: "string" },
+    relatedQueries: { type: "array", items: { type: "string" } },
     competitors: {
       type: "array",
       items: {
@@ -107,6 +113,9 @@ const ANALYSIS_SCHEMA = {
     "mentioned",
     "rank",
     "visibilityScore",
+    "summary",
+    "competitorStrength",
+    "relatedQueries",
     "competitors",
     "sourceCategories",
     "reasons",
@@ -131,12 +140,15 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     mentioned: false,
     rank: null,
     visibilityScore: 0,
+    summary: "",
     answer: "",
     sources: [],
     competitors: [],
+    competitorStrength: "",
     sourceCategories: [],
     reasons: [],
     actions: [],
+    relatedQueries: [],
     analyzed: false,
   };
   if (!apiKey) return base;
@@ -223,12 +235,15 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     mentioned: fallbackMentioned,
     rank: null,
     visibilityScore: fallbackMentioned ? 50 : 10,
+    summary: "",
     answer,
     sources: uniqueSources.slice(0, 10),
     competitors: [],
+    competitorStrength: "",
     sourceCategories: [],
     reasons: [],
     actions: [],
+    relatedQueries: [],
     analyzed: false,
   };
 
@@ -258,6 +273,9 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     `第三者メディア掲載、レビューの有無、コンテンツ量など具体的に)。\n` +
     `7. actions: 「${brand}」がAIに引用されるための改善アクションを優先度付きで3〜5個。` +
     `各 title(短い見出し)、detail(具体的にどうするか1〜2文)、priority(高/中/低)。\n` +
+    `8. summary: この状況の一言要約(1〜2文)。誰が上位を占め、「${brand}」がどの位置かを具体的に。\n` +
+    `9. competitorStrength: 上位の競合がAIに選ばれている共通の勝因(1〜2文)。「${brand}」が何で負けているか分かるように。\n` +
+    `10. relatedQueries: 「${brand}」が次に狙う/チェックすべき関連検索クエリを3〜5個(実際にユーザーが打ちそうな日本語クエリ)。\n` +
     `JSONのみを出力してください。`;
 
   try {
@@ -278,6 +296,9 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
       mentioned?: boolean;
       rank?: number;
       visibilityScore?: number;
+      summary?: string;
+      competitorStrength?: string;
+      relatedQueries?: string[];
       competitors?: CompetitorRef[];
       sourceCategories?: SourceCategory[];
       reasons?: string[];
@@ -287,6 +308,12 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     const rankNum = typeof parsed.rank === "number" ? parsed.rank : 0;
     result.mentioned = Boolean(parsed.mentioned);
     result.rank = rankNum > 0 ? rankNum : null;
+    result.summary = typeof parsed.summary === "string" ? parsed.summary : "";
+    result.competitorStrength =
+      typeof parsed.competitorStrength === "string" ? parsed.competitorStrength : "";
+    result.relatedQueries = Array.isArray(parsed.relatedQueries)
+      ? parsed.relatedQueries.map((q) => String(q)).filter(Boolean).slice(0, 5)
+      : [];
     result.visibilityScore = Math.max(
       0,
       Math.min(100, Math.round(parsed.visibilityScore ?? result.visibilityScore))
