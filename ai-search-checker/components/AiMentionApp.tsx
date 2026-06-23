@@ -31,6 +31,11 @@ interface EngineResult {
   answer: string;
   sources: MentionSource[];
 }
+interface HistoryPoint {
+  date: string;
+  score: number;
+  mentioned: boolean;
+}
 interface MentionResult {
   query: string;
   brand: string;
@@ -132,6 +137,48 @@ function getVerdict(r: MentionResult): Verdict {
   };
 }
 
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+/** AI可視性スコアの推移を描く簡易折れ線グラフ(SVG) */
+function TrendChart({ points }: { points: HistoryPoint[] }) {
+  const W = 600;
+  const H = 130;
+  const P = 14;
+  const n = points.length;
+  const coords = points.map((p, i) => {
+    const x = n === 1 ? W / 2 : P + (i / (n - 1)) * (W - 2 * P);
+    const score = Math.max(0, Math.min(100, p.score));
+    const y = P + (1 - score / 100) * (H - 2 * P);
+    return { x, y, mentioned: p.mentioned };
+  });
+  const path = coords
+    .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
+    .join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="スコア推移グラフ">
+      {[0, 25, 50, 75, 100].map((g) => {
+        const y = P + (1 - g / 100) * (H - 2 * P);
+        return (
+          <g key={g}>
+            <line x1={P} y1={y} x2={W - P} y2={y} stroke="#e2e8f0" strokeWidth={1} />
+            <text x={0} y={y + 3} fontSize={9} fill="#94a3b8">
+              {g}
+            </text>
+          </g>
+        );
+      })}
+      <path d={path} fill="none" stroke="#1d4ed8" strokeWidth={2.5} />
+      {coords.map((c, i) => (
+        <circle key={i} cx={c.x} cy={c.y} r={4} fill={c.mentioned ? "#16a34a" : "#1d4ed8"} />
+      ))}
+    </svg>
+  );
+}
+
 export default function AiMentionApp() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [brand, setBrand] = useState("");
@@ -142,6 +189,7 @@ export default function AiMentionApp() {
   const [website, setWebsite] = useState(""); // honeypot
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<MentionResult | null>(null);
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,6 +226,7 @@ export default function AiMentionApp() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "チェックに失敗しました。");
       setResult(data.result as MentionResult);
+      setHistory(Array.isArray(data.history) ? (data.history as HistoryPoint[]) : []);
       setPhase("result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "チェックに失敗しました。");
@@ -187,6 +236,7 @@ export default function AiMentionApp() {
 
   const reset = () => {
     setResult(null);
+    setHistory([]);
     setPhase("idle");
     setError(null);
   };
@@ -288,6 +338,34 @@ export default function AiMentionApp() {
               <p className="mt-3 text-xs text-ink-400">
                 未設定で比較できなかったAI：{result.unconfiguredEngines.join("・")}
                 （各社APIキーを設定すると横断比較に追加されます）
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ===== AI可視性スコアの推移 ===== */}
+        {history.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold">AI可視性スコアの推移</h3>
+              {history.length >= 2 && (
+                <span className="text-xs text-ink-500">
+                  {fmtDate(history[0].date)} 〜 {fmtDate(history[history.length - 1].date)}
+                </span>
+              )}
+            </div>
+            {history.length >= 2 ? (
+              <>
+                <div className="mt-3">
+                  <TrendChart points={history} />
+                </div>
+                <p className="mt-2 text-xs text-ink-500">
+                  緑の点＝そのAIに掲載されていた日。継続診断・日次自動追跡で線が伸びます。
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-ink-600">
+                📈 追跡を開始しました。同じブランド×クエリで再診断するたびに、ここへ推移が記録されます（日次の自動追跡にも登録済み）。
               </p>
             )}
           </div>
