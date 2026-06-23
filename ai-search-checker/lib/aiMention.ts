@@ -1,4 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { fetchOtherEngines, type EngineResult } from "./aiProviders";
+
+export type { EngineResult } from "./aiProviders";
 
 export interface MentionSource {
   title: string;
@@ -41,6 +44,10 @@ export interface MentionResult {
   reasons: string[]; // 引用されない(/されている)理由
   actions: ActionItem[]; // 改善アクション
   relatedQueries: string[]; // 次に狙う/チェックすべき関連クエリ
+  engines: EngineResult[]; // AI横断比較(Claude + 設定済みの他AI)
+  coverageMentioned: number; // 掲載しているAIの数
+  coverageTotal: number; // 比較したAIの数
+  unconfiguredEngines: string[]; // 未設定で比較できなかったAI名
   analyzed: boolean; // 競合解析(フェーズ2)が成功したか
 }
 
@@ -149,6 +156,10 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     reasons: [],
     actions: [],
     relatedQueries: [],
+    engines: [],
+    coverageMentioned: 0,
+    coverageTotal: 0,
+    unconfiguredEngines: [],
     analyzed: false,
   };
   if (!apiKey) return base;
@@ -175,53 +186,63 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     `実在する具体的なサービス名・店舗名・ブランド名を複数挙げ、それぞれの特徴を簡潔に説明してください。` +
     `最新の情報を踏まえて回答してください。`;
 
-  type Msg = Anthropic.MessageParam;
-  const messages: Msg[] = [{ role: "user", content: userMessage }];
+  // Claudeの回答を web検索付きで取得する
+  async function fetchClaudeAnswer(): Promise<{ answer: string; sources: MentionSource[] }> {
+    type Msg = Anthropic.MessageParam;
+    const messages: Msg[] = [{ role: "user", content: userMessage }];
+    let ans = "";
+    const src: MentionSource[] = [];
 
-  let answer = "";
-  const sources: MentionSource[] = [];
+    // server-tool ループ(pause_turn)に対応
+    for (let i = 0; i < 4; i++) {
+      const res = await client.messages.create({
+        model,
+        max_tokens: 1200,
+        // 検索回数を3回に制限し、時間切れ(60秒)を防ぐ
+        tools: [webSearchTool],
+        messages,
+      });
 
-  // server-tool ループ(pause_turn)に対応
-  for (let i = 0; i < 4; i++) {
-    const res = await client.messages.create({
-      model,
-      max_tokens: 1200,
-      // 検索回数を3回に制限し、時間切れ(60秒)を防ぐ
-      tools: [webSearchTool],
-      messages,
-    });
-
-    for (const block of res.content) {
-      if (block.type === "text") {
-        answer += block.text;
-      } else if (block.type === "web_search_tool_result") {
-        const content = (block as { content?: unknown }).content;
-        if (Array.isArray(content)) {
-          for (const r of content as Array<Record<string, unknown>>) {
-            if (r && r.type === "web_search_result" && typeof r.url === "string") {
-              sources.push({ title: String(r.title ?? r.url), url: String(r.url) });
+      for (const block of res.content) {
+        if (block.type === "text") {
+          ans += block.text;
+        } else if (block.type === "web_search_tool_result") {
+          const content = (block as { content?: unknown }).content;
+          if (Array.isArray(content)) {
+            for (const r of content as Array<Record<string, unknown>>) {
+              if (r && r.type === "web_search_result" && typeof r.url === "string") {
+                src.push({ title: String(r.title ?? r.url), url: String(r.url) });
+              }
             }
           }
         }
       }
+
+      if (res.stop_reason === "pause_turn") {
+        messages.push({ role: "assistant", content: res.content });
+        continue; // サーバーツールの続きを再開
+      }
+      break;
     }
 
-    if (res.stop_reason === "pause_turn") {
-      messages.push({ role: "assistant", content: res.content });
-      continue; // サーバーツールの続きを再開
-    }
-    break;
+    // 参照元は重複URLを除去
+    const seen = new Set<string>();
+    const dedup = src.filter((s) => {
+      if (seen.has(s.url)) return false;
+      seen.add(s.url);
+      return true;
+    });
+    return { answer: ans.trim(), sources: dedup };
   }
 
-  answer = answer.trim();
+  // Claude と 他社AI(ChatGPT/Gemini/Perplexity/Grok) を並列実行して横断比較
+  const [claude, other] = await Promise.all([
+    fetchClaudeAnswer(),
+    fetchOtherEngines(userMessage, brand),
+  ]);
 
-  // 参照元は重複URLを除去
-  const seen = new Set<string>();
-  const uniqueSources = sources.filter((s) => {
-    if (seen.has(s.url)) return false;
-    seen.add(s.url);
-    return true;
-  });
+  const answer = claude.answer;
+  const uniqueSources = claude.sources;
 
   // ブランド/サイトの単純な文字列一致(フェーズ2が失敗したときのフォールバック)
   const brandNorm = normalize(brand);
@@ -244,6 +265,10 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
     reasons: [],
     actions: [],
     relatedQueries: [],
+    engines: [],
+    coverageMentioned: 0,
+    coverageTotal: 0,
+    unconfiguredEngines: other.unconfigured,
     analyzed: false,
   };
 
@@ -347,6 +372,21 @@ export async function runMentionCheck(brand: string, query: string): Promise<Men
   } catch (err) {
     console.error("[ai-mention] 競合解析(フェーズ2)失敗:", err);
   }
+
+  // ===== AI横断カバー率(Claude + 設定済みの他AI) =====
+  const claudeEngine: EngineResult = {
+    id: "claude",
+    label: "Claude",
+    configured: true,
+    ok: true,
+    mentioned: result.mentioned, // フェーズ2の意味的判定に揃える
+    answer: claude.answer,
+    sources: claude.sources.slice(0, 8),
+  };
+  const engines: EngineResult[] = [claudeEngine, ...other.engines];
+  result.engines = engines;
+  result.coverageTotal = engines.filter((e) => e.ok).length;
+  result.coverageMentioned = engines.filter((e) => e.ok && e.mentioned).length;
 
   return result;
 }

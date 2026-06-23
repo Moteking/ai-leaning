@@ -22,6 +22,15 @@ interface ActionItem {
   detail: string;
   priority: "高" | "中" | "低";
 }
+interface EngineResult {
+  id: string;
+  label: string;
+  configured: boolean;
+  ok: boolean;
+  mentioned: boolean;
+  answer: string;
+  sources: MentionSource[];
+}
 interface MentionResult {
   query: string;
   brand: string;
@@ -37,6 +46,10 @@ interface MentionResult {
   reasons: string[];
   actions: ActionItem[];
   relatedQueries: string[];
+  engines: EngineResult[];
+  coverageMentioned: number;
+  coverageTotal: number;
+  unconfiguredEngines: string[];
   analyzed: boolean;
 }
 
@@ -224,6 +237,61 @@ export default function AiMentionApp() {
             </div>
           </div>
         </div>
+
+        {/* ===== AI横断カバー率 ===== */}
+        {result.engines.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold">AI横断カバー率</h3>
+              <span className="text-sm font-bold">
+                <span className="text-brand-700">{result.coverageMentioned}</span>
+                <span className="text-ink-400"> / {result.coverageTotal} AIで掲載</span>
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-ink-500">
+              主要AIに同じ質問をして、あなたのブランドが回答に登場したかを横断比較しました。
+            </p>
+            <ul className="mt-4 space-y-2">
+              {result.engines.map((e, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-3 rounded-lg border border-slate-100 px-3 py-2"
+                >
+                  <span className="w-24 flex-none text-sm font-semibold text-ink-700">{e.label}</span>
+                  {e.ok ? (
+                    e.mentioned ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
+                        ✓ 掲載
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">
+                        ✗ 未掲載
+                      </span>
+                    )
+                  ) : (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+                      取得できず
+                    </span>
+                  )}
+                  {e.ok && e.answer && (
+                    <details className="ml-auto min-w-0 text-xs text-brand-700">
+                      <summary className="cursor-pointer">回答を見る</summary>
+                      <div className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-slate-50 p-2 text-ink-600">
+                        {e.answer}
+                      </div>
+                    </details>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {result.unconfiguredEngines.length > 0 && (
+              <p className="mt-3 text-xs text-ink-400">
+                未設定で比較できなかったAI：{result.unconfiguredEngines.join("・")}
+                （各社APIキーを設定すると横断比較に追加されます）
+              </p>
+            )}
+          </div>
+        )}
 
         {/* ===== 分析サマリー ===== */}
         {result.summary && (
