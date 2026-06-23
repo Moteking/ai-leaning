@@ -28,12 +28,15 @@ interface MentionResult {
   mentioned: boolean;
   rank: number | null;
   visibilityScore: number;
+  summary: string;
   answer: string;
   sources: MentionSource[];
   competitors: CompetitorRef[];
+  competitorStrength: string;
   sourceCategories: SourceCategory[];
   reasons: string[];
   actions: ActionItem[];
+  relatedQueries: string[];
   analyzed: boolean;
 }
 
@@ -222,6 +225,19 @@ export default function AiMentionApp() {
           </div>
         </div>
 
+        {/* ===== 分析サマリー ===== */}
+        {result.summary && (
+          <div className="rounded-2xl border border-brand-200 bg-brand-50/60 p-5 shadow-card">
+            <div className="flex gap-3">
+              <span className="text-xl leading-none">🧭</span>
+              <div>
+                <h3 className="text-sm font-bold text-brand-800">分析サマリー</h3>
+                <p className="mt-1 text-sm leading-relaxed text-ink-700">{result.summary}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ===== 競合シェア(誰がAIに選ばれているか) ===== */}
         {result.competitors.length > 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
@@ -265,6 +281,12 @@ export default function AiMentionApp() {
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 <span className="font-bold">あなた（{result.brand}）：圏外</span>
                 ー このクエリではAIに認識されていません。上位の競合に割り込むには下の対策が有効です。
+              </div>
+            )}
+            {result.competitorStrength && (
+              <div className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-ink-600">
+                <span className="font-bold text-ink-700">競合の勝因：</span>
+                {result.competitorStrength}
               </div>
             )}
           </div>
@@ -362,6 +384,36 @@ export default function AiMentionApp() {
             {result.answer || "（回答を取得できませんでした）"}
           </div>
         </details>
+
+        {/* ===== 次に狙う関連クエリ ===== */}
+        {result.relatedQueries.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <h3 className="text-base font-bold">次にチェックすべき関連クエリ</h3>
+            <p className="mt-1 text-xs text-ink-500">
+              クリックすると、そのクエリで続けて診断できます（会社名・メールは保持されます）。
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {result.relatedQueries.map((q, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setQuery(q);
+                    setResult(null);
+                    setError(null);
+                    setPhase("idle");
+                    if (typeof window !== "undefined") {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                  className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700 transition hover:bg-brand-100"
+                >
+                  🔎 {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ===== CTA ===== */}
         <div className="rounded-2xl bg-gradient-to-br from-brand-700 to-brand-900 p-6 text-center text-white shadow-card">
