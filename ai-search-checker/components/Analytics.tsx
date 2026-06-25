@@ -20,14 +20,19 @@ export default function Analytics() {
   useEffect(() => {
     if (!GA_MEASUREMENT_ID) return;
     const stored = window.localStorage.getItem(CONSENT_KEY);
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (stored === "granted" || stored === "denied") {
       setConsent(stored);
     } else {
-      setShowBanner(true);
+      // ファーストビューを邪魔しないよう、同意バナーは少し遅らせて表示する
+      timer = setTimeout(() => setShowBanner(true), 6000);
     }
     const open = () => setShowBanner(true);
     window.addEventListener("aio:open-consent", open);
-    return () => window.removeEventListener("aio:open-consent", open);
+    return () => {
+      window.removeEventListener("aio:open-consent", open);
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const choose = (value: "granted" | "denied") => {

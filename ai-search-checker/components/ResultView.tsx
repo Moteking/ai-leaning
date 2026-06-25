@@ -14,11 +14,13 @@ interface ResultViewProps {
   results: DiagnosisResult[];
   notices?: string[];
   onReset: () => void;
+  /** サンプル(デモ)表示か。trueなら詳細レポートを最初から開示しリード入力を省く。 */
+  demo?: boolean;
 }
 
 /** 診断結果の表示。複数ページはタブで切替。サマリー → リードフォーム → 詳細レポートの順に開示する。 */
-export default function ResultView({ results, notices = [], onReset }: ResultViewProps) {
-  const [unlocked, setUnlocked] = useState(false);
+export default function ResultView({ results, notices = [], onReset, demo = false }: ResultViewProps) {
+  const [unlocked, setUnlocked] = useState(demo);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const active = results[activeIndex] ?? results[0];
@@ -32,17 +34,32 @@ export default function ResultView({ results, notices = [], onReset }: ResultVie
 
   return (
     <div className="space-y-6">
+      {/* サンプル表示時の案内バナー */}
+      {demo && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold text-brand-800">
+            これは「サンプル」の診断結果です。あなたのECサイトの実際のスコアを30秒で無料診断できます。
+          </p>
+          <button
+            onClick={onReset}
+            className="shrink-0 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700"
+          >
+            自分のサイトを無料診断する
+          </button>
+        </div>
+      )}
+
       {/* 診断対象 */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-ink-500">
-          <span className="font-semibold text-ink-700">診断対象：</span>
+          <span className="font-semibold text-ink-700">{demo ? "サンプル対象：" : "診断対象："}</span>
           <span className="break-all">{active.finalUrl}</span>
         </div>
         <button
           onClick={onReset}
           className="self-start rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-slate-50"
         >
-          別のURLを診断する
+          {demo ? "自分のURLを診断する" : "別のURLを診断する"}
         </button>
       </div>
 
