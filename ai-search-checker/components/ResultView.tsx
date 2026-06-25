@@ -8,6 +8,7 @@ import CategoryCard from "./CategoryCard";
 import LeadForm from "./LeadForm";
 import ShareButtons from "./ShareButtons";
 import { CONSULT_CTA_URL } from "@/lib/config";
+import { trackEvent } from "@/lib/analytics";
 
 interface ResultViewProps {
   results: DiagnosisResult[];
@@ -170,6 +171,7 @@ export default function ResultView({ results, notices = [], onReset }: ResultVie
               href={CONSULT_CTA_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("consult_cta_click", { score: primary.totalScore })}
               className="mt-6 inline-block rounded-xl bg-white px-8 py-3.5 text-base font-bold text-brand-700 shadow-sm transition hover:bg-brand-50"
             >
               専門家による無料相談を申し込む

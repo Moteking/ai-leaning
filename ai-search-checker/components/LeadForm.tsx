@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
 interface LeadFormProps {
   url: string;
@@ -48,6 +49,7 @@ export default function LeadForm({ url, score, grade, onUnlock }: LeadFormProps)
       if (!res.ok) {
         throw new Error(data.error || "送信に失敗しました。");
       }
+      trackEvent("lead_submit", { score });
       onUnlock();
     } catch (err) {
       setError(err instanceof Error ? err.message : "送信に失敗しました。");
