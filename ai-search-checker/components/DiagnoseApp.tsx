@@ -5,6 +5,9 @@ import type { DiagnosisResult } from "@/lib/diagnose/types";
 import ProgressView from "./ProgressView";
 import ResultView from "./ResultView";
 import { trackEvent } from "@/lib/analytics";
+import { SAMPLE_RESULT } from "@/lib/diagnose/sample";
+
+const TRUST_POINTS = ["URLを入れるだけ", "約30秒で結果", "完全無料", "会員登録不要"];
 
 type Phase = "idle" | "loading" | "result";
 
@@ -23,6 +26,7 @@ export default function DiagnoseApp() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<DiagnosisResult[]>([]);
   const [notices, setNotices] = useState<string[]>([]);
+  const [demo, setDemo] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,9 +63,20 @@ export default function DiagnoseApp() {
     }
   };
 
+  // 入力不要のサンプル結果を表示(冷たい流入向けの摩擦低減)
+  const handleDemo = () => {
+    trackEvent("demo_view");
+    setResults([SAMPLE_RESULT]);
+    setNotices([]);
+    setDemo(true);
+    setPhase("result");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleReset = () => {
     setResults([]);
     setNotices([]);
+    setDemo(false);
     setPhase("idle");
     setError(null);
   };
@@ -84,6 +99,18 @@ export default function DiagnoseApp() {
               URLを入力するだけで、AI検索と通常検索への対応度を100点満点で無料診断。
               構造化データ・AIクローラー対応・SEOを総合チェックし、具体的な改善アドバイスをお届けします。
             </p>
+            {/* 信頼要素(無名ブランドへの不安を下げる) */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              {TRUST_POINTS.map((t) => (
+                <span
+                  key={t}
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-ink-700"
+                >
+                  <span className="text-brand-600">✓</span>
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* 入力フォーム */}
@@ -148,6 +175,18 @@ export default function DiagnoseApp() {
             <p className="mt-3 text-xs text-ink-500">
               ※ 会員登録不要・無料。指定ページのHTMLを解析します。
             </p>
+
+            {/* 入力前にサンプルで結果イメージを見せる(摩擦低減) */}
+            <div className="mt-4 border-t border-slate-100 pt-4 text-center">
+              <p className="text-xs text-ink-500">どんな結果が出るか先に見たい方は</p>
+              <button
+                type="button"
+                onClick={handleDemo}
+                className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700 transition hover:bg-brand-100"
+              >
+                🔍 サンプル診断結果を見る（入力不要）
+              </button>
+            </div>
           </form>
 
           {/* 診断内容の紹介 */}
@@ -165,7 +204,7 @@ export default function DiagnoseApp() {
       {phase === "loading" && <ProgressView />}
 
       {phase === "result" && results.length > 0 && (
-        <ResultView results={results} notices={notices} onReset={handleReset} />
+        <ResultView results={results} notices={notices} onReset={handleReset} demo={demo} />
       )}
     </div>
   );
