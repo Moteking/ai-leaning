@@ -27,7 +27,7 @@ export default function BlogArticle({ params }: { params: { slug: string } }) {
   const post = getPost(params.slug);
   if (!post) notFound();
 
-  // Article + FAQPage の構造化データ(このメディア自身もAIOを実践)
+  // Article + FAQPage + BreadcrumbList の構造化データ(このメディア自身もAIOを実践)
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -39,8 +39,26 @@ export default function BlogArticle({ params }: { params: { slug: string } }) {
         dateModified: post.date,
         inLanguage: "ja",
         mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+        image: `${SITE_URL}/opengraph-image`,
         author: { "@type": "Organization", name: "株式会社KAAAY" },
-        publisher: { "@type": "Organization", name: "株式会社KAAAY" },
+        publisher: {
+          "@type": "Organization",
+          name: "株式会社KAAAY",
+          logo: { "@type": "ImageObject", url: `${SITE_URL}/icon`, width: 32, height: 32 },
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ホーム", item: SITE_URL },
+          { "@type": "ListItem", position: 2, name: "AIOメディア", item: `${SITE_URL}/blog` },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: `${SITE_URL}/blog/${post.slug}`,
+          },
+        ],
       },
       ...(post.faq.length > 0
         ? [
