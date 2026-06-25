@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { DiagnosisResult } from "@/lib/diagnose/types";
 import ProgressView from "./ProgressView";
 import ResultView from "./ResultView";
+import { trackEvent } from "@/lib/analytics";
 
 type Phase = "idle" | "loading" | "result";
 
@@ -31,6 +32,7 @@ export default function DiagnoseApp() {
       return;
     }
     setPhase("loading");
+    trackEvent("diagnose_submit");
     try {
       const res = await fetch("/api/diagnose", {
         method: "POST",
@@ -44,8 +46,10 @@ export default function DiagnoseApp() {
       if (!res.ok) {
         throw new Error(data.error || "診断に失敗しました。");
       }
-      setResults((data.results ?? []) as DiagnosisResult[]);
+      const list = (data.results ?? []) as DiagnosisResult[];
+      setResults(list);
       setNotices((data.notices ?? []) as string[]);
+      trackEvent("diagnose_complete", { score: list[0]?.totalScore ?? 0 });
       setPhase("result");
       // 結果表示位置へスクロール
       window.scrollTo({ top: 0, behavior: "smooth" });
