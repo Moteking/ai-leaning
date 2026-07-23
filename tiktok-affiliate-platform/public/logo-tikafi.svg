@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fe2c55"/>
+      <stop offset="50%" stop-color="#ff0050"/>
+      <stop offset="100%" stop-color="#25f4ee"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#25f4ee"/>
+      <stop offset="100%" stop-color="#69f7f2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+
+  <!-- Inner shadow/glow effect -->
+  <rect x="40" y="40" width="944" height="944" rx="190" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="2"/>
+
+  <!-- "T" letter stylized like TikTok note -->
+  <g transform="translate(512, 340)">
+    <!-- Main T vertical bar -->
+    <rect x="-45" y="-80" width="90" height="380" rx="45" fill="white"/>
+    <!-- T horizontal bar -->
+    <rect x="-180" y="-80" width="360" height="90" rx="45" fill="white"/>
+    <!-- Accent circle (like TikTok music note) -->
+    <circle cx="0" cy="340" r="65" fill="url(#accent)"/>
+    <!-- Small decorative dot -->
+    <circle cx="140" cy="-35" r="25" fill="#25f4ee" opacity="0.8"/>
+  </g>
+
+  <!-- "TikAfi" text -->
+  <text x="512" y="820" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="130" fill="white" letter-spacing="8">
+    <tspan>Tik</tspan><tspan fill="#25f4ee">Afi</tspan>
+  </text>
+</svg>
